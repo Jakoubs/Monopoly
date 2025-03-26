@@ -1,3 +1,4 @@
+import javax.swing.text.Position
 import scala.util.Random;
 
 case class House(
@@ -31,7 +32,21 @@ case class Player(
                    position: Int = 0,
                    isInJail: Boolean = false,
                    properties: List[PropertyField] = List()
-                 )
+                 ) {
+  def moveToIndex(newPos: Int): Player = {
+    copy(position = newPos)
+  }
+  def getIsInJail(): Boolean = {
+    isInJail
+  }
+  def goToJail(): Player = {
+    copy(position = 11)
+  }
+  def playerMove(rollcount: Int = 0): Unit = {
+    val(diceA, diceB) = rollDice()
+    moveToIndex(diceA + diceB)
+  }
+}
 sealed trait CardAction
 case class GainMoney(amount: Int) extends CardAction
 case class LoseMoney(amount: Int) extends CardAction
@@ -66,10 +81,14 @@ val game: MonopolyGame = MonopolyGame(
   board = defaultBoard
 )
 
-def rollDice(): Int = {
+def rollDice(): (Int, Int) = {
   val a =   Random.nextInt(6) + 1
   val b =   Random.nextInt(6) + 1
-  println(s"Du hast ${a} und ${b} gewürfelt! Das sind ${a + b} Züge.")
-  a + b
+  println(s"Du hast $a und $b gewürfelt! Das sind ${a + b} Züge.")
+  (a, b)
 }
+
+val P1 = Player("KP", 1500,  5, false)
+P1.moveToIndex(200)
+
 
