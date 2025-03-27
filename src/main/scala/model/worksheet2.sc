@@ -41,7 +41,7 @@ case class Player(
                    properties: List[PropertyField] = List()
                  ) {
   def moveToIndex(newPos: Int): Player = {
-    copy(position = newPos)
+    copy(sposition = position + newPos)
   }
   def getIsInJail: Boolean = {
     isInJail
@@ -66,7 +66,9 @@ case class Player(
 }
 
 sealed trait CardAction
-case class GainMoney(amount: Int, player: Player) extends CardAction
+case class GainMoney(amount: Int, player: Player) extends CardAction {
+  val updatedPlayer = player.copy(balance = player.balance + amount)
+}
 case class LoseMoney(amount: Int) extends CardAction
 case class GoToJail(destination: Int) extends CardAction
 case class MoveToIndex(index: Int) extends CardAction
