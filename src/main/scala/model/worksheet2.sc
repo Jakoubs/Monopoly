@@ -49,19 +49,21 @@ case class Player(
   def goToJail(): Player = {
     copy(position = 11, isInJail = true)
   }
-  def playerMove(rollcount: Int = 1): Unit = {
+  def playerMove(rollcount: Int = 1): Player = {
     if (rollcount == 3) {
       println("Du hast 3x ein Pasch gehabt -> Jail :(")
-      goToJail()
+      return goToJail()
     }
     if(!isInJail){
       val (diceA, diceB) = rollDice()
-      moveToIndex(diceA + diceB)
+      val updatePlayer = moveToIndex(diceA + diceB)
       //playerAction() -> Noch Implimentieren
       if(diceA == diceB) {
-        playerMove(rollcount + 1)
+        return updatePlayer.playerMove(rollcount + 1)
       }
+      return updatePlayer
     }
+    this
   }
 }
 
@@ -104,24 +106,10 @@ val game: MonopolyGame = MonopolyGame(
 
 
 val P1 = Player("KP", 1500,  5)
-P1.playerMove()
 P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
-P1.playerMove()
-P1.position
+val P2 = P1.playerMove()
+P2.position
+
 GainMoney(amount = 100, player = P1)
 
 
