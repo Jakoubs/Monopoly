@@ -41,7 +41,7 @@ case class Player(
                    properties: List[PropertyField] = List()
                  ) {
   def moveToIndex(newPos: Int): Player = {
-    copy(sposition = position + newPos)
+    copy(position = position + newPos)
   }
   def getIsInJail: Boolean = {
     isInJail
