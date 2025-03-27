@@ -25,6 +25,13 @@ case class FreeParkingField(amount: Int) extends BoardField
 case object ChanceField extends BoardField
 case object CommunityChestField extends BoardField
 
+def rollDice(): (Int, Int) = {
+  val a =   Random.nextInt(6) + 1
+  val b =   Random.nextInt(6) + 1
+  println(s"Du hast $a und $b gewürfelt! Das sind ${a + b} Züge.")
+  (a, b)
+}
+
 // Ein Spieler im Monopoly
 case class Player(
                    name: String,
@@ -36,15 +43,27 @@ case class Player(
   def moveToIndex(newPos: Int): Player = {
     copy(position = newPos)
   }
-  def getIsInJail(): Boolean = {
+  def getIsInJail: Boolean = {
     isInJail
   }
   def goToJail(): Player = {
-    copy(position = 11)
+    copy(position = 11, isInJail = true)
   }
-  def playerMove(rollcount: Int = 0): Unit = {
-    val(diceA, diceB) = rollDice()
-    moveToIndex(diceA + diceB)
+  def playerMove(rollcount: Int = 1): Unit = {
+    if (rollcount == 3) {
+      println("Du hast 3x ein Pasch gehabt -> Jail :(")
+      goToJail()
+    }
+    if(!isInJail){
+      val (diceA, diceB) = rollDice()
+      moveToIndex(diceA + diceB)
+      //playerAction() -> Noch Implimentieren
+      if(diceA == diceB) {
+        playerMove(rollcount + 1)
+      }
+    }
+
+
   }
 }
 sealed trait CardAction
@@ -81,14 +100,27 @@ val game: MonopolyGame = MonopolyGame(
   board = defaultBoard
 )
 
-def rollDice(): (Int, Int) = {
-  val a =   Random.nextInt(6) + 1
-  val b =   Random.nextInt(6) + 1
-  println(s"Du hast $a und $b gewürfelt! Das sind ${a + b} Züge.")
-  (a, b)
-}
 
-val P1 = Player("KP", 1500,  5, false)
-P1.moveToIndex(200)
+
+val P1 = Player("KP", 1500,  5)
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+P1.playerMove()
+P1.position
+
 
 
