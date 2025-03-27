@@ -62,12 +62,11 @@ case class Player(
         playerMove(rollcount + 1)
       }
     }
-
-
   }
 }
+
 sealed trait CardAction
-case class GainMoney(amount: Int) extends CardAction
+case class GainMoney(amount: Int, player: Player) extends CardAction
 case class LoseMoney(amount: Int) extends CardAction
 case class GoToJail(destination: Int) extends CardAction
 case class MoveToIndex(index: Int) extends CardAction
@@ -121,6 +120,7 @@ P1.playerMove()
 P1.position
 P1.playerMove()
 P1.position
+GainMoney(amount = 100, player = P1)
 
 
 
