@@ -1,5 +1,4 @@
-import javax.swing.text.Position
-import scala.util.Random;
+import scala.util.Random
 
 case class House(
                   price: Int,
@@ -73,6 +72,17 @@ case class Player(
     this
   }
 }
+sealed trait Card  {
+  def name: String
+  def discription: String
+}
+case class MoneyCard(name: String, discription: String, amount: Int) extends Card {
+}
+case class MoveCard(name: String, discription: String, index: Int) extends Card {
+}
+case class PenaltyCard(name: String, discription: String) extends Card {
+}
+
 
 sealed trait CardAction
 case class GainMoney(amount: Int) extends CardAction {
