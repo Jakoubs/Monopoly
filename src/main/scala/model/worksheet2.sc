@@ -68,8 +68,10 @@ case class Player(
 }
 
 sealed trait CardAction
-case class GainMoney(amount: Int, player: Player) extends CardAction {
-  val updatedPlayer = player.copy(balance = player.balance + amount)
+case class GainMoney(amount: Int) extends CardAction {
+  def apply(player: Player): Player = {
+    player.copy(balance = player.balance + amount)
+  }
 }
 case class LoseMoney(amount: Int) extends CardAction
 case class GoToJail(destination: Int) extends CardAction
@@ -110,7 +112,7 @@ P1.position
 val P2 = P1.playerMove()
 P2.position
 
-GainMoney(amount = 100, player = P1)
-
+val P3 = GainMoney(amount = 100).apply(player = P1)
+P3.balance
 
 
