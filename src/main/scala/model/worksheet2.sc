@@ -14,7 +14,6 @@ case class Mortgage(
 enum Color:
   case Brown, LightBlue, Pink, Orange, Red, Yellow, Green, DarkBlue
 
-// Ein Monopoly-Feld
 sealed trait BoardField
 case class PropertyField(name: String, price: Int, rent: Int, /*owner: Option[Player] = None,*/ color: Color, mortgage: Mortgage, house: Option[House] = None) extends BoardField
 case object GoField extends BoardField // "Los"-Feld
@@ -28,7 +27,7 @@ case object CommunityChestField extends BoardField
 def rollDice(): (Int, Int) = {
   val a =   Random.nextInt(6) + 1
   val b =   Random.nextInt(6) + 1
-  println(s"Du hast $a und $b gewürfelt! Das sind ${a + b} Züge.")
+  println(s"You rolled $a and $b! That's ${a + b} moves.")
   (a, b)
 }
 
@@ -41,7 +40,10 @@ case class Player(
                    properties: List[PropertyField] = List()
                  ) {
   def moveToIndex(newPos: Int): Player = {
-    copy(position = position + newPos)
+    if(!isInJail) {
+      copy(position = position + newPos)
+    }
+    this
   }
   def getIsInJail: Boolean = {
     isInJail
@@ -51,7 +53,7 @@ case class Player(
   }
   def playerMove(rollcount: Int = 1): Player = {
     if (rollcount == 3) {
-      println("Du hast 3x ein Pasch gehabt -> Jail :(")
+      println("You rolled doubles 3 times -> Jail :(")
       return goToJail()
     }
     if(!isInJail){
@@ -73,14 +75,25 @@ case class GainMoney(amount: Int) extends CardAction {
     player.copy(balance = player.balance + amount)
   }
 }
-case class LoseMoney(amount: Int) extends CardAction
-case class GoToJail(destination: Int) extends CardAction
-case class MoveToIndex(index: Int) extends CardAction
+case class LoseMoney(amount: Int) extends CardAction {
+  def apply(player: Player): Player = {
+    player.copy(balance = player.balance - amount)
+  }
+}
+case object CardToJail extends CardAction {
+  def apply(player: Player): Player = {
+    player.goToJail()
+  }
+}
+case class CardMoveTo(index: Int) extends CardAction {
+  def apply(player: Player): Player = {
+    player.moveToIndex(index)
+  }
+}
 
-// Das Monopoly-Spielbrett
+
 case class Board(fields: Vector[BoardField])
 
-// Monopoly-Spiel-Zustand
 case class MonopolyGame(
                          players: Vector[Player],
                          board: Board,
@@ -114,5 +127,8 @@ P2.position
 
 val P3 = GainMoney(amount = 100).apply(player = P1)
 P3.balance
-
-
+val P4 = LoseMoney(amount = 100).apply(player = P3)
+P4.balance
+val P5 = CardToJail.apply(P4)
+P5.position
+val P6 = CardMoveTo(index = 10).apply(P5)
