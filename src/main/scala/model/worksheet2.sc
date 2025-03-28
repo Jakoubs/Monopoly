@@ -15,7 +15,7 @@ enum Color:
   case Brown, LightBlue, Pink, Orange, Red, Yellow, Green, DarkBlue
 
 sealed trait BoardField
-case class PropertyField(name: String, price: Int, rent: Int, /*owner: Option[Player] = None,*/ color: Color, mortgage: Mortgage, house: Option[House] = None) extends BoardField
+case class PropertyField(name: String, price: Int, rent: Int, owner: Option[String] = None, color: Color, mortgage: Mortgage, house: Option[House] = None) extends BoardField
 case object GoField extends BoardField // "Los"-Feld
 case object JailField extends BoardField
 case object VisitField extends BoardField
