@@ -45,6 +45,11 @@ case class Player(
     }
     this
   }
+
+  def releaseFromJail(): Player = {
+    copy(isInJail = false)
+  }
+
   def getIsInJail: Boolean = {
     isInJail
   }
@@ -132,3 +137,5 @@ P4.balance
 val P5 = CardToJail.apply(P4)
 P5.position
 val P6 = CardMoveTo(index = 10).apply(P5)
+val P7 = P6.releaseFromJail()
+P7.isInJail
