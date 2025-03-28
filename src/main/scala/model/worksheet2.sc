@@ -75,12 +75,21 @@ case class Player(
 sealed trait Card  {
   def name: String
   def discription: String
+  def action: CardAction
 }
 case class MoneyCard(name: String, discription: String, amount: Int) extends Card {
+  override def action: CardAction = GainMoney(amount)
 }
 case class MoveCard(name: String, discription: String, index: Int) extends Card {
+  override def action: CardAction = CardMoveTo(index)
 }
-case class PenaltyCard(name: String, discription: String) extends Card {
+case class PenaltyCard(name: String, discription: String, amount: Int) extends Card {
+  override def action: CardAction = LoseMoney(amount)
+
+}
+case class JailCard(name: String, discription: String) extends Card {
+  override def action: CardAction = CardToJail
+
 }
 
 
