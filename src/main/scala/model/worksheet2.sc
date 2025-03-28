@@ -72,26 +72,6 @@ case class Player(
     this
   }
 }
-sealed trait Card  {
-  def name: String
-  def discription: String
-  def action: CardAction
-}
-case class MoneyCard(name: String, discription: String, amount: Int) extends Card {
-  override def action: CardAction = GainMoney(amount)
-}
-case class MoveCard(name: String, discription: String, index: Int) extends Card {
-  override def action: CardAction = CardMoveTo(index)
-}
-case class PenaltyCard(name: String, discription: String, amount: Int) extends Card {
-  override def action: CardAction = LoseMoney(amount)
-
-}
-case class JailCard(name: String, discription: String) extends Card {
-  override def action: CardAction = CardToJail
-
-}
-
 
 sealed trait CardAction
 case class GainMoney(amount: Int) extends CardAction {
@@ -115,6 +95,25 @@ case class CardMoveTo(index: Int) extends CardAction {
   }
 }
 
+sealed trait Card  {
+  def name: String
+  def discription: String
+  def action: CardAction
+}
+case class MoneyCard(name: String, discription: String, amount: Int) extends Card {
+  override def action: CardAction = GainMoney(amount)
+}
+case class MoveCard(name: String, discription: String, index: Int) extends Card {
+  override def action: CardAction = CardMoveTo(index)
+}
+case class PenaltyCard(name: String, discription: String, amount: Int) extends Card {
+  override def action: CardAction = LoseMoney(amount)
+
+}
+case class JailCard(name: String, discription: String) extends Card {
+  override def action: CardAction = CardToJail
+
+}
 
 case class Board(fields: Vector[BoardField])
 
