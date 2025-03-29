@@ -100,7 +100,7 @@ sealed trait Card  {
   def discription: String
   def action: CardAction
 }
-case class MoneyCard(name: String, discription: String, amount: Int) extends Card {
+case class MoneyCard(name: String, discription: String, amount: Int,   effect: MonopolyGame => Unit = _ => {} ) extends Card {
   override def action: CardAction = GainMoney(amount)
 }
 case class MoveCard(name: String, discription: String, index: Int) extends Card {
@@ -120,7 +120,7 @@ case class Board(fields: Vector[BoardField])
 case class MonopolyGame(
                          players: Vector[Player],
                          board: Board,
-                         currentPlayerIndex: Int = 0
+                         currentPlayer: Player
                        )
 
 val defaultBoard: Board = Board(Vector(
@@ -132,18 +132,18 @@ val defaultBoard: Board = Board(Vector(
   CommunityChestField(communityCardList = List()),
   ChanceField,
 ))
-
+val P1 = Player("KP", 1500,  5)
 val game: MonopolyGame = MonopolyGame(
   players = Vector(
+    P1,
     Player("Alice", 1500, 5),
     Player("Bob", 1500)
   ),
-  board = defaultBoard
+  board = defaultBoard, P1
 )
 
 
 
-val P1 = Player("KP", 1500,  5)
 P1.position
 val P2 = P1.playerMove()
 P2.position
@@ -159,9 +159,17 @@ val P7 = P6.releaseFromJail()
 P7.isInJail
 
 val communityChestField1 = CommunityChestField(
-  communityCardList = (
-    List(MoneyCard("Its your Birthday", "It is your birthday. Collect $10 from every player", (
-      (game.players.length-1)*10)))
+  communityCardList = 
+    List(MoneyCard("Its your Birthday", "It is your birthday. Collect $10 from every player", 
+      (game.players.length-1)*10, effect = (game: MonopolyGame) => {
+      val currentPlayer = game.currentPlayer
+      val otherPlayers = game.players.filter(_ != currentPlayer)
+      currentPlayer.balance
+      otherPlayers.foreach { player =>
+        1+1
+        //player.balance = player.balance - 10
+      }
+    }
+      )
   )
-):  {
-}
+)
