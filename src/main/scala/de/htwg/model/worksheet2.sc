@@ -21,7 +21,7 @@ case object VisitField extends BoardField
 case class GoToJailField(destination: Int) extends BoardField
 case class FreeParkingField(amount: Int) extends BoardField
 case object ChanceField extends BoardField
-case object CommunityChestField extends BoardField
+case class CommunityChestField(communityCardList: List[Card]) extends BoardField
 
 def rollDice(): (Int, Int) = {
   val a =   Random.nextInt(6) + 1
@@ -129,7 +129,7 @@ val defaultBoard: Board = Board(Vector(
   PropertyField("Baltic Avenue", price = 60, rent = 4, color = Color.Brown, mortgage = Mortgage(price = 10, active = false)),
   JailField,
   FreeParkingField(amount = 30),
-  CommunityChestField,
+  CommunityChestField(communityCardList = List()),
   ChanceField,
 ))
 
@@ -157,3 +157,11 @@ P5.position
 val P6 = CardMoveTo(index = 10).apply(P5)
 val P7 = P6.releaseFromJail()
 P7.isInJail
+
+val communityChestField1 = CommunityChestField(
+  communityCardList = (
+    List(MoneyCard("Its your Birthday", "It is your birthday. Collect $10 from every player", (
+      (game.players.length-1)*10)))
+  )
+):  {
+}
