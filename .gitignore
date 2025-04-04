@@ -10,6 +10,7 @@
 
 # scala 3
 .tasty
+.bsp
 
 # mac
 .DS_Store
