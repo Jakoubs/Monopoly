@@ -1,5 +1,4 @@
 # Monopoly with Scala
-
 Welcome to the Monopoly project! This is a Scala implementation of the game Monopoly.
 
 ## Contents
