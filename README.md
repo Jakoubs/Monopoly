@@ -1,5 +1,6 @@
 # Monopoly
 ![Monopoly Logo](./images/MonopolyLogo.png)
+---
 Welcome to the Monopoly project. This is a Scala implementation of the classic board game Monopoly.
 
 ## Contents
