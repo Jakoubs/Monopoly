@@ -41,6 +41,7 @@ To start the game, simply run the main class:
 ```sh
 sbt run
 
+```
 ---
 ![Monopoly Logo](./images/MonopolyLogo.png)
 ---
