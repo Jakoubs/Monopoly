@@ -1,22 +1,22 @@
-package de.htwg.se.tictactoe
+package de.htwg.model
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers._
 class DiceTest extends AnyWordSpec {
   "Dice" should {
-    "a dice should be in range 1-6" in {
-      bar() should be("+---+---+---+" + eol)
+    "be in range 1-6" in {
+      val (d1, d2) = Dice().rollDice()
+      d1 should (be >= 1 and be <= 6)
+      d2 should (be >= 1 and be <= 6)
     }
-    "have a scalable bar" in {
-      bar(1, 1) should be("+-+" + eol)
-      bar(1, 2) should be("+-+-+" + eol)
-      bar(2, 1) should be("+--+" + eol)
+    " return the params if added" in {
+      val (d1, d2) = Dice().rollDice(1, 5)
+      d1 should (be(1) and be >= 1 and be <= 6)
+      d2 should (be(5) and be >= 1 and be <= 6)
     }
-    "have cells as String of form '|   |   |   |'" in {
-      cells() should be("|   |   |   |" + eol)
-    }
-    "have scalable cells" in {
-      cells(1, 1) should be("| |" + eol)
-      cells(1, 2) should be("| | |" + eol)
-      cells(2, 1) should be("|  |" + eol)
+    " return -1 -1 when there are numbers out of range" in {
+      val (d1, d2) = Dice().rollDice(1, 5)
+      d1 should (be(1) and be >= 1 and be <= 6)
+      d2 should (be(5) and be >= 1 and be <= 6)
     }
   }
+}
