@@ -58,6 +58,7 @@ sbt run
 ```
 =======
 
+```
 ---
 ![Monopoly Logo](./images/MonopolyLogo.png)
 ---
