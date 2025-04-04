@@ -5,7 +5,11 @@
 
 =======
 ![Monopoly Logo](./images/MonopolyLogo.png)
+<<<<<<< HEAD
 >>>>>>> cfa279c (Update README.md)
+=======
+---
+>>>>>>> e22cfdb (Update README.md)
 Welcome to the Monopoly project. This is a Scala implementation of the classic board game Monopoly.
 
 ## Contents
