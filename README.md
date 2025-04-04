@@ -1,5 +1,6 @@
 # Monopoly
 <<<<<<< HEAD
+<<<<<<< HEAD
 ![[./images/MonopolyLogo.png]]
 >>>>>>> 298a9c5 (Update README.md)
 
@@ -10,6 +11,8 @@
 =======
 ---
 >>>>>>> e22cfdb (Update README.md)
+=======
+>>>>>>> ff20e95 (Update README.md)
 Welcome to the Monopoly project. This is a Scala implementation of the classic board game Monopoly.
 
 ## Contents
@@ -51,4 +54,11 @@ To start the game, simply run the main class:
 
 ```sh
 sbt run
+<<<<<<< HEAD
 ```
+=======
+
+---
+![Monopoly Logo](./images/MonopolyLogo.png)
+---
+>>>>>>> ff20e95 (Update README.md)
