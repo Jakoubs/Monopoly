@@ -6,3 +6,6 @@ lazy val root = (project in file("."))
   .settings(
     name := "Monopoly"
   )
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.14"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
+
