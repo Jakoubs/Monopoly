@@ -18,5 +18,6 @@ class DiceTest extends AnyWordSpec {
       d1 should (be(1) and be >= 1 and be <= 6)
       d2 should (be(5) and be >= 1 and be <= 6)
     }
+
   }
 }
