@@ -1,4 +1,4 @@
-# Monopoly Skala
+# Monopoly Skala test
 
 Welcome to the Monopoly project! This is a Scala implementation of the classic board game Monopoly.
 
