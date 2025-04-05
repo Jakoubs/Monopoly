@@ -10,7 +10,7 @@ class Dice:
   }
 
   def rollDice(d1: Int, d2: Int): (Int, Int) = {
-    if (d1 >= 6 && d1 >= 1)
+    if (d1 <= 6 && d1 >= 1 && d2 <= 6 && d2 >= 1)
       (d1, d2)
     else
       (-1, -1)
