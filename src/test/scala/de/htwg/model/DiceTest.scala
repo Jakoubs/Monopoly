@@ -1,6 +1,6 @@
 package de.htwg.model
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers._
 class DiceTest extends AnyWordSpec {
   "Dice" should {
     "be in range 1-6" in {
