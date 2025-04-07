@@ -1,7 +1,8 @@
 package de.htwg.model
 
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PlayerSpec extends WordSpec {
+class PlayerSpec extends AnyWordSpec {
   
 }
