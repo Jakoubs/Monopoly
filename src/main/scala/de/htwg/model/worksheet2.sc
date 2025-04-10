@@ -52,9 +52,11 @@ case class Player(
   def getIsInJail: Boolean = {
     isInJail
   }
+  
   def goToJail(): Player = {
     copy(position = 11, isInJail = true)
   }
+  
   def playerMove(rollcount: Int = 1): Player = {
     if (rollcount == 3) {
       println("You rolled doubles 3 times -> Jail :(")
