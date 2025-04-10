@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class CardSpec extends AnyWordSpec {
 
   "MoneyCard" should {
-    "have a name, a description and an amount" in {
+    "have a name, a description and an amount and an action" in {
       val card = MoneyCard("Cash Bonus", "Gain 200 money", 200)
       card.name shouldEqual "Cash Bonus"
       card.description shouldEqual "Gain 200 money"
@@ -16,7 +16,7 @@ class CardSpec extends AnyWordSpec {
   }
 
   "MoveCard" should {
-    "have a name, a description and an index" in {
+    "have a name, a description and an index and an actio" in {
       val card = MoveCard("Move Ahead", "Move to position 10", 10)
       card.name shouldEqual "Move Ahead"
       card.description shouldEqual "Move to position 10"
@@ -26,7 +26,7 @@ class CardSpec extends AnyWordSpec {
   }
 
   "PenaltyCard" should {
-    "have a name, a description and an amount" in {
+    "have a name, a description and an amount and an actio" in {
       val card = PenaltyCard("Penalty", "Lose 200 money", 200)
       card.name shouldEqual "Penalty"
       card.description shouldEqual "Lose 200 money"
@@ -36,7 +36,7 @@ class CardSpec extends AnyWordSpec {
   }
 
   "JailCard" should {
-    "have a name and a description" in {
+    "have a name and a description and an actio" in {
       val card = JailCard("Go to Jail","Move directly to jail")
       card.name shouldEqual "Go to Jail"
       card.description shouldEqual "Move directly to jail"
