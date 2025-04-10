@@ -25,15 +25,16 @@ case class Player(name: String,
     newPlayer
   }
 
-  def playerMove(rollcount: Int = 1): Player = {
+  def playerMove(rollDice: () => (Int, Int),
+                 rollcount: Int = 1): Player = {
     if (rollcount == 3) {
       println("You rolled doubles 3 times -> Jail :(")
       return this.goToJail()
     } else if(!isInJail) {
       val (diceA, diceB) = rollDice()
-      val newPlayer = this.moveToIndex(diceA + diceB)
+      val newPlayer = this.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
-        return newPlayer.playerMove(rollcount + 1)
+        return newPlayer.playerMove(rollDice,rollcount + 1)
       }
       newPlayer
     } else {

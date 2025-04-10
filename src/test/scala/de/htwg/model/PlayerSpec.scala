@@ -15,18 +15,18 @@ class PlayerSpec extends AnyWordSpec {
       player.isInJail should be(false)
     }
 
-    "be able to move to a new postion when not in jail" in {
+    "be able to change position index when not in jail" in {
       val player = Player("TestPlayer", 100, 5, false)
       val updatedPlayer = player.moveToIndex(4)
-      updatedPlayer.position shouldEqual 9
+      updatedPlayer.position shouldEqual 4
       updatedPlayer.isInJail should be(false)
     }
 
-    "not be able to move when in jail" in {
+    "not be able to change index when in jail" in {
       val player = Player("TestPlayer", 100 ,5 ,true)
       val updatedPlayer = player.moveToIndex(4)
       updatedPlayer.position shouldEqual 5
-      updatedPlayer.isInJail should be(false)
+      updatedPlayer.isInJail should be(true)
     }
 
     "be released from Jail" in {
@@ -43,21 +43,25 @@ class PlayerSpec extends AnyWordSpec {
     }
 
     "roll the dice and move position" in {
-      val player = Player("TestPlayer", 100,0,true)
-      val updatedPlayer = player.playerMove(1)
-      updatedPlayer.position should be > 0
+      val player = Player("TestPlayer", 100,0,false)
+      val mockRollDice = () => (3, 4)
+      val updatedPlayer = player.playerMove(mockRollDice)
+      updatedPlayer.position shouldEqual 7
     }
 
     "remain in jail when trying to move while jailed" in {
-      val player = Player("Frank", 2000, position = 10, isInJail = true)
-      val updatedPlayer = player.playerMove(1)
+      val player = Player("TestPlayer", 2000, position = 10, isInJail = true)
+      val mockRollDice = () => (5, 6)
+      val updatedPlayer = player.playerMove(mockRollDice)
       updatedPlayer.position shouldEqual 10
       updatedPlayer.isInJail shouldEqual true
     }
 
     "move to jail after rolling doubles three times" in {
-      val player = Player("George", 1500)
-      val jailedPlayer = player.playerMove(3)
+      val player = Player("TestPlayer", 1500)
+      val mockRollDice = () => (6, 6)
+
+      val jailedPlayer = player.playerMove(mockRollDice)
       jailedPlayer.position shouldEqual 11
       jailedPlayer.isInJail shouldEqual true
     }
