@@ -9,8 +9,13 @@ case class Player(name: String,
 
   def moveToIndex(index: Int): Player = {
     if (!isInJail) {
-      val newPlayer = this.copy(position = index)
-      return newPlayer
+      if (index == 0) {
+        val newPlayer = this.copy(position = 40)
+        return newPlayer
+      } else {
+        val newPlayer = this.copy(position = index)
+        return newPlayer
+      }
     }
     this
   }
@@ -25,21 +30,19 @@ case class Player(name: String,
     newPlayer
   }
 
-  def playerMove(rollDice: () => (Int, Int),
-                 rollcount: Int = 1): Player = {
+  def playerMove(rollcount: Int = 1): Player = {
     if (rollcount == 3) {
       println("You rolled doubles 3 times -> Jail :(")
       return this.goToJail()
     } else if(!isInJail) {
-      val (diceA, diceB) = rollDice()
+      val (diceA, diceB) = Dice().rollDice()
       val newPlayer = this.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
-        return newPlayer.playerMove(rollDice,rollcount + 1)
+        return newPlayer.playerMove(rollcount + 1)
       }
       newPlayer
     } else {
       this
     }
   }
-
 }
