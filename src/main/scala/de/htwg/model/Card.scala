@@ -2,9 +2,7 @@ package de.htwg.model
 
 sealed trait Card {
   def name: String
-
   def description: String
-
   def action: CardAction
 }
 

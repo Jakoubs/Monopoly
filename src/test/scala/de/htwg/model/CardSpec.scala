@@ -11,6 +11,7 @@ class CardSpec extends AnyWordSpec {
       card.name shouldEqual "Cash Bonus"
       card.description shouldEqual "Gain 200 money"
       card.amount shouldEqual 200
+      card.action shouldEqual GainMoney(200)
     }
   }
 
@@ -20,6 +21,7 @@ class CardSpec extends AnyWordSpec {
       card.name shouldEqual "Move Ahead"
       card.description shouldEqual "Move to position 10"
       card.index shouldEqual 10
+      card.action shouldEqual CardMoveTo(10)
     }
   }
 
@@ -29,6 +31,7 @@ class CardSpec extends AnyWordSpec {
       card.name shouldEqual "Penalty"
       card.description shouldEqual "Lose 200 money"
       card.amount shouldEqual 200
+      card.action shouldEqual LoseMoney(200)
     }
   }
 
@@ -37,6 +40,7 @@ class CardSpec extends AnyWordSpec {
       val card = JailCard("Go to Jail","Move directly to jail")
       card.name shouldEqual "Go to Jail"
       card.description shouldEqual "Move directly to jail"
+      card.action shouldEqual CardToJail
     }
   }
 }
