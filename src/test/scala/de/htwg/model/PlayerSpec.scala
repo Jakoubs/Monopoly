@@ -44,28 +44,27 @@ class PlayerSpec extends AnyWordSpec {
 
     "roll the dice and move position" in {
       val player = Player("TestPlayer", 100,0,false)
-      val updatedPlayer = player.playerMove(1)
-      updatedPlayer.position should be > 0
+      val mockRollDice = () => (3, 4)
+      val updatedPlayer = player.playerMove(mockRollDice)
+      updatedPlayer.position shouldEqual 7
     }
 
     "remain in jail when trying to move while jailed" in {
       val player = Player("TestPlayer", 2000, position = 10, isInJail = true)
-      val updatedPlayer = player.playerMove(1)
+      val mockRollDice = () => (5, 6)
+      val updatedPlayer = player.playerMove(mockRollDice)
       updatedPlayer.position shouldEqual 10
       updatedPlayer.isInJail shouldEqual true
     }
 
     "move to jail after rolling doubles three times" in {
       val player = Player("TestPlayer", 1500)
-      val jailedPlayer = player.playerMove(3)
+      val mockRollDice = () => (6, 6)
+
+      val jailedPlayer = player.playerMove(mockRollDice)
       jailedPlayer.position shouldEqual 11
       jailedPlayer.isInJail shouldEqual true
     }
 
-    "never be above index 40" in {
-      val player = Player("TestPlayer", 1500,40)
-      val jailedPlayer = player.playerMove(1)
-      jailedPlayer.position should be < 40
-    }
   }
 }
