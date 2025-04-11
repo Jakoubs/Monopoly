@@ -7,6 +7,22 @@ case class Board(fields: Vector[BoardField])
 object Monopoly:
   def main(args: Array[String]): Unit = {
     val game = defineGame()
+    while (game.players.size > 1) {
+      println(s"${game.currentPlayer.name}'s turn")
+      println("Press enter to continue")
+      readLine()
+      val updatedPlayer = playerTurn(game.currentPlayer)
+      println("Turn finished. Proceeding to next player.")
+      val updatedGame = game.copy(currentPlayer = game.players((game.players.indexOf(game.currentPlayer) + 1) % game.players.size))
+      println(s"${updatedGame.currentPlayer} would be the next player.")
+      println(s"${updatedPlayer.position} would be the position of p1.")
+    }
+  }
+
+  def playerTurn(player: Player): Player = {
+    val dice = new Dice()
+    val updatedPlayer = player.playerMove(() => dice.rollDice(), 1)
+    updatedPlayer
   }
 
   def defineGame(): MonopolyGame = {
