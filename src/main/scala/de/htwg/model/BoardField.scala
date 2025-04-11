@@ -12,12 +12,10 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
   object PropertyField {
     case class House(amount: Int = 0) {
       private val maxHouses = 5
-
       def calculateHousePrice(purchasePrice: Int): Int = {
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
       }
-
       def buyHouse(player: Player, field: PropertyField): (PropertyField, Player) = {
         if (player.balance < calculateHousePrice(field.price) || amount >= maxHouses) {
           (field, player)
@@ -73,6 +71,11 @@ case class FreeParkingField(amount: Int) extends BoardField{
 case class ChanceField() extends BoardField {
   override val index: Int = 20
   override val name: String = "ChanceField"
+  val CardList: List[Card] = List(
+    MoveCard("Advance to Boardwalk", "",3, false), //Welcher Index?
+    MoveCard("Advance to Go", "(Collect $200)",1, true),
+    MoveCard("Advance to Illinois Avenue", "If you pass Go, collect $200", 4, true) // Welcher Index?
+  )
 
 }
 case class CommunityChestField(communityCardList: List[Card]) extends BoardField{

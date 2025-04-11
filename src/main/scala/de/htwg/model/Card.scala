@@ -10,8 +10,9 @@ case class MoneyCard(name: String, description: String, amount: Int) extends Car
   override def action: CardAction = GainMoney(amount)
 }
 
-case class MoveCard(name: String, description: String, index: Int) extends Card {
-  override def action: CardAction = CardMoveTo(index)
+case class MoveCard(name: String, description: String, index: Int, collectMoney: Boolean) extends Card {
+    override def action: CardAction = CardMoveTo(index, collectMoney)
+
 }
 
 case class PenaltyCard(name: String, description: String, amount: Int) extends Card {

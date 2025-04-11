@@ -22,8 +22,12 @@ case object CardToJail extends CardAction {
   }
 }
 
-case class CardMoveTo(index: Int) extends CardAction {
+case class CardMoveTo(index: Int, collectMoney: Boolean) extends CardAction {
   def apply(player: Player): Player = {
-    player.moveToIndex(index)
+    if(collectMoney)
+      player.playerMove(rollDice = () =>((index-player.position)%40,0))
+    else
+      player.moveToIndex(index)
+
   }
 }

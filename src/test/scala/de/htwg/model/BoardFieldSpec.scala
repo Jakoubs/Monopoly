@@ -1,5 +1,4 @@
 package de.htwg.model
-import de.htwg.model
 import org.scalatest.matchers.should.Matchers.{shouldBe, *}
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
@@ -31,7 +30,6 @@ class BoardFieldSpec extends AnyWordSpec {
       f1.house.amount should be(0)
       f1.mortgage.active should be(false)
     }
-
     "buildHomes" in {
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
       val p1 = Player("TestPlayer", 1000, 5)
@@ -97,7 +95,7 @@ class BoardFieldSpec extends AnyWordSpec {
       val updatedPlayer = goField.addMoney(player)
       updatedPlayer.balance should be(1200)
     }
-    
+
   }
 
   "JailField" should {
