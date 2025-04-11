@@ -1,16 +1,22 @@
 package de.htwg.model
 
+case class Color(name: String, group: Int)
 sealed trait BoardField {
 val name: String
 val index: Int
 }
-case class PropertyField(name: String, price: Int, rent: Int, owner: Option[String] = None, color: Color, mortgage: Mortgage, house: Option[House] = None) extends BoardField {
+case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner: Option[String] = None,color: String, mortgage: Int, house: Option[Int] = None) extends BoardField {
   def calculateHousePrice(purchasePrice: Int): Int = {
     val baseHousePrice = purchasePrice / 2
     ((baseHousePrice + 9) / 10) * 10
   }
+  def buyHouse(player: Player,field: PropertyField, anz: Int): (PropertyField, Player) = {
+    (field.copy(house = Some(house.get + anz)), player.copy(balance = player.balance - price))
+  }
+
 
 }
+/*
 case object GoField extends BoardField {
   override val index: Int = 1
   override val name: String = "GoField"
@@ -26,20 +32,21 @@ case object VisitField extends BoardField{
   override val index: Int = 11
   override val name: String = "JailOnVisit"
 }
-case class GoToJailField(player: Player) extends BoardField{
-  override val index: Int = 31
+case class GoToJailField(destination: Int) extends BoardField{
+  override val index: Int = 11
   override val name: String = "JailOnVisit"
-
-  def goToJail(player: Player): Player = {
-    player.goToJail()
-  }
 }
 case class FreeParkingField(amount: Int) extends BoardField{
   override val index: Int = 21
   override val name: String = "FreeParking"
 }
-case object ChanceField(name: String, index: Int) extends BoardField{
+
+case class ChanceField() extends BoardField {
+  override val index: Int = 20
+  override val name: String = "ChanceField"
 
 }
 case class CommunityChestField(communityCardList: List[Card]) extends BoardField{
-}
+  override val index: Int = 25
+  override val name: String = "communityCard"
+}*/
