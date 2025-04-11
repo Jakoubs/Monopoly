@@ -9,12 +9,14 @@ class BoardFieldSpec extends AnyWordSpec {
     "build a property field" in {
       val f1 = PropertyField("kpAlee", 10, 100, 20, Some("p1"), Red, Mortgage(1000))
       f1.name should be("kpAlee")
+      f1.index should be(10)
       f1.price should be(100)
       f1.rent should be(20)
       f1.owner should be(Some("p1"))
       f1.color should be(Red)
       f1.mortgage.price should be(1000)
       f1.house.amount should be(0)
+
     }
 
     "be created without Default values" in {
@@ -61,7 +63,6 @@ class BoardFieldSpec extends AnyWordSpec {
       val f3 = PropertyField("Baltic Avenue", 5, 64, 4, Some("P3"), Brown, Mortgage(300))
       House().calculateHousePrice(f3.price) should be(40)
     }
-
   }
 
   "Mortgage" should {
@@ -72,6 +73,13 @@ class BoardFieldSpec extends AnyWordSpec {
 
       updatedField.mortgage.active should be(true)
     }
+    "toggle the mortgage and not affect price" in {
+      val mortgage = Mortgage()
+      val updatedMortgage = mortgage.toggle()
+      updatedMortgage.active should be(true)
+      updatedMortgage.price should be(0)
+    }
+
   }
 
 
