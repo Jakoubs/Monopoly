@@ -18,7 +18,8 @@ class CardActionSpec extends AnyWordSpec {
     "decrease the player's balance by the given amount" in {
       val player = Player("TestPlayer", 1000, 5)
       val action = LoseMoney(200)
-      val updatedPlayer = action.apply(player)
+      val freeParkingField = FreeParkingField(0)
+      val updatedPlayer = action.apply(player,freeParkingField)
       updatedPlayer.balance shouldEqual 800
     }
   }
