@@ -8,7 +8,7 @@ class PlayerSpec extends AnyWordSpec {
 
   "Player" should {
     "have a name, a balance, a position and a Jail status" in {
-      val player = Player("TestPlayer", 1000, 5, false)
+      val player = Player("TestPlayer", 1000, 5)
       player.name should be("TestPlayer")
       player.balance should be(1000)
       player.position should be(5)
@@ -16,7 +16,7 @@ class PlayerSpec extends AnyWordSpec {
     }
 
     "be able to change position index when not in jail" in {
-      val player = Player("TestPlayer", 100, 5, false)
+      val player = Player("TestPlayer", 100, 5)
       val updatedPlayer = player.moveToIndex(4)
       updatedPlayer.position shouldEqual 4
       updatedPlayer.isInJail should be(false)
@@ -36,14 +36,14 @@ class PlayerSpec extends AnyWordSpec {
     }
 
     "go to Jail" in {
-      val player = Player("TestPlayer", 100, 0, false)
+      val player = Player("TestPlayer", 100)
       val updatedPlayer = player.goToJail()
       updatedPlayer.position shouldEqual 11
       updatedPlayer.isInJail should be(true)
     }
 
     "roll the dice and move position" in {
-      val player = Player("TestPlayer", 100,0,false)
+      val player = Player("TestPlayer", 100)
       val mockRollDice = () => (3, 4)
       val updatedPlayer = player.playerMove(mockRollDice)
       updatedPlayer.position shouldEqual 7
@@ -66,5 +66,11 @@ class PlayerSpec extends AnyWordSpec {
       jailedPlayer.isInJail shouldEqual true
     }
 
+    "never be on index 0" in {
+      val player = Player("TestPlayer", 2000, position = 35)
+      val mockRollDice = () => (2, 3)
+      val updatedPlayer = player.playerMove(mockRollDice)
+      updatedPlayer.position shouldEqual 40
+    }
   }
 }
