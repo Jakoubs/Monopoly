@@ -9,8 +9,6 @@ object Monopoly:
     val game = defineGame()
     while (game.players.size > 1) {
       println(s"${game.currentPlayer.name}'s turn")
-      println("Press enter to continue")
-      readLine()
       val updatedPlayer = playerTurn(game.currentPlayer)
       println("Turn finished. Proceeding to next player.")
       val updatedGame = game.copy(currentPlayer = game.players((game.players.indexOf(game.currentPlayer) + 1) % game.players.size))
@@ -21,7 +19,7 @@ object Monopoly:
 
   def playerTurn(player: Player): Player = {
     val dice = new Dice()
-    val updatedPlayer = player.playerMove(() => dice.rollDice(), 1)
+    val updatedPlayer = player.playerMove(() => dice.rollDice(2,2), 1)
     updatedPlayer
   }
 
