@@ -1,5 +1,5 @@
 package de.htwg.model
-import org.scalatest.matchers.should.Matchers.{shouldBe, *}
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Red}
@@ -158,7 +158,12 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
   "ChanceField" should {
+    "pick a card" in {
+      val chanceField = ChanceField()
+      chanceField.
+    }
   }
   "CommunityChestField" should {
+    val player = Player("TestPlayer", 100, 21)
   }
 }

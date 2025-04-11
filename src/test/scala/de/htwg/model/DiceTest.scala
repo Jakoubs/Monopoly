@@ -13,10 +13,10 @@ class DiceTest extends AnyWordSpec {
       d1 should (be(1) and be >= 1 and be <= 6)
       d2 should (be(5) and be >= 1 and be <= 6)
     }
-    " return -1 -1 when there are numbers out of range" in {
+    " return custom" in {
       val (d1, d2) = Dice().rollDice(7, 5)
-      d1 should be(-1)
-      d2 should be(-1)
+      d1 should be(7)
+      d2 should be(5)
     }
 
   }

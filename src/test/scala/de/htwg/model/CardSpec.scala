@@ -17,11 +17,11 @@ class CardSpec extends AnyWordSpec {
 
   "MoveCard" should {
     "have a name, a description and an index and an actio" in {
-      val card = MoveCard("Move Ahead", "Move to position 10", 10)
+      val card = MoveCard("Move Ahead", "Move to position 10", 10,false)
       card.name shouldEqual "Move Ahead"
       card.description shouldEqual "Move to position 10"
       card.index shouldEqual 10
-      card.action shouldEqual CardMoveTo(10)
+      card.action shouldEqual CardMoveTo(10,false)
     }
   }
 
