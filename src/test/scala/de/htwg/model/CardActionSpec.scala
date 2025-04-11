@@ -19,7 +19,7 @@ class CardActionSpec extends AnyWordSpec {
       val player = Player("TestPlayer", 1000, 5)
       val action = LoseMoney(200)
       val freeParkingField = FreeParkingField(0)
-      val updatedPlayer = action.apply(player,freeParkingField)
+      val (updatedPlayer, updatedField) = action.apply(player,freeParkingField)
       updatedPlayer.balance shouldEqual 800
     }
   }

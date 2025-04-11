@@ -9,10 +9,10 @@ case class GainMoney(amount: Int) extends CardAction {
 }
 
 case class LoseMoney(amount: Int) extends CardAction {
-  def apply(player: Player, freeParkingField: FreeParkingField): Player = {
+  def apply(player: Player, freeParkingField: FreeParkingField): (Player,FreeParkingField) = {
     val updatedPlayer = player.copy(balance = player.balance - amount)
     val updatedField = freeParkingField.copy(amount = freeParkingField.amount + amount)
-    updatedPlayer
+    (updatedPlayer, updatedField)
   }
 }
 
