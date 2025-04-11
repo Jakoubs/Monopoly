@@ -35,7 +35,7 @@ case object VisitField extends BoardField{
   override val name: String = "JailOnVisit"
 }
 case class GoToJailField() extends BoardField{
-  override val index: Int = 11
+  override val index: Int = 31
   override val name: String = "JailOnVisit"
   def goToJail(player: Player): Player = {
     player.goToJail()
@@ -44,6 +44,7 @@ case class GoToJailField() extends BoardField{
 case class FreeParkingField(amount: Int) extends BoardField{
   override val index: Int = 21
   override val name: String = "FreeParking"
+
 }
 
 case class ChanceField() extends BoardField {
