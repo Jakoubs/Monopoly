@@ -1,6 +1,5 @@
 package de.htwg.model
 
-import de.htwg.model.Player
 import org.scalatest.matchers.should.Matchers.{shouldEqual, *}
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -72,5 +71,13 @@ class PlayerSpec extends AnyWordSpec {
       val updatedPlayer = player.playerMove(mockRollDice)
       updatedPlayer.position shouldEqual 40
     }
+
+    "earn 200 Money when go over Go" in {
+      val player = Player("TestPlayer", 1000, position = 35)
+      val mockRollDice = () => (4, 3)
+      val updatedPlayer = player.playerMove(mockRollDice)
+      updatedPlayer.balance shouldEqual 1200
+    }
+
   }
 }

@@ -36,7 +36,10 @@ case class Player(name: String,
       this.goToJail()
     } else if(!isInJail) {
       val (diceA, diceB) = rollDice()
-      val newPlayer = this.moveToIndex((position + diceA + diceB) % 40)
+      val updatedPlayer = if ((position + diceA + diceB) > 40) 
+        this.copy(balance = balance + 200) else this 
+
+      val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
         return newPlayer.playerMove(rollDice,rollcount + 1)
       }
