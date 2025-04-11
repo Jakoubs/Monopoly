@@ -16,13 +16,15 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 
 
 }
-/*
+
 case object GoField extends BoardField {
   override val index: Int = 1
   override val name: String = "GoField"
   /*def getGoBonus(player: Player): Int = {
     if()
-  }*/
+  }
+
+   */
 }
 case object JailField extends BoardField{
   override val index: Int = 11
@@ -32,9 +34,12 @@ case object VisitField extends BoardField{
   override val index: Int = 11
   override val name: String = "JailOnVisit"
 }
-case class GoToJailField(destination: Int) extends BoardField{
+case class GoToJailField() extends BoardField{
   override val index: Int = 11
   override val name: String = "JailOnVisit"
+  def goToJail(player: Player): Player = {
+    player.goToJail()
+  }
 }
 case class FreeParkingField(amount: Int) extends BoardField{
   override val index: Int = 21
@@ -49,4 +54,4 @@ case class ChanceField() extends BoardField {
 case class CommunityChestField(communityCardList: List[Card]) extends BoardField{
   override val index: Int = 25
   override val name: String = "communityCard"
-}*/
+}

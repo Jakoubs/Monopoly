@@ -32,7 +32,7 @@ class BoardFieldSpec extends AnyWordSpec {
       f3.calculateHousePrice(f3.price) should be(40)
     }
   }
-  /*
+
   "GoField" should {
   }
 
@@ -44,16 +44,16 @@ class BoardFieldSpec extends AnyWordSpec {
   "GoToJailField" should {
     "send a Player to jail" in {
       val player = Player("TestPlayer", 1000, 5)
-      val goToJailField = GoToJailField(player)
-      val updatedPlayer = goToJailField.goToJail()
+      val goToJailField = GoToJailField()
+      val updatedPlayer = goToJailField.goToJail(player)
       updatedPlayer.position should be(11)
-      updatedPlayer.isInJail should be true
+      updatedPlayer.isInJail should be(true)
     }
 
     "not give Player money when moving over Go" in {
       val player = Player("TestPlayer", 1000, 5)
-      val goToJailField = GoToJailField(player)
-      val updatedPlayer = goToJailField.goToJail()
+      val goToJailField = GoToJailField()
+      val updatedPlayer = goToJailField.goToJail(player)
       updatedPlayer.balance should be(1000)
     }
 
@@ -64,6 +64,4 @@ class BoardFieldSpec extends AnyWordSpec {
   }
   "CommunityChestField" should {
   }
-*/
-
 }
