@@ -31,12 +31,10 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
       }
     }
 
-    // Klasse für Mortgage
     case class Mortgage(price: Int = 0, active: Boolean = false) {
       def toggle(): Mortgage = copy(active = !active)
     }
 
-    // Enum für Farben
     enum Color:
       case Brown, LightBlue, Pink, Orange, Red, Yellow, Green, DarkBlue
   }

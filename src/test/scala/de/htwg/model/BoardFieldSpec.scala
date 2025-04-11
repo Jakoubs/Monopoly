@@ -16,6 +16,19 @@ class BoardFieldSpec extends AnyWordSpec {
       f1.mortgage.price should be(1000)
       f1.house.amount should be(0)
     }
+
+    "be created without Default values" in {
+      val f1 = PropertyField("kpAlee", 10, 100, 20, None, Red)
+      f1.name should be("kpAlee")
+      f1.price should be(100)
+      f1.rent should be(20)
+      f1.owner should be(None)
+      f1.color should be(Red)
+      f1.mortgage.price should be(0)
+      f1.house.amount should be(0)
+      f1.mortgage.active should be(false)
+    }
+
     "buildHomes" in {
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
       val p1 = Player("TestPlayer", 1000, 5)
@@ -48,7 +61,20 @@ class BoardFieldSpec extends AnyWordSpec {
       val f3 = PropertyField("Baltic Avenue", 5, 64, 4, Some("P3"), Brown, Mortgage(300))
       House().calculateHousePrice(f3.price) should be(40)
     }
+
   }
+
+  "Mortgage" should {
+    "toggle the mortgage status in a PropertyField" in {
+      val originalField = PropertyField("TestStreet", 1, 100, 10, Some("Player1"), Red, Mortgage(100))
+      val toggledMortgage = originalField.mortgage.toggle()
+      val updatedField = originalField.copy(mortgage = toggledMortgage)
+
+      updatedField.mortgage.active should be(true)
+    }
+  }
+
+
 
   "GoField" should {
     "be created" in {
