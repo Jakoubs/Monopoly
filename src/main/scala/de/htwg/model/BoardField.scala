@@ -90,7 +90,7 @@ case class TrainStationField(nm: String ,idx: Int, owner: Option[Player]) extend
   override val index: Int = idx
   override val name: String = nm
 }
-case class UtilityField(idx: Int, nm: String, owner: Option[Player]) extends BoardField{
+case class UtilityField(nm: String, idx: Int, owner: Option[Player]) extends BoardField{
   override val index: Int = idx
   override val name: String = nm
 }

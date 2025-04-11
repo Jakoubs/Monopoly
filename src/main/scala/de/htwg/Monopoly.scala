@@ -1,6 +1,6 @@
 package de.htwg.model
 
-import de.htwg.model.PropertyField.Color.{Brown, LightBlue, Pink, Red}
+import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 
 import scala.io.StdIn.readLine
 
@@ -47,22 +47,44 @@ object Monopoly:
       Vector(
         GoField,
         PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        CommunityChestField(3), //ListofCards
+        CommunityChestField(3),
         PropertyField("brown2",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         TaxField(100,5),
         TrainStationField("Marklylebone Station",6,None),
         PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         ChanceField(8),
         PropertyField("lightBlue2",9,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("lightBlue2",10,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("lightBlue3",10,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         JailField,
         PropertyField("Pink1",12,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Pink1",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Pink1",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-
-
-
-
+        UtilityField("Electric Company", 13, None),
+        PropertyField("Pink2",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Pink3",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        TrainStationField("Fenchurch ST Station",16,None),
+        PropertyField("Orange1",17,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        CommunityChestField(18),
+        PropertyField("Orange2",19,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Orange3",20,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        FreeParkingField(0),
+        PropertyField("Red1",22,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        ChanceField(23),
+        PropertyField("Red2",24,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Red3",25,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        TrainStationField("Kings Cross Station",26,None),
+        PropertyField("Yellow1",27,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Yellow2",28,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        UtilityField("Water Works",29,None),
+        PropertyField("Yellow3",30,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        GoToJailField(),
+        PropertyField("Green1",32,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Green2",33,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        ChanceField(35),
+        PropertyField("Green3",35,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        TrainStationField("Liverpool ST Station",36,None),
+        ChanceField(37),
+        PropertyField("Blue1",38,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        TaxField(200,39),
+        PropertyField("Blue2",40,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
       )
     )
 
