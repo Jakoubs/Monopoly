@@ -13,7 +13,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
   def buyHouse(player: Player,field: PropertyField, anz: Int): (PropertyField, Player) = {
     (field.copy(house = Some(house.get + anz)), player.copy(balance = player.balance - price))
   }
-  
+
 
 }
 /*
