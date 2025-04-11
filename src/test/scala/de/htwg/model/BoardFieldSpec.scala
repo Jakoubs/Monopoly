@@ -1,5 +1,5 @@
 package de.htwg.model
-import org.scalatest.matchers.should.Matchers.*
+import org.scalatest.matchers.should.Matchers.{shouldBe, *}
 import org.scalatest.wordspec.AnyWordSpec
 class BoardFieldSpec extends AnyWordSpec {
   "PropertyField" should {
@@ -35,17 +35,34 @@ class BoardFieldSpec extends AnyWordSpec {
   }
   "GoField" should {
   }
+
   "JailField" should {
   }
+
   "VisitField" should {
   }
   "GoToJailField" should {
+    "send a Player to jail" in {
+      val player = Player("TestPlayer", 1000, 5)
+      val goToJailField = GoToJailField(player)
+      val updatedPlayer = goToJailField.goToJail()
+      updatedPlayer.position should be(11)
+      updatedPlayer.isInJail should be true
+    }
+
+    "not give Player money when moving over Go" in {
+      val player = Player("TestPlayer", 1000, 5)
+      val goToJailField = GoToJailField(player)
+      val updatedPlayer = goToJailField.goToJail()
+      updatedPlayer.balance should be(1000)
+    }
+
   }
   "FreeParkingField" should {
   }
   "ChanceField" should {
   }
-  "ChanceField" should {
+  "CommunityChestField" should {
   }
 
 
