@@ -21,6 +21,21 @@ class BoardFieldSpec extends AnyWordSpec {
       newf1.house should be(Some(1))
       newp1.balance should be(900)
     }
+    "not buildHomes if balance is to low" in {
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), "red", 1000, Some(0))
+      val p1 = Player("TestPlayer", 0, 5)
+      val (newf1, newp1) = f1.buyHouse(p1, f1)
+      newf1.house should  be(Some(0))
+      newp1.balance should be(0)
+    }
+    "not buildHomes if max Hotel" in {
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), "red", 1000, Some(5))
+      val p1 = Player("TestPlayer", 1000, 5)
+      val (newf1, newp1) = f1.buyHouse(p1, f1)
+      newf1.house should  be(Some(5))
+      newp1.balance should be(1000)
+    }
+
     "calculate house price based on rent correctly" in {
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), "red", 1000, Some(0))
       f1.calculateHousePrice(f1.price) should be(50)
@@ -34,13 +49,21 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
   "GoField" should {
+    "be created" in {
+      val goField = GoField;
+      goField.index should be(1)
+      goField.name should be("GoField")
+    }
   }
 
   "JailField" should {
+    "be created" in{
+      val jail = JailField;
+      jail.index should be(11)
+      jail.name should be("Jail")
+    }
   }
 
-  "VisitField" should {
-  }
   "GoToJailField" should {
     "have a name and an index" in {
       val goToJailField = GoToJailField()

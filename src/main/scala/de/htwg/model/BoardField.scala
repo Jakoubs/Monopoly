@@ -33,10 +33,6 @@ case object JailField extends BoardField{
   override val index: Int = 11
   override val name: String = "Jail"
 }
-case object VisitField extends BoardField{
-  override val index: Int = 11
-  override val name: String = "JailOnVisit"
-}
 case class GoToJailField() extends BoardField{
   override val index: Int = 31
   override val name: String = "GoToJail"
