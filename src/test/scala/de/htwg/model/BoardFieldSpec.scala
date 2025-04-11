@@ -67,7 +67,7 @@ class BoardFieldSpec extends AnyWordSpec {
   "FreeParkingField" should {
     "have a name and an index and an amount" in {
       val freeParkingField = FreeParkingField(0)
-      freeParkingField.name should be("GoToJail")
+      freeParkingField.name should be("FreeParking")
       freeParkingField.index should be(21)
       freeParkingField.amount should be(0)
     }
@@ -75,8 +75,8 @@ class BoardFieldSpec extends AnyWordSpec {
       val player = Player("TestPlayer", 100, 21)
       val action = LoseMoney(100)
       val freeParkingField = FreeParkingField(0)
-      action.apply(player,freeParkingField)
-      freeParkingField.amount should be(100)
+      val (updatedPlayer, updatedField) = action.apply(player,freeParkingField)
+      updatedField.amount should be(100)
     }
     "give player amount when on field" in {
       val player = Player("TestPlayer", 100, 21)

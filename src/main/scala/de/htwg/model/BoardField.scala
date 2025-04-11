@@ -12,7 +12,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
   }
   def buyHouse(player: Player,field: PropertyField): (PropertyField, Player) = {
     if(player.balance < field.calculateHousePrice(field.price) || field.house.get==5)
-      return (field, player)
+      (field, player)
     else
       (field.copy(house = Some(house.get + 1)), player.copy(balance = player.balance - price))
   }
@@ -39,7 +39,7 @@ case object VisitField extends BoardField{
 }
 case class GoToJailField() extends BoardField{
   override val index: Int = 31
-  override val name: String = "JailOnVisit"
+  override val name: String = "GoToJail"
   def goToJail(player: Player): Player = {
     player.goToJail()
   }
@@ -48,6 +48,13 @@ case class FreeParkingField(amount: Int) extends BoardField{
   override val index: Int = 21
   override val name: String = "FreeParking"
 
+  def apply(player: Player): Player = {
+    player.copy(balance = player.balance + amount)
+  }
+
+  def resetAmount(): FreeParkingField = {
+    this.copy(amount = 0)
+  }
 }
 
 case class ChanceField() extends BoardField {
