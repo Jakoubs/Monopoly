@@ -42,7 +42,9 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 case object GoField extends BoardField {
   override val index: Int = 1
   override val name: String = "GoField"
-
+  def addMoney(player: Player): Player = {
+    player.copy(balance = player.balance + 200)
+  }
 }
 case object JailField extends BoardField{
   override val index: Int = 11

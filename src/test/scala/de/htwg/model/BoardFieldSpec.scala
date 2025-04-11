@@ -1,4 +1,5 @@
 package de.htwg.model
+import de.htwg.model
 import org.scalatest.matchers.should.Matchers.{shouldBe, *}
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
@@ -90,6 +91,13 @@ class BoardFieldSpec extends AnyWordSpec {
       goField.index should be(1)
       goField.name should be("GoField")
     }
+    "add player 200 to Player" in {
+      val goField = GoField
+      val player = Player("TestPlayer", 1000, 5)
+      val updatedPlayer = goField.addMoney(player)
+      updatedPlayer.balance should be(1200)
+    }
+    
   }
 
   "JailField" should {
