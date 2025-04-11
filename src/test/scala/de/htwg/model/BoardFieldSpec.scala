@@ -2,6 +2,7 @@ package de.htwg.model
 import org.scalatest.matchers.should.Matchers.{shouldBe, *}
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
+import de.htwg.model.Card
 class BoardFieldSpec extends AnyWordSpec {
   "PropertyField" should {
     "build a property field" in {
@@ -116,7 +117,18 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
   "ChanceField" should {
+    "be created" in {
+      val chance = ChanceField()
+      chance.index should be(20)
+      chance.name should be("ChanceField")
+    }
   }
   "CommunityChestField" should {
+    "be created" in {
+      val gotToJail = JailCard("Go to jail","You are a criminal! Go to jail.")
+      val community = CommunityChestField(List(gotToJail))
+      community.index should be(25)
+      community.name should be("communityCard")
+    }
   }
 }

@@ -16,8 +16,6 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
     else
       (field.copy(house = Some(house.get + 1)), player.copy(balance = player.balance - price))
   }
-
-
 }
 
 case object GoField extends BoardField {
