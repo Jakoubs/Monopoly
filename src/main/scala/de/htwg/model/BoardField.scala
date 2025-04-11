@@ -68,8 +68,8 @@ case class FreeParkingField(amount: Int) extends BoardField{
   }
 }
 
-case class ChanceField() extends BoardField {
-  override val index: Int = 20
+case class ChanceField(idx: Int) extends BoardField {
+  override val index: Int = idx
   override val name: String = "ChanceField"
   val CardList: List[Card] = List(
     MoveCard("Advance to Boardwalk", "",3, false), //Welcher Index?
@@ -78,7 +78,19 @@ case class ChanceField() extends BoardField {
   )
 
 }
-case class CommunityChestField(communityCardList: List[Card]) extends BoardField{
-  override val index: Int = 25
+case class CommunityChestField(idx: Int) extends BoardField{
+  override val index: Int = idx
   override val name: String = "communityCard"
+}
+case class TaxField(amount: Int, idx: Int) extends BoardField {
+  override val index: Int = idx
+  override val name: String = "TaxField"
+}
+case class TrainStationField(nm: String ,idx: Int, owner: Option[Player]) extends BoardField {
+  override val index: Int = idx
+  override val name: String = nm
+}
+case class UtilityField(idx: Int, nm: String, owner: Option[Player]) extends BoardField{
+  override val index: Int = idx
+  override val name: String = nm
 }

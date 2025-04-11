@@ -165,4 +165,26 @@ class BoardFieldSpec extends AnyWordSpec {
   "CommunityChestField" should {
     val player = Player("TestPlayer", 100, 21)
   }
-}
+  "A TaxField" should {
+    "be correctly initialized with amount and index" in {
+      val taxField = TaxField(200, 4)
+      taxField.amount shouldBe 200
+      taxField.index shouldBe 4
+      taxField.name shouldBe "TaxField"
+    }
+
+    "A TrainStationField" should {
+      "be correctly initialized with index and no owner" in {
+        val trainStation = TrainStationField(5, None)
+        trainStation.index shouldBe 5
+        trainStation.name shouldBe "TrainStationField"
+        trainStation.owner shouldBe None
+      }
+
+      "be able to have an owner" in {
+        val player = Player("Alice", 1500)
+        val trainStation = TrainStationField(15, Some(player))
+        trainStation.owner shouldBe defined
+        trainStation.owner.get.name shouldBe "Alice"
+      }
+    }

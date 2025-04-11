@@ -1,5 +1,7 @@
 package de.htwg.model
 
+import de.htwg.model.PropertyField.Color.{Brown, LightBlue, Pink, Red}
+
 import scala.io.StdIn.readLine
 
 case class Board(fields: Vector[BoardField])
@@ -41,7 +43,28 @@ object Monopoly:
       println("Keine Spieler eingegeben. Spiel wird beendet.")
     }
 
-    val board = Board(Vector(GoField))
+    val board = Board(
+      Vector(
+        GoField,
+        PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        CommunityChestField(3), //ListofCards
+        PropertyField("brown2",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        TaxField(100,5),
+        TrainStationField("Marklylebone Station",6,None),
+        PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        ChanceField(8),
+        PropertyField("lightBlue2",9,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("lightBlue2",10,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        JailField,
+        PropertyField("Pink1",12,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Pink1",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("Pink1",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+
+
+
+
+      )
+    )
 
     val game = MonopolyGame(playerVector, board, playerVector.head)
     println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
