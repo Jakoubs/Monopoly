@@ -160,7 +160,6 @@ class BoardFieldSpec extends AnyWordSpec {
   "ChanceField" should {
     "pick a card" in {
       val chanceField = ChanceField()
-      chanceField.
     }
   }
   "CommunityChestField" should {

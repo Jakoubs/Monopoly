@@ -24,10 +24,11 @@ case object CardToJail extends CardAction {
 
 case class CardMoveTo(index: Int, collectMoney: Boolean) extends CardAction {
   def apply(player: Player): Player = {
-    if(collectMoney)
-      player.playerMove(rollDice = () =>((index-player.position)%40,0))
+    val passedGo = player.position > index
+    val movedPlayer = player.moveToIndex(index)
+    if (collectMoney && passedGo)
+      movedPlayer.copy(balance = movedPlayer.balance + 200)
     else
-      player.moveToIndex(index)
-
+      movedPlayer
   }
 }

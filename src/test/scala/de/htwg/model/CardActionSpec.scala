@@ -41,12 +41,26 @@ class CardActionSpec extends AnyWordSpec {
       val updatedPlayer = action.apply(player)
       updatedPlayer.position shouldEqual 10
     }
-    "if goTo200" in{
+    "if collectMoney -> true collect money on Go" in{
       val player = Player("TestPlayer", 1000, 30)
       val action = CardMoveTo(1,true)
-      val updatedPlayer = player.playerMove(()=>(11,0))
+      val updatedPlayer = action.apply(player)
       updatedPlayer.position should be(1)
       updatedPlayer.balance should be(1200)
+    }
+    "if collectMoney -> false collect no money" in {
+      val player = Player("TestPlayer", 1000, 30)
+      val action = CardMoveTo(1, false)
+      val updatedPlayer = action.apply(player)
+      updatedPlayer.position should be(1)
+      updatedPlayer.balance should be(1000)
+    }
+    "if collectMoney -> true and no move over GO collect no money" in {
+      val player = Player("TestPlayer", 1000, 30)
+      val action = CardMoveTo(35, true)
+      val updatedPlayer = action.apply(player)
+      updatedPlayer.position should be(35)
+      updatedPlayer.balance should be(1000)
     }
   }
 }

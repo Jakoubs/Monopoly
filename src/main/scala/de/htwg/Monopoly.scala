@@ -1,14 +1,40 @@
-package de.htwg
+package de.htwg.model
 
-class Monopoly
+import scala.io.StdIn.readLine
 
-import model.Player
-import model.Dice
+case class Board(fields: Vector[BoardField])
 
 object Monopoly:
   def main(args: Array[String]): Unit = {
-    println("Hello ")
-    val (a, b) = Dice().rollDice()
-    println(s"$a and $b")
+    val game = defineGame()
   }
 
+  def defineGame(): MonopolyGame = {
+    println("Spieler eingeben (tippe 'ready' um fertig zu sein):")
+
+    var playerVector = Vector[Player]()
+    var playerName = ""
+
+    while {
+      playerName = readLine()
+      playerName != "ready"
+    } do {
+      playerVector = playerVector.appended(Player(playerName, 1500))
+      println(s"Spieler $playerName hinzugefügt. Nächster Spieler (oder 'ready'):")
+    }
+
+    if (playerVector.isEmpty) {
+      println("Keine Spieler eingegeben. Spiel wird beendet.")
+    }
+
+    val board = Board(Vector(GoField))
+
+    val game = MonopolyGame(playerVector, board, playerVector.head)
+    println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
+    game
+  }
+case class MonopolyGame(
+                         players: Vector[Player],
+                         board: Board,
+                         currentPlayer: Player
+                       )
