@@ -10,8 +10,11 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
     val baseHousePrice = purchasePrice / 2
     ((baseHousePrice + 9) / 10) * 10
   }
-  def buyHouse(player: Player,field: PropertyField, anz: Int): (PropertyField, Player) = {
-    (field.copy(house = Some(house.get + anz)), player.copy(balance = player.balance - price))
+  def buyHouse(player: Player,field: PropertyField): (PropertyField, Player) = {
+    if(player.balance < field.calculateHousePrice(field.price) || field.house.get==5)
+      return (field, player)
+    else
+      (field.copy(house = Some(house.get + 1)), player.copy(balance = player.balance - price))
   }
 
 

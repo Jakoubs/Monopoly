@@ -17,7 +17,7 @@ class BoardFieldSpec extends AnyWordSpec {
     "buildHomes" in {
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), "red", 1000, Some(0))
       val p1 = Player("TestPlayer", 1000, 5)
-      val (newf1, newp1) = f1.buyHouse(p1, f1, 1)
+      val (newf1, newp1) = f1.buyHouse(p1, f1)
       newf1.house should be(Some(1))
       newp1.balance should be(900)
     }
