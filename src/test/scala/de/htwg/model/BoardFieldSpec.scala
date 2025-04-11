@@ -1,8 +1,6 @@
 package de.htwg.model
-import org.scalatest.matchers.should.Matchers.{shouldBe, *}
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
-import de.htwg.model.BoardField
-import de.htwg.model.Card
 class BoardFieldSpec extends AnyWordSpec {
   "PropertyField" should {
     "build a property field" in {
@@ -51,7 +49,7 @@ class BoardFieldSpec extends AnyWordSpec {
 
   "GoField" should {
     "be created" in {
-      val goField = GoField;
+      val goField = GoField
       goField.index should be(1)
       goField.name should be("GoField")
     }
@@ -59,7 +57,7 @@ class BoardFieldSpec extends AnyWordSpec {
 
   "JailField" should {
     "be created" in{
-      val jail = JailField;
+      val jail = JailField
       jail.index should be(11)
       jail.name should be("Jail")
     }
