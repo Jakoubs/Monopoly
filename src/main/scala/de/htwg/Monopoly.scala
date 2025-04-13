@@ -8,20 +8,30 @@ case class Board(fields: Vector[BoardField])
 
 object Monopoly:
   def main(args: Array[String]): Unit = {
-    val game = defineGame()
+    var game = defineGame()
+    printBoard(game)
     while (game.players.size > 1) {
       println(s"${game.currentPlayer.name}'s turn")
       val updatedPlayer = playerTurn(game.currentPlayer)
-      println("Turn finished. Proceeding to next player.")
-      val updatedGame = game.copy(currentPlayer = game.players((game.players.indexOf(game.currentPlayer) + 1) % game.players.size))
-      println(s"${updatedGame.currentPlayer} would be the next player.")
-      println(s"${updatedPlayer.position} would be the position of p1.")
+
+      val updatedPlayers = game.players.map(p =>
+        if (p.name == updatedPlayer.name) updatedPlayer else p
+      )
+
+      val nextPlayer = updatedPlayers((updatedPlayers.indexOf(updatedPlayer) + 1) % updatedPlayers.size)
+
+      game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer)
+
+      printBoard(game)
+      println(s"${game.currentPlayer.name} would be the next player.")
+      println(s"${updatedPlayer.position} is the new position of ${updatedPlayer.name}.")
     }
   }
 
+
   def playerTurn(player: Player): Player = {
     val dice = new Dice()
-    val updatedPlayer = player.playerMove(() => dice.rollDice(2,2), 1)
+    val updatedPlayer = player.playerMove(() => dice.rollDice(), 1)
     updatedPlayer
   }
 
@@ -35,7 +45,7 @@ object Monopoly:
       playerName = readLine()
       playerName != "ready"
     } do {
-      playerVector = playerVector.appended(Player(playerName, 1500))
+      playerVector = playerVector.appended(Player(playerName, 1500, 1))
       println(s"Spieler $playerName hinzugefügt. Nächster Spieler (oder 'ready'):")
     }
 
@@ -48,7 +58,7 @@ object Monopoly:
         GoField,
         PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         CommunityChestField(3),
-        PropertyField("brown2",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        PropertyField("brown2",4,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         TaxField(100,5),
         TrainStationField("Marklylebone Station",6,None),
         PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
@@ -78,7 +88,7 @@ object Monopoly:
         GoToJailField(),
         PropertyField("Green1",32,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         PropertyField("Green2",33,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        ChanceField(35),
+        ChanceField(34),
         PropertyField("Green3",35,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         TrainStationField("Liverpool ST Station",36,None),
         ChanceField(37),
@@ -87,10 +97,124 @@ object Monopoly:
         PropertyField("Blue2",40,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
       )
     )
-
     val game = MonopolyGame(playerVector, board, playerVector.head)
     println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
     game
+  }
+  def printBoard(game: MonopolyGame): Unit = {
+    printTop(game)
+    printSides(game)
+    printBottum(game)
+  }
+  def printTop(game: MonopolyGame): Unit = {
+    val a = 0
+    val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
+    var line2 = "|  ______  _____  |"
+    var line3 = "| |  ____ |     | |"
+    var line4 = "| |_____| |_____| |"
+    var line5 = "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |"
+    var line6 = "|  ssssssssSSSS   |                                                                                |          |      |"
+    var line7 = "|          ;:`    |                                                                                |          |      |"
+    var line8 = "|" + fillSpace(playersOnIndex(1, game,false), 17) + "|                                                                                |"+fillSpace(playersOnIndex(11, game,true), 10)+"|"+fillSpace(playersOnIndex(11, game,false), 6)+"|"
+    var line9 = "+--------+--------+                                                                                +--------+-+------+"
+    for (field <- game.board.fields) {
+      if (field.index > 1 && field.index < 11) {
+        var extra = getExtra(field)
+        var name = field.name
+        var idx = field.index
+        line2 = line2 + fillSpace(("Nr" + idx.toString + extra), 8) + "|"
+        val priceStr = getPrice(field)
+        line3 = line3 + fillSpace(priceStr, 8) + '|'
+        line4 = line4 + fillSpace(playersOnIndex(field.index, game,false), 8) + '|'
+      }
+    }
+    line2 = line2 + "                 |"
+    line3 = line3 + "__________       |"
+    line4 = line4 + "  JAIL    |      |"
+    val lines = Vector(line1, line2, line3, line4, line5, line6, line7, line8, line9)
+    lines.foreach(println)
+  }
+  def printSides(game: MonopolyGame): Unit = {
+    val a=0
+    for(a <- 12 to 20){
+      var fieldA = game.board.fields.find(_.index == 52-a).get
+      var fieldB = game.board.fields.find(_.index == a).get
+      var topLine ='|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA),8) + '|', 107)+'|'+ fillSpace(fieldB.index.toString + getExtra(fieldB),8) + '|'
+      var priceLine = '|' + fillSpace(fillSpace(getPrice(fieldA),8) + '|', 107)+'|'+ fillSpace(getPrice(fieldB),8) + '|'
+      var playerLine = '|' + fillSpace(fillSpace(playersOnIndex(52-a, game,false),8) + '|', 107)+'|'+ fillSpace(playersOnIndex(a, game,false),8) + '|'
+      var bottomLine = ""
+      if(a!=20){
+        bottomLine = "+--------+                                                                                                  +--------+"
+      } else {
+        bottomLine = "+--------+--------+                                                                                +--------+--------+"
+      }
+      println(topLine)
+      println(priceLine)
+      println(playerLine)
+      println(bottomLine)
+    }
+  }
+  def printBottum(game: MonopolyGame): Unit = {
+    val line1 = "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |"
+    var line2 = "|     ---->       |                                                                                |   ______        |"
+    var line4 = "|                 |                                                                                |  /|_||_`.__     |"
+    var line5 = "|                 +--------+--------+--------+--------+--------+--------+--------+--------+--------+ (   _    _ _\\   |"
+    var line6 = "|                 |"
+    var line7 = "|                 |"
+    var line8 = "|"+fillSpace(playersOnIndex(31,game,false),17)+"|"
+    var line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
+    val a = 0
+    for (a <- 22 to 30) {
+      var field = game.board.fields.find(_.index == 52-a).get
+      line6 = line6 + fillSpace(field.index.toString + getExtra(field), 8) + '|'
+      line7 = line7 + fillSpace(getPrice(field), 8) + '|'
+      line8 = line8 + fillSpace(playersOnIndex(field.index, game,false), 8) + '|'
+    }
+    line6 = line6 + "                 |"
+    line7 = line7 + "                 |"
+    line8 = line8 + fillSpace(playersOnIndex(21, game,false), 17) + '|'
+    val lines = Vector(line1, line2, line4, line5, line6, line7, line8, line9)
+    lines.foreach(println)
+  }
+  def fillSpace(input: String, maxChar: Int): String = {
+    input.padTo(maxChar, ' ')
+  }
+  def getPrice(field: BoardField): String = {
+    field match
+      case pf: PropertyField => pf.price.toString + '$'
+      case tf: TrainStationField => "200$"
+      case _ => ""
+  }
+  def getExtra(field: BoardField): String = {
+    field match
+      case pf: PropertyField =>
+        if (pf.owner.isEmpty)
+          ""
+        else
+          (pf.owner.toString + " [" + pf.house.amount.toString + ']')
+      case cf: ChanceField => ("")
+      case cc: CommunityChestField => ("")
+      case tf: TaxField => ("")
+      case ts: TrainStationField =>
+        if (ts.owner.isEmpty)
+          ""
+        else
+          (' ' + ts.owner.toString)
+      case uf: UtilityField =>
+        if (uf.owner.isEmpty)
+          ""
+        else
+        (' ' + uf.owner.toString)
+      case _ => ""
+  }
+  def playersOnIndex(idx: Int, game: MonopolyGame, inJail: Boolean): String = {
+    var playerString =""
+    for(p<- game.players){
+      if(p.position == idx && p.isInJail == inJail) {
+        playerString = playerString + p.name + " "
+      }
+    }
+    playerString
   }
 case class MonopolyGame(
                          players: Vector[Player],
