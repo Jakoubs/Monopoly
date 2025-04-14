@@ -1,5 +1,4 @@
 package de.htwg.model
-
 import de.htwg.model.PropertyField.*
 
 sealed trait BoardField {
@@ -86,11 +85,11 @@ case class TaxField(amount: Int, idx: Int) extends BoardField {
   override val index: Int = idx
   override val name: String = "TaxField"
 }
-case class TrainStationField(nm: String ,idx: Int, owner: Option[Player]) extends BoardField {
+case class TrainStationField(nm: String ,idx: Int, owner: Option[String]) extends BoardField {
   override val index: Int = idx
   override val name: String = nm
 }
-case class UtilityField(nm: String, idx: Int, owner: Option[Player]) extends BoardField{
+case class UtilityField(nm: String, idx: Int, owner: Option[String]) extends BoardField{
   override val index: Int = idx
   override val name: String = nm
 }
