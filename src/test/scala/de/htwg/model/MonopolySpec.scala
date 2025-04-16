@@ -1,5 +1,5 @@
 package de.htwg.model
-import de.htwg.Monopoly
+import de.htwg.model.Monopoly
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers

@@ -24,8 +24,6 @@ object Monopoly:
       game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer)
 
       printBoard(game)
-      println(s"${game.currentPlayer.name} would be the next player.")
-      println(s"${updatedPlayer.position} is the new position of ${updatedPlayer.name}.")
     }
   }
 
@@ -94,23 +92,29 @@ object Monopoly:
     }
   }
 
+  import scala.util.Random
+
+  def randomEmoji(): String = {
+    val emojis = List(
+      "🐶", "🐱", "🐯", "🦁", "🐻", "🐼", "🦊", "🐺", "🦄", "🐲", "🦉",
+      "🦅", "🐝", "🦋", "🐙", "🦑", "🦈", "🐊", "🦖", "🦓", "🦒", "🐘",
+      "🦔", "🐢", "🐸", "🦜", "👑", "🤖", "👽", "🧙", "🧛", "🧟", "👻",
+      "🦸", "🧚", "🥷")
+
+    emojis(Random.nextInt(emojis.size))
+  }
+
   def defineGame(): MonopolyGame = {
-    println("Spieler eingeben (tippe 'ready' um fertig zu sein):")
-
+    println("Wie viele Spieler? (2-4):")
+    val playerAnz = readLine().toInt
     var playerVector = Vector[Player]()
-    var playerName = ""
 
-    while {
-      playerName = readLine()
-      playerName != "ready"
-    } do {
+    for (i <- 1 to playerAnz) {
+      val playerName = randomEmoji()
       playerVector = playerVector.appended(Player(playerName, 1500, 1))
-      println(s"Spieler $playerName hinzugefügt. Nächster Spieler (oder 'ready'):")
+      println(s"Spieler $playerName hinzugefügt.")
     }
 
-    if (playerVector.isEmpty) {
-      println("Keine Spieler eingegeben. Spiel wird beendet.")
-    }
 
     val board = Board(
       Vector(
@@ -166,17 +170,17 @@ object Monopoly:
     printBottum(game)
   }
   def printTop(game: MonopolyGame): Unit = {
-    var (stats1,stats2,stats3) = getStats(game)
+    var (stats1,stats2,stats3, stats4) = getStats(game)
     val a = 0
     val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
     var line2 = "|  ______  _____  |"
     var line3 = "| |  ____ |     | |"
     var line4 = "| |_____| |_____| |"
     var line5 = "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |"
-    var line6 = "|  ssssssssSSSS   |                                                                                |          |      |"
-    var line7 = "|          ;:`    |  "+fillSpace(stats1,76)+"  |          |      |"
-    var line8 = "|" + fillSpace(playersOnIndex(1, game,false), 17) + "|  "+fillSpace(stats2,76)+"  |"+fillSpace(playersOnIndex(11, game,true), 10)+"|"+fillSpace(playersOnIndex(11, game,false), 6)+ "|"
-    var line9 = "+--------+--------+  "+fillSpace(stats3,76)+"  +--------+-+------+"
+    var line6 = "|  ssssssssSSSS   |  "+fillSpace(stats1,76)+"  |          |      |"
+    var line7 = "|          ;:`    |  "+fillSpace(stats2,76)+"  |          |      |"
+    var line8 = "|" + fillSpace(playersOnIndex(1, game,false), 17) + "|  "+fillSpace(stats3,76)+"  |"+fillSpace(playersOnIndex(11, game,true), 10)+"|"+fillSpace(playersOnIndex(11, game,false), 6)+ "|"
+    var line9 = "+--------+--------+  "+fillSpace(stats4,76)+"  +--------+-+------+"
     for (field <- game.board.fields) {
       if (field.index > 1 && field.index < 11) {
         var extra = getExtra(field)
@@ -222,7 +226,7 @@ object Monopoly:
     var line6 = "|                 |"
     var line7 = "|                 |"
     var line8 = "|"+fillSpace(playersOnIndex(31,game,false),17)+"|"
-    var line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
+    var line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
     val a = 0
     for (a <- 22 to 30) {
       var field = game.board.fields.find(_.index == 52-a).get
@@ -272,20 +276,42 @@ object Monopoly:
     }
     playerString
   }
-  def getStats(game: MonopolyGame): (String,String, String) = {
-    var stats1 = ""
-    var stats2 = ""
-    var stats3 = ""
-    for(p <- game.players){
-      if(stats1.length<40)
-        stats1 = stats1 + p.name + " pos["+p.position+"], balance["+p.balance+"], isInJail["+p.isInJail+"]    "
-      else if(stats2.length<40)
-        stats2 = stats2 + p.name + " pos["+p.position+"], balance["+p.balance+"], isInJail["+p.isInJail+"]    "
-      else
-        stats3 = stats3 + p.name + " pos["+p.position+"], balance["+p.balance+"], isInJail["+p.isInJail+"]    "
+  def getStats(game: MonopolyGame): (String, String, String, String) = {
+    // Erstelle Informationsstrings für alle Spieler
+    val playerInfos = game.players.map(p =>
+      p.name + " pos[" + p.position + "], balance[" + p.balance + "], isInJail[" + p.isInJail + "]    "
+    )
+    val result = playerInfos.foldLeft(("", "", "", "")) {
+      case ((s1, s2, s3, s4), info) =>
+        if (s1.length < 20) (s1 + info, s2, s3, s4)
+        else if (s2.length < 20) (s1, s2 + info, s3, s4)
+        else if (s3.length < 20) (s1, s2, s3 + info, s4)
+        else (s1, s2, s3, s4 + info)
     }
-    (stats1, stats2, stats3)
+
+    result
   }
+
+
+  def getInventory(game: MonopolyGame): String = {
+    val header = "INVENTORY Player: " + game.currentPlayer.name + "|"
+
+    game.board.fields.foldLeft(header) { (acc, field) =>
+      field match {
+        case pf: PropertyField if pf.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + pf.index + "[" + pf.house.amount + "], "
+
+        case ts: TrainStationField if ts.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + ts.index + ", "
+
+        case uf: UtilityField if uf.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + uf.index + ", "
+
+        case _ => acc
+      }
+    }
+  }
+
 
   def buyHouse(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame, Player) = {
     // Überprüfe, ob das Feld im Spielbrett existiert

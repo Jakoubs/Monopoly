@@ -41,14 +41,14 @@ class BoardFieldSpec extends AnyWordSpec {
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
       val p1 = Player("TestPlayer", 0, 5)
       val (newf1, newp1) = f1.house.buyHouse(p1, f1)
-      newf1.house.amount should  be(0)
+      newf1.house.amount should be(0)
       newp1.balance should be(0)
     }
     "not buildHomes if max Hotel" in {
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000),House(5))
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000), House(5))
       val p1 = Player("TestPlayer", 1000, 5)
       val (newf1, newp1) = f1.house.buyHouse(p1, f1)
-      newf1.house.amount should  be(5)
+      newf1.house.amount should be(5)
       newp1.balance should be(1000)
     }
 
@@ -82,7 +82,6 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
 
-
   "GoField" should {
     "be created" in {
       val goField = GoField
@@ -99,7 +98,7 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
   "JailField" should {
-    "be created" in{
+    "be created" in {
       val jail = JailField
       jail.index should be(11)
       jail.name should be("Jail")
@@ -140,7 +139,7 @@ class BoardFieldSpec extends AnyWordSpec {
       val player = Player("TestPlayer", 100, 21)
       val action = LoseMoney(100)
       val freeParkingField = FreeParkingField(0)
-      val (updatedPlayer, updatedField) = action.apply(player,freeParkingField)
+      val (updatedPlayer, updatedField) = action.apply(player, freeParkingField)
       updatedField.amount should be(100)
     }
     "give player amount when on field" in {
@@ -172,19 +171,22 @@ class BoardFieldSpec extends AnyWordSpec {
       taxField.index shouldBe 4
       taxField.name shouldBe "TaxField"
     }
+  }
 
-    "A TrainStationField" should {
-      "be correctly initialized with index and no owner" in {
-        val trainStation = TrainStationField("kp",5, None)
-        trainStation.index shouldBe 5
-        trainStation.name shouldBe "TrainStationField"
-        trainStation.owner shouldBe None
-      }
-
-      "be able to have an owner" in {
-        val player = Player("Alice", 1500)
-        val trainStation = TrainStationField("kp",15, Some(player))
-        trainStation.owner shouldBe defined
-        trainStation.owner.get.name shouldBe "Alice"
-      }
+  "A TrainStationField" should {
+    "be correctly initialized with index and no owner" in {
+      val trainStation = TrainStationField("kp", 5, None)
+      trainStation.index shouldBe 5
+      trainStation.name shouldBe "TrainStationField"
+      trainStation.owner shouldBe None
     }
+
+    "be able to have an owner" in {
+      val player = Player("Alice", 1500)
+      val trainStation = TrainStationField("kp", 15, Some(player.name))
+      trainStation.owner shouldBe defined
+      trainStation.owner.get shouldBe "Alice"
+    }
+  }
+
+}
