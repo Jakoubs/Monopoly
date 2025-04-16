@@ -6,7 +6,12 @@ class Dice:
   def rollDice(): (Int, Int) = {
     val a = Random.nextInt(6) + 1
     val b = Random.nextInt(6) + 1
-    //println(s"You rolled $a and $b! That's ${a + b} moves.")
     (a, b)
   }
+
+  def rollDice(d1: Int, d2: Int): (Int, Int) = {
+      (d1, d2)
+  }
+
+
 

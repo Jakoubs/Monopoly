@@ -1,6 +1,15 @@
-# Monopoly Scala test
+<<<<<<< HEAD
+<<<<<<< HEAD
+# Monopoly with Scala
+=======
+# Monopoly
 
+>>>>>>> c89c744 (Merge Conflict test)
 Welcome to the Monopoly project! This is a Scala implementation of the game Monopoly.
+=======
+# Monopoly
+Welcome to the Monopoly project. This is a Scala implementation of the classic board game Monopoly.
+>>>>>>> Lecture3
 
 ## Contents
 
@@ -42,3 +51,5 @@ To start the game, simply run the main class:
 ```sh
 sbt run
 ```
+![Monopoly Logo](./images/MonopolyLogo.png)
+
