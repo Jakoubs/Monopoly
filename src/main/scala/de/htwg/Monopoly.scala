@@ -164,132 +164,149 @@ object Monopoly:
     println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
     game
   }
+
   def printBoard(game: MonopolyGame): Unit = {
     printTop(game)
     printSides(game)
-    printBottum(game)
+    printBottom(game)
   }
+
   def printTop(game: MonopolyGame): Unit = {
-    var (stats1,stats2,stats3, stats4) = getStats(game)
-    val a = 0
+    val (stats1, stats2, stats3, stats4) = getStats(game)
+
     val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
-    var line2 = "|  ______  _____  |"
-    var line3 = "| |  ____ |     | |"
-    var line4 = "| |_____| |_____| |"
-    var line5 = "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |"
-    var line6 = "|  ssssssssSSSS   |  "+fillSpace(stats1,76)+"  |          |      |"
-    var line7 = "|          ;:`    |  "+fillSpace(stats2,76)+"  |          |      |"
-    var line8 = "|" + fillSpace(playersOnIndex(1, game,false), 17) + "|  "+fillSpace(stats3,76)+"  |"+fillSpace(playersOnIndex(11, game,true), 10)+"|"+fillSpace(playersOnIndex(11, game,false), 6)+ "|"
-    var line9 = "+--------+--------+  "+fillSpace(stats4,76)+"  +--------+-+------+"
-    for (field <- game.board.fields) {
-      if (field.index > 1 && field.index < 11) {
-        var extra = getExtra(field)
-        var name = field.name
-        var idx = field.index
-        line2 = line2 + fillSpace(("Nr" + idx.toString + extra), 8) + "|"
-        val priceStr = getPrice(field)
-        line3 = line3 + fillSpace(priceStr, 8) + '|'
-        line4 = line4 + fillSpace(playersOnIndex(field.index, game,false), 8) + '|'
-      }
-    }
-    line2 = line2 + "                 |"
-    line3 = line3 + "__________       |"
-    line4 = line4 + "  JAIL    |      |"
-    val lines = Vector(line1, line2, line3, line4, line5, line6, line7, line8, line9)
-    lines.foreach(println)
+
+    val baseLines = List(
+      "|  ______  _____  |",
+      "| |  ____ |     | |",
+      "| |_____| |_____| |"
+    )
+
+    val fields2To10 = game.board.fields.filter(field => field.index > 1 && field.index < 11)
+
+    val line2 = fields2To10.foldLeft(baseLines(0))((line, field) =>
+      line + fillSpace(("Nr" + field.index.toString + getExtra(field)), 8) + "|") + "                 |"
+
+    val line3 = fields2To10.foldLeft(baseLines(1))((line, field) =>
+      line + fillSpace(getPrice(field), 8) + '|') + "__________       |"
+
+    val line4 = fields2To10.foldLeft(baseLines(2))((line, field) =>
+      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |"
+
+    val additionalLines = List(
+      "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |",
+      "|  ssssssssSSSS   |  " + fillSpace(stats1, 76) + "  |          |      |",
+      "|          ;:`    |  " + fillSpace(stats2, 76) + "  |          |      |",
+      "|" + fillSpace(playersOnIndex(1, game, false), 17) + "|  " + fillSpace(stats3, 76) + "  |" + fillSpace(playersOnIndex(11, game, true), 10) + "|" + fillSpace(playersOnIndex(11, game, false), 6) + "|",
+      "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+"
+    )
+
+    println(line1)
+    println(line2)
+    println(line3)
+    println(line4)
+    additionalLines.foreach(println)
   }
+
   def printSides(game: MonopolyGame): Unit = {
-    val a=0
-    for(a <- 12 to 20){
-      var fieldA = game.board.fields.find(_.index == 52-a).get
-      var fieldB = game.board.fields.find(_.index == a).get
-      var topLine ='|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA),8) + '|', 107)+'|'+ fillSpace(fieldB.index.toString + getExtra(fieldB),8) + '|'
-      var priceLine = '|' + fillSpace(fillSpace(getPrice(fieldA),8) + '|', 107)+'|'+ fillSpace(getPrice(fieldB),8) + '|'
-      var playerLine = '|' + fillSpace(fillSpace(playersOnIndex(52-a, game,false),8) + '|', 107)+'|'+ fillSpace(playersOnIndex(a, game,false),8) + '|'
-      var bottomLine = ""
-      if(a!=20){
-        bottomLine = "+--------+                                                                                                  +--------+"
-      } else {
-        bottomLine = "+--------+--------+                                                                                +--------+--------+"
-      }
-      println(topLine)
-      println(priceLine)
-      println(playerLine)
-      println(bottomLine)
+    (12 to 20).foreach { a =>
+      val fieldA = game.board.fields.find(_.index == 52 - a).get
+      val fieldB = game.board.fields.find(_.index == a).get
+
+      val lines = List(
+        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|',
+        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|',
+        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|',
+        if (a != 20) "+--------+                                                                                                  +--------+"
+        else "+--------+--------+                                                                                +--------+--------+"
+      )
+
+      lines.foreach(println)
     }
   }
-  def printBottum(game: MonopolyGame): Unit = {
-    val line1 = "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |"
-    var line2 = "|     ---->       |                                                                                |   ______        |"
-    var line4 = "|                 |                                                                                |  /|_||_`.__     |"
-    var line5 = "|                 +--------+--------+--------+--------+--------+--------+--------+--------+--------+ (   _    _ _\\   |"
-    var line6 = "|                 |"
-    var line7 = "|                 |"
-    var line8 = "|"+fillSpace(playersOnIndex(31,game,false),17)+"|"
-    var line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
-    val a = 0
-    for (a <- 22 to 30) {
-      var field = game.board.fields.find(_.index == 52-a).get
-      line6 = line6 + fillSpace(field.index.toString + getExtra(field), 8) + '|'
-      line7 = line7 + fillSpace(getPrice(field), 8) + '|'
-      line8 = line8 + fillSpace(playersOnIndex(field.index, game,false), 8) + '|'
-    }
-    line6 = line6 + " =`-(_)--(_)-`   |"
-    line7 = line7 + "   Money ["+getPrice(game.board.fields.find(_.index == 21).get)+"]    |"
-    line8 = line8 + fillSpace(playersOnIndex(21, game,false), 17) + '|'
-    val lines = Vector(line1, line2, line4, line5, line6, line7, line8, line9)
-    lines.foreach(println)
+
+  def printBottom(game: MonopolyGame): Unit = {
+    val fixedLines = List(
+      "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |",
+      "|     ---->       |                                                                                |   ______        |",
+      "|                 |                                                                                |  /|_||_`.__     |",
+      "|                 +--------+--------+--------+--------+--------+--------+--------+--------+--------+ (   _    _ _\\   |"
+    )
+
+    val fields22To30 = (22 to 30).map(a => game.board.fields.find(_.index == 52 - a).get)
+
+    val line6 = fields22To30.foldLeft("|                 |")((line, field) =>
+      line + fillSpace(field.index.toString + getExtra(field), 8) + '|') + " =`-(_)--(_)-`   |"
+
+    val line7 = fields22To30.foldLeft("|                 |")((line, field) =>
+      line + fillSpace(getPrice(field), 8) + '|') + "   Money [" + getPrice(game.board.fields.find(_.index == 21).get) + "]    |"
+
+    val line8 = fields22To30.foldLeft("|" + fillSpace(playersOnIndex(31, game, false), 17) + "|")((line, field) =>
+      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + fillSpace(playersOnIndex(21, game, false), 17) + '|'
+
+    val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
+
+    fixedLines.foreach(println)
+    println(line6)
+    println(line7)
+    println(line8)
+    println(line9)
   }
+
   def fillSpace(input: String, maxChar: Int): String = {
     input.padTo(maxChar, ' ')
   }
+
   def getPrice(field: BoardField): String = {
-    field match
+    field match {
       case pf: PropertyField => pf.price.toString + '$'
       case tf: TrainStationField => "200$"
       case fp: FreeParkingField => fp.amount.toString + '$'
       case _ => ""
+    }
   }
 
   def getExtra(field: BoardField): String = {
-    field match
+    field match {
       case pf: PropertyField =>
-        pf.owner match
+        pf.owner match {
           case Some(ownerName) => (ownerName + " [" + pf.house.amount.toString + ']')
           case None => ""
+        }
       case ts: TrainStationField =>
-        ts.owner match
+        ts.owner match {
           case Some(ownerName) => " " + ownerName
           case None => ""
+        }
       case uf: UtilityField =>
-        uf.owner match
+        uf.owner match {
           case Some(ownerName) => " " + ownerName
           case None => ""
+        }
       case _ => ""
-  }
-  def playersOnIndex(idx: Int, game: MonopolyGame, inJail: Boolean): String = {
-    var playerString =""
-    for(p<- game.players){
-      if(p.position == idx && p.isInJail == inJail) {
-        playerString = playerString + p.name + " "
-      }
     }
-    playerString
   }
+
+  def playersOnIndex(idx: Int, game: MonopolyGame, inJail: Boolean): String = {
+    game.players
+      .filter(p => p.position == idx && p.isInJail == inJail)
+      .map(_.name + " ")
+      .mkString
+  }
+
   def getStats(game: MonopolyGame): (String, String, String, String) = {
-    // Erstelle Informationsstrings für alle Spieler
+    // Create information strings for all players
     val playerInfos = game.players.map(p =>
       p.name + " pos[" + p.position + "], balance[" + p.balance + "], isInJail[" + p.isInJail + "]    "
     )
-    val result = playerInfos.foldLeft(("", "", "", "")) {
+
+    playerInfos.foldLeft(("", "", "", "")) {
       case ((s1, s2, s3, s4), info) =>
         if (s1.length < 20) (s1 + info, s2, s3, s4)
         else if (s2.length < 20) (s1, s2 + info, s3, s4)
         else if (s3.length < 20) (s1, s2, s3 + info, s4)
         else (s1, s2, s3, s4 + info)
     }
-
-    result
   }
 
 
