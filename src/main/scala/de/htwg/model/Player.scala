@@ -5,6 +5,7 @@ case class Player(name: String,
                   balance: Int,
                   position: Int = 0,
                   isInJail: Boolean = false,
+                  jailTurns: Int = 0
                   //properties: List[PropertyField] = List()
                  ) {
 

@@ -12,8 +12,9 @@ object Monopoly:
     printBoard(game)
     while (game.players.size > 1) {
       println(s"${game.currentPlayer.name}'s turn")
-      val (updatedPlayer, updatedGame) = playerTurn(game.currentPlayer, game)
-
+      val playerId = game.players.indexOf(game.currentPlayer)
+      val updatedGame = handlePlayerTurn(game)
+      val updatedPlayer = updatedGame.players(playerId)
       val updatedPlayers = updatedGame.players.map(p =>
         if (p.name == updatedPlayer.name) updatedPlayer else p
       )
@@ -28,70 +29,133 @@ object Monopoly:
   }
 
 
-  def playerTurn(player: Player, game: MonopolyGame): (Player, MonopolyGame) = {
-    val dice = new Dice()
-    val updatedPlayer = player.playerMove(() => dice.rollDice(), 1)
-
-    // Prüfen, ob der Spieler auf einem kaufbaren Feld gelandet ist
-    val currentFieldOption = game.board.fields.find(_.index == updatedPlayer.position)
-
-    currentFieldOption match {
-      case Some(field: PropertyField) if field.owner.isEmpty =>
-        println(s"Sie sind auf dem freien Grundstück ${field.name} gelandet. Möchten Sie es für ${field.price} kaufen? (j/n)")
-        val answer = readLine().trim.toLowerCase
-        if (answer == "j") {
-          val (updatedGame, playerAfterBuying) = buyProperty(game, field.index, updatedPlayer)
-          return (playerAfterBuying, updatedGame)
-        }
-      case Some(field: TrainStationField) if field.owner.isEmpty =>
-        println(s"Sie sind auf dem Bahnhof ${field.name} gelandet. Möchten Sie ihn kaufen? (j/n)")
-        val answer = readLine().trim.toLowerCase
-        if (answer == "j") {
-          val (updatedGame, playerAfterBuying) = buyProperty(game, field.index, updatedPlayer)
-          return (playerAfterBuying, updatedGame)
-        }
-      case Some(field: UtilityField) if field.owner.isEmpty =>
-        println(s"Sie sind auf dem Versorgungswerk ${field.name} gelandet. Möchten Sie es kaufen? (j/n)")
-        val answer = readLine().trim.toLowerCase
-        if (answer == "j") {
-          val (updatedGame, playerAfterBuying) = buyProperty(game, field.index, updatedPlayer)
-          return (playerAfterBuying, updatedGame)
-        }
-      case _ => // Nichts zu tun
-    }
-
-    // Nach dem Würfeln weitere Aktionen anbieten
-    println("Möchten Sie eine Aktion ausführen? (h: Haus kaufen, k: Immobilie kaufen, n: Nächster Spieler)")
-    val action = readLine().trim.toLowerCase
-
-    action match {
-      case "h" =>
-        println("Auf welchem Grundstück möchten Sie ein Haus bauen? (Geben Sie den Index ein)")
-        try {
-          val propertyIndex = readLine().toInt
-          val (updatedGame, playerAfterBuying) = buyHouse(game, propertyIndex, updatedPlayer)
-          (playerAfterBuying, updatedGame)
-        } catch {
-          case _: NumberFormatException =>
-            println("Ungültige Eingabe. Bitte geben Sie eine Zahl ein.")
-            (updatedPlayer, game)
-        }
-      case "k" =>
-        println("Welche Immobilie möchten Sie kaufen? (Geben Sie den Index ein)")
-        try {
-          val propertyIndex = readLine().toInt
-          val (updatedGame, playerAfterBuying) = buyProperty(game, propertyIndex, updatedPlayer)
-          (playerAfterBuying, updatedGame)
-        } catch {
-          case _: NumberFormatException =>
-            println("Ungültige Eingabe. Bitte geben Sie eine Zahl ein.")
-            (updatedPlayer, game)
-        }
-      case _ =>
-        (updatedPlayer, game)
+  def handlePlayerTurn(game: MonopolyGame): MonopolyGame = {
+    if (game.currentPlayer.isInJail) {
+      handleJailTurn(game)
+    } else {
+      handleRegularTurn(game)
     }
   }
 
+  def handleRegularTurn(game: MonopolyGame): MonopolyGame = {
+    val player = game.currentPlayer
+    println(s"${player.name}'s regular turn")
+    readLine("Press anything to roll a dice")
+    val (dice1, dice2) = Dice().rollDice()
+    val diceSum = dice1 + dice2
+    println(s"You rolled $dice1 and $dice2 ($diceSum)")
+
+    val newPosition = (player.position + diceSum) % game.board.fields.size
+    val updatedPlayer = player.copy(position = newPosition)
+    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+    val updatedGame = game.copy(players = updatedPlayers)
+
+    handleFieldAction(updatedGame, newPosition)
+  }
+
+  def handleJailTurn(game: MonopolyGame): MonopolyGame = {
+    println(s"${game.currentPlayer.name}, you are in jail!")
+    println("Options to get out of jail:")
+    println("1. Pay €50 to get out")
+    println("2. Use a 'Get Out of Jail Free' card (if available)")
+    println("3. Try to roll doubles")
+
+    val choice = readLine("Enter your choice (1-3): ").trim
+
+    choice match {
+      case "1" =>
+        if (game.currentPlayer.balance >= 50) {
+          val updatedPlayer = game.currentPlayer.copy(
+            isInJail = false,
+            balance = game.currentPlayer.balance - 50,
+            jailTurns = 0
+          )
+
+          val (dice1, dice2) = Dice().rollDice()
+          val diceSum = dice1 + dice2
+          println(s"You rolled $dice1 and $dice2 ($diceSum)")
+
+          val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
+          val playerAfterMove = updatedPlayer.copy(position = newPosition)
+          val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), playerAfterMove)
+          val updatedGame = game.copy(players = updatedPlayers)
+
+          handleFieldAction(updatedGame, newPosition)
+        } else {
+          println("You don't have enough money to pay €50!")
+          game
+        }
+
+      case "2" =>
+        println("Not implimented yet")
+        game
+      case "3" =>
+        val (dice1, dice2) = Dice().rollDice()
+        val isDoubles = dice1 == dice2
+        println(s"You rolled $dice1 and $dice2")
+
+        if (isDoubles) {
+          println("You rolled doubles! You're free!")
+          val diceSum = dice1 + dice2
+
+          val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
+          val updatedPlayer = game.currentPlayer.copy(
+            isInJail = false,
+            jailTurns = 0,
+            position = newPosition
+          )
+
+          val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+          val updatedGame = game.copy(players = updatedPlayers)
+
+          handleFieldAction(updatedGame, newPosition)
+        } else {
+          val jailTurns = game.currentPlayer.jailTurns + 1
+
+          if (jailTurns >= 3) {
+            println("This was your third attempt. You must pay €50 to get out.")
+
+            val updatedPlayer = if (game.currentPlayer.balance >= 50) {
+              val (dice1, dice2) = Dice().rollDice()
+              val diceSum = dice1 + dice2
+              println(s"You rolled $dice1 and $dice2 ($diceSum)")
+
+              val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
+              game.currentPlayer.copy(
+                isInJail = false,
+                balance = game.currentPlayer.balance - 50,
+                jailTurns = 0,
+                position = newPosition
+              )
+            } else {
+              println("You don't have enough money to pay €50. You must sell properties or declare bankruptcy.")
+              game.currentPlayer.copy(jailTurns = jailTurns)
+            }
+
+            val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+            val updatedGame = game.copy(players = updatedPlayers)
+
+            if (!updatedPlayer.isInJail) {
+              handleFieldAction(updatedGame, updatedPlayer.position)
+            } else {
+              updatedGame
+            }
+          } else {
+            println(s"You failed to roll doubles. This was attempt ${jailTurns}/3.")
+            val updatedPlayer = game.currentPlayer.copy(jailTurns = jailTurns)
+            val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+            game.copy(players = updatedPlayers)
+          }
+        }
+      case _ =>
+        println("Invalid choice. Try again.")
+        game
+    }
+  }
+
+def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
+  game
+}
   import scala.util.Random
 
   def randomEmoji(): String = {
