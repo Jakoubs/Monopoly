@@ -19,13 +19,15 @@ object Monopoly:
       val updatedPlayers = updatedGame.players.map(p =>
         if (p.name == updatedPlayer.name) updatedPlayer else p
       )
+      val updatedBoard = updatedGame.board
 
 
       val nextPlayer = updatedPlayers((updatedPlayers.indexOf(updatedPlayer) + 1) % updatedPlayers.size)
 
-      game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer)
+      game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer,board = updatedBoard)
 
       printBoard(game)
+      print(game.players)
     }
   }
 
@@ -46,11 +48,11 @@ object Monopoly:
     val diceSum = dice1 + dice2
     println(s"You rolled $dice1 and $dice2 ($diceSum)")
 
-    val newPosition = ((player.position + diceSum - 1) % game.board.fields.size) + 1
+    val newPosition = (player.position + diceSum - 1) % game.board.fields.size + 1
+    println(s"Moving to position $newPosition")
     val updatedPlayer = player.copy(position = newPosition)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     val updatedGame = game.copy(players = updatedPlayers)
-
     handleFieldAction(updatedGame, newPosition)
   }
   def caseDiceJail(game: MonopolyGame):MonopolyGame = {
@@ -166,9 +168,10 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
   if (index >= 0) {
     // Den Spieler in das Gefängnis schicken (Position = 11, isInJail = true)
     val updatedPlayer = game.currentPlayer.goToJail()
-
     val updatedPlayers = game.players.updated(index, updatedPlayer)
-
+    printBoard(game)
+    print("you landet on \"go to jail\", Press any key to continue the game")
+    readLine()
     game.copy(players = updatedPlayers)
   } else {
     println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
@@ -176,25 +179,44 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
   }
 }
 def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
-  val index = game.players.indexWhere(_.name == game.currentPlayer.name)
-  if (index >= 0 && game.currentPlayer.balance>=amount) {
-    val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance-amount)
-    val updatedPlayers = game.players.updated(index, updatedPlayer)
-    game.copy(players = updatedPlayers)
+  print("PlayerOnTax")
+  val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
+  val freeParkingFieldIndex = game.board.fields.indexWhere(_.isInstanceOf[FreeParkingField])
+  print(freeParkingFieldIndex + "is the parkingIndex")
 
-  } else if(game.currentPlayer.balance<amount){
-    //TODO: bankrott der verkaufen
-    game
+  if (playerIndex >= 0 && freeParkingFieldIndex >= 0) {
+    val updatedPlayer = if (game.currentPlayer.balance >= amount) {
+      game.currentPlayer.copy(balance = game.currentPlayer.balance - amount)
+    } else {
+      // TODO: Implementiere Bankrott oder Verkauf von Eigentum
+      game.currentPlayer
+    }
+    val updatedPlayers = game.players.updated(playerIndex, updatedPlayer)
+    val freeParkingField = game.board.fields(freeParkingFieldIndex).asInstanceOf[FreeParkingField]
+    print(freeParkingField)
+    val updatedFreeParkingField = freeParkingField.copy(amount = freeParkingField.amount + amount)
+    print(updatedFreeParkingField)
+    val updatedFields = game.board.fields.updated(freeParkingFieldIndex, updatedFreeParkingField)
+    val updatedBoard = game.board.copy(fields = updatedFields)
+    print(updatedBoard)
+
+    val returnVal = game.copy(players = updatedPlayers, board = updatedBoard)
+    print(returnVal)
+    returnVal
+
   } else {
-    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
+    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden oder 'Frei Parken'-Feld fehlt!")
     game
   }
 }
 def handleFreeParkingField(game: MonopolyGame, freeP: FreeParkingField): MonopolyGame = {
-  val index = game.players.indexWhere(_.name == game.currentPlayer.name)
-  if (index >= 0) {
-    val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance + freeP.amount)
-    val updatedPlayers = game.players.updated(index, updatedPlayer)
+  println(s"You landed on Free Parking! Collecting €${freeP.amount}.")
+  val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
+  print("PlayersIndex" + playerIndex)
+  if (playerIndex >= 0) {
+    val collectedAmount = freeP.amount
+    val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance + collectedAmount)
+    val updatedPlayers = game.players.updated(playerIndex, updatedPlayer)
     val updatedField = freeP.copy(amount = 0)
     val updatedBoard = game.board.copy(fields = game.board.fields.updated(freeP.index, updatedField))
     game.copy(players = updatedPlayers, board = updatedBoard)
