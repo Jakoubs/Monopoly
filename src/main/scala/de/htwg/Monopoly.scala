@@ -2,6 +2,7 @@ package de.htwg.model
 
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
+import de.htwg.model.PropertyField.calculateRent
 import scala.io.StdIn.readLine
 import scala.util.Random
 
@@ -159,10 +160,45 @@ def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
     case goToJail: GoToJailField => handleGoToJailField(game)
     case taxF: TaxField => handleTaxField(game, taxF.amount)
     case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
+    case pf: PropertyField => handlePropertyField(game, pf)
     case _ => game
   }
   updatedGame
 }
+def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGame = {
+  property.owner match {
+    case None =>
+      println(s"Property (${property.name}) is available for ${property.price}$$")
+      println("Buy? (y/n)")
+      val response = readLine().trim.toLowerCase
+      if (response == "y") {
+        val (updatedGame, _) = buyProperty(game, property.index, game.currentPlayer)
+        updatedGame
+      } else {
+        game
+      }
+    case Some(ownerName) if ownerName != game.currentPlayer.name =>
+      val rent = calculateRent(property)
+      println(s"Pay ${rent}$$ rent to ${ownerName}")
+      val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
+      val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent)
+
+      val ownerIndex = game.players.indexWhere(_.name == ownerName)
+      val owner = game.players(ownerIndex)
+      val updatedOwner = owner.copy(balance = owner.balance + rent)
+
+      // Aktualisiere die Spielerliste
+      val updatedPlayers = game.players
+        .updated(playerIndex, updatedPlayer)
+        .updated(ownerIndex, updatedOwner)
+
+      game.copy(players = updatedPlayers)
+    case Some(_) =>
+      println("Tis property is owned by you.")
+      game
+  }
+}
+
 def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
   val index = game.players.indexWhere(_.name == game.currentPlayer.name)
   if (index >= 0) {
@@ -262,7 +298,7 @@ def randomEmoji(vektor: Vector[Player]): String = {
         JailField,
         PropertyField("Pink1",12,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         UtilityField("Electric Company", 13, None),
-        PropertyField("Pink2",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(5)),
+        PropertyField("Pink2",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         PropertyField("Pink3",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
         TrainStationField("Fenchurch ST Station",16,None),
         PropertyField("Orange1",17,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
@@ -410,26 +446,26 @@ def printBottom(game: MonopolyGame): Unit = {
     }
   }
 
-  def getExtra(field: BoardField): String = {
-    field match {
-      case pf: PropertyField =>
-        pf.owner match {
-          case Some(ownerName) => (ownerName + " [" + pf.house.amount.toString + ']')
-          case None => ""
-        }
-      case ts: TrainStationField =>
-        ts.owner match {
-          case Some(ownerName) => " " + ownerName
-          case None => ""
-        }
-      case uf: UtilityField =>
-        uf.owner match {
-          case Some(ownerName) => " " + ownerName
-          case None => ""
-        }
-      case _ => ""
-    }
+def getExtra(field: BoardField): String = {
+  field match {
+    case pf: PropertyField =>
+      pf.owner match {
+        case Some(ownerName) => s" $ownerName${pf.house.amount}"
+        case None => ""
+      }
+    case ts: TrainStationField =>
+      ts.owner match {
+        case Some(ownerName) => s" $ownerName"
+        case None => ""
+      }
+    case uf: UtilityField =>
+      uf.owner match {
+        case Some(ownerName) => s" $ownerName"
+        case None => ""
+      }
+    case _ => ""
   }
+}
 
   def playersOnIndex(idx: Int, game: MonopolyGame, inJail: Boolean): String = {
     game.players

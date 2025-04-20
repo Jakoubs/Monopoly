@@ -11,10 +11,6 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
   object PropertyField {
     case class House(amount: Int = 0) {
       private val maxHouses = 5
-      def calculateRent(property: PropertyField): Int = {
-        var rent = property.rent
-        rent += property.house.amount * rent/2
-      }
       def calculateHousePrice(purchasePrice: Int): Int = {
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
@@ -38,6 +34,12 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 
     enum Color:
       case Brown, LightBlue, Pink, Orange, Red, Yellow, Green, DarkBlue
+
+    def calculateRent(property: PropertyField): Int = {
+      val rent = property.rent
+      val finalRent =  property.rent + property.house.amount * (rent / 2)
+      finalRent
+    }
   }
 
 case object GoField extends BoardField {
