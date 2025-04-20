@@ -3,6 +3,7 @@ package de.htwg.model
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
 import scala.io.StdIn.readLine
+import scala.util.Random
 
 case class Board(fields: Vector[BoardField])
 
@@ -155,6 +156,8 @@ def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
   val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
   val updatedGame = field match {
     case goToJail: GoToJailField => handleGoToJailField(game)
+    case taxF: TaxField => handleTaxField(game, taxF.amount)
+    case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
     case _ => game
   }
   updatedGame
@@ -173,7 +176,34 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
     game
   }
 }
-  import scala.util.Random
+def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
+  val index = game.players.indexWhere(_.name == game.currentPlayer.name)
+  if (index >= 0 && game.currentPlayer.balance>=amount) {
+    val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance-amount)
+    val updatedPlayers = game.players.updated(index, updatedPlayer)
+    game.copy(players = updatedPlayers)
+   
+  } else if(game.currentPlayer.balance<amount){
+    //TODO: bankrott der verkaufen
+    game
+  } else {
+    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
+    game
+  }
+}
+def handleFreeParkingField(game: MonopolyGame, freeP: FreeParkingField): MonopolyGame = {
+  val index = game.players.indexWhere(_.name == game.currentPlayer.name)
+  if (index >= 0) {
+    val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance + freeP.amount)
+    val updatedPlayers = game.players.updated(index, updatedPlayer)
+    val updatedField = freeP.copy(amount = 0)
+    val updatedBoard = game.board.copy(fields = game.board.fields.updated(freeP.index, updatedField))
+    game.copy(players = updatedPlayers, board = updatedBoard)
+  } else {
+    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
+    game
+  }
+}
 
 def randomEmoji(vektor: Vector[Player]): String = {
   val emojis = List(
