@@ -45,7 +45,7 @@ object Monopoly:
     val diceSum = dice1 + dice2
     println(s"You rolled $dice1 and $dice2 ($diceSum)")
 
-    val newPosition = (player.position + diceSum) % game.board.fields.size
+    val newPosition = ((player.position + diceSum - 1) % game.board.fields.size) + 1
     val updatedPlayer = player.copy(position = newPosition)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     val updatedGame = game.copy(players = updatedPlayers)
@@ -79,7 +79,6 @@ object Monopoly:
           val playerAfterMove = updatedPlayer.copy(position = newPosition)
           val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), playerAfterMove)
           val updatedGame = game.copy(players = updatedPlayers)
-
           handleFieldAction(updatedGame, newPosition)
         } else {
           println("You don't have enough money to pay €50!")
@@ -107,7 +106,6 @@ object Monopoly:
 
           val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
           val updatedGame = game.copy(players = updatedPlayers)
-
           handleFieldAction(updatedGame, newPosition)
         } else {
           val jailTurns = game.currentPlayer.jailTurns + 1
@@ -154,7 +152,31 @@ object Monopoly:
   }
 
 def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
-  game
+  // Entweder die Felder mit Index ab 0 definieren
+  // ODER
+  val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
+  val updatedGame = field match {
+    case goToJail: GoToJailField => handleGoToJailField(game)
+    case _ => game
+  }
+  updatedGame
+}
+def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
+  val index = game.players.indexWhere(_.name == game.currentPlayer.name)
+  if (index >= 0) {
+    // Den Spieler in das Gefängnis schicken (Position = 11, isInJail = true)
+    val updatedPlayer = game.currentPlayer.goToJail()
+
+    // Die Liste der Spieler aktualisieren
+    val updatedPlayers = game.players.updated(index, updatedPlayer)
+
+    // Das Spiel mit den aktualisierten Spielern zurückgeben
+    game.copy(players = updatedPlayers)
+  } else {
+    // Falls der Spieler nicht gefunden wird, gebe das Spiel unverändert zurück
+    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
+    game
+  }
 }
   import scala.util.Random
 
