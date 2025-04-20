@@ -178,13 +178,23 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
     game
   }
 }
-def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
-  print("PlayerOnTax")
-  val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
-  val freeParkingFieldIndex = game.board.fields.indexWhere(_.isInstanceOf[FreeParkingField])
-  print(freeParkingFieldIndex + "is the parkingIndex")
+def updateFreeParkingAmount(board: Board, amount: Int): Board = {
+  val freeParkingFieldIndex = board.fields.indexWhere(_.isInstanceOf[FreeParkingField])
+  if (freeParkingFieldIndex >= 0) {
+    val freeParkingField = board.fields(freeParkingFieldIndex).asInstanceOf[FreeParkingField]
+    val updatedFreeParkingField = freeParkingField.copy(amount = freeParkingField.amount + amount)
+    board.copy(fields = board.fields.updated(freeParkingFieldIndex, updatedFreeParkingField))
+  } else {
+    println("Fehler: 'Frei Parken'-Feld nicht gefunden!")
+    board
+  }
+}
 
-  if (playerIndex >= 0 && freeParkingFieldIndex >= 0) {
+def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
+  println("PlayerOnTax")
+  val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
+
+  if (playerIndex >= 0) {
     val updatedPlayer = if (game.currentPlayer.balance >= amount) {
       game.currentPlayer.copy(balance = game.currentPlayer.balance - amount)
     } else {
@@ -192,33 +202,22 @@ def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
       game.currentPlayer
     }
     val updatedPlayers = game.players.updated(playerIndex, updatedPlayer)
-    val freeParkingField = game.board.fields(freeParkingFieldIndex).asInstanceOf[FreeParkingField]
-    print(freeParkingField)
-    val updatedFreeParkingField = freeParkingField.copy(amount = freeParkingField.amount + amount)
-    print(updatedFreeParkingField)
-    val updatedFields = game.board.fields.updated(freeParkingFieldIndex, updatedFreeParkingField)
-    val updatedBoard = game.board.copy(fields = updatedFields)
-    print(updatedBoard)
-
-    val returnVal = game.copy(players = updatedPlayers, board = updatedBoard)
-    print(returnVal)
-    returnVal
-
+    val updatedBoard = updateFreeParkingAmount(game.board, amount)
+    game.copy(players = updatedPlayers, board = updatedBoard)
   } else {
-    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden oder 'Frei Parken'-Feld fehlt!")
+    println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
     game
   }
 }
+
 def handleFreeParkingField(game: MonopolyGame, freeP: FreeParkingField): MonopolyGame = {
   println(s"You landed on Free Parking! Collecting €${freeP.amount}.")
   val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
-  print("PlayersIndex" + playerIndex)
   if (playerIndex >= 0) {
     val collectedAmount = freeP.amount
     val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance + collectedAmount)
     val updatedPlayers = game.players.updated(playerIndex, updatedPlayer)
-    val updatedField = freeP.copy(amount = 0)
-    val updatedBoard = game.board.copy(fields = game.board.fields.updated(freeP.index, updatedField))
+    val updatedBoard = game.board.copy(fields = game.board.fields.updated(freeP.index-1, freeP.copy(amount = 0)))
     game.copy(players = updatedPlayers, board = updatedBoard)
   } else {
     println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
@@ -357,33 +356,46 @@ def randomEmoji(vektor: Vector[Player]): String = {
     }
   }
 
-  def printBottom(game: MonopolyGame): Unit = {
-    val fixedLines = List(
-      "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |",
-      "|     ---->       |                                                                                |   ______        |",
-      "|                 |                                                                                |  /|_||_`.__     |",
-      "|                 +--------+--------+--------+--------+--------+--------+--------+--------+--------+ (   _    _ _\\   |"
-    )
+def printBottom(game: MonopolyGame): Unit = {
+  val fixedLines = List(
+    "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |",
+    "|     ---->       |                                                                                |   ______        |",
+    "|                 |                                                                                |  /|_||_`.__     |",
+    "|                 +--------+--------+--------+--------+--------+--------+--------+--------+--------+ (   _    _ _\\   |"
+  )
 
-    val fields22To30 = (22 to 30).map(a => game.board.fields.find(_.index == 52 - a).get)
+  val fields22To30Options = (22 to 30).map(a => game.board.fields.find(_.index == 52 - a))
 
-    val line6 = fields22To30.foldLeft("|                 |")((line, field) =>
-      line + fillSpace(field.index.toString + getExtra(field), 8) + '|') + " =`-(_)--(_)-`   |"
+  val line6 = fields22To30Options.foldLeft("|                 |")((line, fieldOption) =>
+    fieldOption match {
+      case Some(field) => line + fillSpace(field.index.toString + getExtra(field), 8) + '|'
+      case None => line + fillSpace("N/A", 8) + '|'
+    }) + " =`-(_)--(_)-`   |"
 
-    val line7 = fields22To30.foldLeft("|                 |")((line, field) =>
-      line + fillSpace(getPrice(field), 8) + '|') + "   Money [" + getPrice(game.board.fields.find(_.index == 21).get) + "]    |"
-
-    val line8 = fields22To30.foldLeft("|" + fillSpace(playersOnIndex(31, game, false), 17) + "|")((line, field) =>
-      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + fillSpace(playersOnIndex(21, game, false), 17) + '|'
-
-    val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
-
-    fixedLines.foreach(println)
-    println(line6)
-    println(line7)
-    println(line8)
-    println(line9)
+  val freeParkingMoney = game.board.fields.find(_.index == 21) match {
+    case Some(field: FreeParkingField) => getPrice(field)
+    case _ => "N/A"
   }
+  val line7 = fields22To30Options.foldLeft("|                 |")((line, fieldOption) =>
+    fieldOption match {
+      case Some(field) => line + fillSpace(getPrice(field), 8) + '|'
+      case None => line + fillSpace("N/A", 8) + '|'
+    }) + s"   Money [$freeParkingMoney]    |"
+
+  val line8 = fields22To30Options.foldLeft("|" + fillSpace(playersOnIndex(31, game, false), 17) + "|")((line, fieldOption) =>
+    fieldOption match {
+      case Some(field) => line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|'
+      case None => line + fillSpace(" ", 8) + '|'
+    }) + fillSpace(playersOnIndex(21, game, false), 17) + '|'
+
+  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
+
+  fixedLines.foreach(println)
+  println(line6)
+  println(line7)
+  println(line8)
+  println(line9)
+}
 
   def fillSpace(input: String, maxChar: Int): String = {
     input.padTo(maxChar, ' ')
