@@ -2,6 +2,7 @@ package de.htwg.model
 
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
+import de.htwg.model.SoundPlayer
 import de.htwg.model.PropertyField.calculateRent
 import scala.io.StdIn.readLine
 import scala.util.Random
@@ -173,6 +174,7 @@ def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGa
       val response = readLine().trim.toLowerCase
       if (response == "y") {
         val (updatedGame, _) = buyProperty(game, property.index, game.currentPlayer)
+        SoundPlayer().playAndWait("/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/target/scala-3.3.5/classes/Money.wav")
         updatedGame
       } else {
         game
