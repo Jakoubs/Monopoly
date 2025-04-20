@@ -152,8 +152,6 @@ object Monopoly:
   }
 
 def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
-  // Entweder die Felder mit Index ab 0 definieren
-  // ODER
   val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
   val updatedGame = field match {
     case goToJail: GoToJailField => handleGoToJailField(game)
@@ -167,28 +165,25 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
     // Den Spieler in das Gefängnis schicken (Position = 11, isInJail = true)
     val updatedPlayer = game.currentPlayer.goToJail()
 
-    // Die Liste der Spieler aktualisieren
     val updatedPlayers = game.players.updated(index, updatedPlayer)
 
-    // Das Spiel mit den aktualisierten Spielern zurückgeben
     game.copy(players = updatedPlayers)
   } else {
-    // Falls der Spieler nicht gefunden wird, gebe das Spiel unverändert zurück
     println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
     game
   }
 }
   import scala.util.Random
 
-  def randomEmoji(): String = {
-    val emojis = List(
-      "🐶", "🐱", "🐯", "🦁", "🐻", "🐼", "🦊", "🐺", "🦄", "🐲", "🦉",
-      "🦅", "🐝", "🦋", "🐙", "🦑", "🦈", "🐊", "🦖", "🦓", "🦒", "🐘",
-      "🦔", "🐢", "🐸", "🦜", "👑", "🤖", "👽", "🧙", "🧛", "🧟", "👻",
-      "🦸", "🧚", "🥷")
-
-    emojis(Random.nextInt(emojis.size))
-  }
+def randomEmoji(vektor: Vector[Player]): String = {
+  val emojis = List(
+    "🐶", "🐱", "🐯", "🦁", "🐻", "🐼", "🦊", "🐺", "🦄", "🐲", "🦉",
+    "🦅", "🐝", "🦋", "🐙", "🦑", "🦈", "🐊", "🦖", "🦓", "🦒", "🐘",
+    "🦔", "🐢", "🐸", "🦜", "👑", "🤖", "👽", "🧙", "🧛", "🧟", "👻",
+    "🦸", "🧚", "🥷")
+  val availableEmojis = emojis.filterNot(e => vektor.exists(_.name == e))
+  Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
+}
 
   def defineGame(): MonopolyGame = {
     println("Wie viele Spieler? (2-4):")
@@ -196,7 +191,7 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
     var playerVector = Vector[Player]()
 
     for (i <- 1 to playerAnz) {
-      val playerName = randomEmoji()
+      val playerName = randomEmoji(playerVector)
       playerVector = playerVector.appended(Player(playerName, 1500, 1))
       println(s"Spieler $playerName hinzugefügt.")
     }
@@ -381,7 +376,6 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
   }
 
   def getStats(game: MonopolyGame): (String, String, String, String) = {
-    // Create information strings for all players
     val playerInfos = game.players.map(p =>
       p.name + " pos[" + p.position + "], balance[" + p.balance + "], isInJail[" + p.isInJail + "]    "
     )
@@ -417,32 +411,25 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
 
 
   def buyHouse(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame, Player) = {
-    // Überprüfe, ob das Feld im Spielbrett existiert
     val fieldOption = game.board.fields.find(_.index == propertyIndex)
 
     fieldOption match {
       case Some(field: PropertyField) =>
-        // Überprüfe, ob der Spieler der Eigentümer ist
         field.owner match {
           case Some(owner) if owner == player.name =>
-            // Überprüfe, ob der Spieler genug Geld hat (Kosten für Haus: 50)
             val houseCost = 50
             if (player.balance >= houseCost) {
-              // Aktualisiere das Feld mit einem neuen Haus
               val updatedField = field.copy(
                 house = PropertyField.House(field.house.amount + 1)
               )
 
-              // Aktualisiere das Spielbrett
               val updatedFields = game.board.fields.map { f =>
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
 
-              // Aktualisiere den Spieler mit reduziertem Geld
               val updatedPlayer = player.copy(balance = player.balance - houseCost)
 
-              // Aktualisiere das Spiel
               val updatedGame = game.copy(board = updatedBoard)
 
               println(s"${player.name} hat ein Haus auf ${field.name} gebaut.")
@@ -465,31 +452,24 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
   }
 
   def buyProperty(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame, Player) = {
-    // Überprüfe, ob das Feld im Spielbrett existiert
     val fieldOption = game.board.fields.find(_.index == propertyIndex)
 
     fieldOption match {
       case Some(field: PropertyField) =>
-        // Überprüfe, ob die Immobilie noch keinen Eigentümer hat
         field.owner match {
           case None =>
-            // Überprüfe, ob der Spieler genug Geld hat
             if (player.balance >= field.price) {
-              // Aktualisiere das Feld mit dem neuen Eigentümer
               val updatedField = field.copy(
                 owner = Some(player.name)
               )
 
-              // Aktualisiere das Spielbrett
               val updatedFields = game.board.fields.map { f =>
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
 
-              // Aktualisiere den Spieler mit reduziertem Geld
               val updatedPlayer = player.copy(balance = player.balance - field.price)
 
-              // Aktualisiere das Spiel
               val updatedGame = game.copy(board = updatedBoard)
 
               println(s"${player.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
@@ -503,7 +483,6 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
             (game, player)
         }
       case Some(field: TrainStationField) =>
-        // Ähnliche Logik für Bahnhöfe
         field.owner match {
           case None =>
             val stationPrice = 200 // Typischer Preis für Bahnhöfe
@@ -528,7 +507,6 @@ def handleGoToJailField(game: MonopolyGame): MonopolyGame = {
             (game, player)
         }
       case Some(field: UtilityField) =>
-        // Ähnliche Logik für Versorgungswerke
         field.owner match {
           case None =>
             val utilityPrice = 150 // Typischer Preis für Versorgungswerke
