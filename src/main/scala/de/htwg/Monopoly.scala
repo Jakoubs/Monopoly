@@ -53,7 +53,64 @@ object Monopoly:
 
     handleFieldAction(updatedGame, newPosition)
   }
+  def caseDiceJail(game: MonopolyGame):MonopolyGame = {
+    val (dice1, dice2) = Dice().rollDice()
+    val isDoubles = dice1 == dice2
+    println(s"You rolled $dice1 and $dice2")
 
+    if (isDoubles) {
+      println("You rolled doubles! You're free!")
+      val diceSum = dice1 + dice2
+
+      val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
+      val updatedPlayer = game.currentPlayer.copy(
+        isInJail = false,
+        jailTurns = 0,
+        position = newPosition
+      )
+
+      val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+      val updatedGame = game.copy(players = updatedPlayers)
+      handleFieldAction(updatedGame, newPosition)
+    } else {
+      val jailTurns = game.currentPlayer.jailTurns + 1
+
+      if (jailTurns >= 3) {
+        println("This was your third attempt. You must pay €50 to get out.")
+
+        val updatedPlayer = if (game.currentPlayer.balance >= 50) {
+          val (dice1, dice2) = Dice().rollDice()
+          val diceSum = dice1 + dice2
+          println(s"You rolled $dice1 and $dice2 ($diceSum)")
+
+          val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
+          game.currentPlayer.copy(
+            isInJail = false,
+            balance = game.currentPlayer.balance - 50,
+            jailTurns = 0,
+            position = newPosition
+          )
+        } else {
+          println("You don't have enough money to pay €50. You must sell properties or declare bankruptcy.")
+          game.currentPlayer.copy(jailTurns = jailTurns)
+        }
+
+        val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+        val updatedGame = game.copy(players = updatedPlayers)
+
+        if (!updatedPlayer.isInJail) {
+          handleFieldAction(updatedGame, updatedPlayer.position)
+        } else {
+          updatedGame
+        }
+      } else {
+        println(s"You failed to roll doubles. This was attempt ${jailTurns}/3.")
+        val updatedPlayer = game.currentPlayer.copy(jailTurns = jailTurns)
+        val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
+        game.copy(players = updatedPlayers)
+      }
+    }
+  }
   def handleJailTurn(game: MonopolyGame): MonopolyGame = {
     println(s"${game.currentPlayer.name}, you are in jail!")
     println("Options to get out of jail:")
@@ -89,69 +146,11 @@ object Monopoly:
       case "2" =>
         println("Not implimented yet")
         game
-      case "3" =>
-        val (dice1, dice2) = Dice().rollDice()
-        val isDoubles = dice1 == dice2
-        println(s"You rolled $dice1 and $dice2")
+      case "3" => caseDiceJail(game)
 
-        if (isDoubles) {
-          println("You rolled doubles! You're free!")
-          val diceSum = dice1 + dice2
-
-          val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
-          val updatedPlayer = game.currentPlayer.copy(
-            isInJail = false,
-            jailTurns = 0,
-            position = newPosition
-          )
-
-          val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
-          val updatedGame = game.copy(players = updatedPlayers)
-          handleFieldAction(updatedGame, newPosition)
-        } else {
-          val jailTurns = game.currentPlayer.jailTurns + 1
-
-          if (jailTurns >= 3) {
-            println("This was your third attempt. You must pay €50 to get out.")
-
-            val updatedPlayer = if (game.currentPlayer.balance >= 50) {
-              val (dice1, dice2) = Dice().rollDice()
-              val diceSum = dice1 + dice2
-              println(s"You rolled $dice1 and $dice2 ($diceSum)")
-
-              val newPosition = (game.currentPlayer.position + diceSum) % game.board.fields.size
-              game.currentPlayer.copy(
-                isInJail = false,
-                balance = game.currentPlayer.balance - 50,
-                jailTurns = 0,
-                position = newPosition
-              )
-            } else {
-              println("You don't have enough money to pay €50. You must sell properties or declare bankruptcy.")
-              game.currentPlayer.copy(jailTurns = jailTurns)
-            }
-
-            val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
-            val updatedGame = game.copy(players = updatedPlayers)
-
-            if (!updatedPlayer.isInJail) {
-              handleFieldAction(updatedGame, updatedPlayer.position)
-            } else {
-              updatedGame
-            }
-          } else {
-            println(s"You failed to roll doubles. This was attempt ${jailTurns}/3.")
-            val updatedPlayer = game.currentPlayer.copy(jailTurns = jailTurns)
-            val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
-            game.copy(players = updatedPlayers)
-          }
-        }
-      case _ =>
-        println("Invalid choice. Try again.")
-        game
+      case _ => caseDiceJail(game)
     }
   }
-
 def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
   val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
   val updatedGame = field match {
@@ -182,7 +181,7 @@ def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
     val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance-amount)
     val updatedPlayers = game.players.updated(index, updatedPlayer)
     game.copy(players = updatedPlayers)
-   
+
   } else if(game.currentPlayer.balance<amount){
     //TODO: bankrott der verkaufen
     game
