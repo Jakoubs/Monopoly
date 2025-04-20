@@ -174,7 +174,7 @@ def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGa
       val response = readLine().trim.toLowerCase
       if (response == "y") {
         val (updatedGame, _) = buyProperty(game, property.index, game.currentPlayer)
-        SoundPlayer().playAndWait("/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/target/scala-3.3.5/classes/Money.wav")
+        SoundPlayer().playAndWait("src/main/resources/Money.wav")
         updatedGame
       } else {
         game
