@@ -11,6 +11,10 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
   object PropertyField {
     case class House(amount: Int = 0) {
       private val maxHouses = 5
+      def calculateRent(property: PropertyField): Int = {
+        var rent = property.rent
+        rent += property.house.amount * rent/2
+      }
       def calculateHousePrice(purchasePrice: Int): Int = {
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
