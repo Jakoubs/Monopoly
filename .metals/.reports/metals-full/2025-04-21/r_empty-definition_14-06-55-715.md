@@ -1,3 +1,15 @@
+error id: scala/Array#
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+empty definition using pc, found symbol in pc: scala/Array#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -Array#
+	 -scala/Predef.Array#
+offset: 384
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
@@ -10,7 +22,8 @@ import scala.util.Random
 case class Board(fields: Vector[BoardField])
 
 object Monopoly:
-  def main(args: Array[String]): Unit = {
+  def main(args: Arr@@ay[String]): Unit = {
+    SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     var game = defineGame()
     printBoard(game)
     while (game.players.size > 1) {
@@ -46,7 +59,7 @@ object Monopoly:
     val player = game.currentPlayer
     println(s"${player.name}'s regular turn")
     readLine("Press anything to roll a dice")
-    val (dice1, dice2) = Dice().rollDice(game.sound)
+    val (dice1, dice2) = Dice().rollDice()
     val diceSum = dice1 + dice2
     println(s"You rolled $dice1 and $dice2 ($diceSum)")
 
@@ -55,29 +68,10 @@ object Monopoly:
     val updatedPlayer = player.copy(position = newPosition)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     val updatedGame = game.copy(players = updatedPlayers)
-    val gameRolled =  handleFieldAction(updatedGame, newPosition)
-
-    var continue = true
-    println("Do you want to do anything else? |1. Buy House|2.Trade|3.Mortage| => (1/2/3)")
-    while(continue) {
-      val input = readLine()
-      if(input.equals("x")) {
-        continue = false
-      } else {
-        input match {
-          case "1" => println("By House")
-          case "2" => println("Trade")
-          case "3" => println("Mortgage")
-          case _ => println("not valid! Try again")
-        }
-      }
-    }
-
-    gameRolled
+    handleFieldAction(updatedGame, newPosition)
   }
-
   def caseDiceJail(game: MonopolyGame):MonopolyGame = {
-    val (dice1, dice2) = Dice().rollDice(game.sound)
+    val (dice1, dice2) = Dice().rollDice()
     val isDoubles = dice1 == dice2
     println(s"You rolled $dice1 and $dice2")
 
@@ -97,11 +91,12 @@ object Monopoly:
       handleFieldAction(updatedGame, newPosition)
     } else {
       val jailTurns = game.currentPlayer.jailTurns + 1
+
       if (jailTurns >= 3) {
         println("This was your third attempt. You must pay €50 to get out.")
 
         val updatedPlayer = if (game.currentPlayer.balance >= 50) {
-          val (dice1, dice2) = Dice().rollDice(game.sound)
+          val (dice1, dice2) = Dice().rollDice()
           val diceSum = dice1 + dice2
           println(s"You rolled $dice1 and $dice2 ($diceSum)")
 
@@ -151,7 +146,7 @@ object Monopoly:
             jailTurns = 0
           )
 
-          val (dice1, dice2) = Dice().rollDice(game.sound)
+          val (dice1, dice2) = Dice().rollDice()
           val diceSum = dice1 + dice2
           println(s"You rolled $dice1 and $dice2 ($diceSum)")
 
@@ -192,9 +187,7 @@ def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGa
       val response = readLine().trim.toLowerCase
       if (response == "y") {
         val (updatedGame, _) = buyProperty(game, property.index, game.currentPlayer)
-        if(game.sound) {
-          SoundPlayer().playAndWait("src/main/resources/Money.wav")
-        }
+        SoundPlayer().playAndWait("src/main/resources/Money.wav")
         updatedGame
       } else {
         game
@@ -296,15 +289,13 @@ def randomEmoji(vektor: Vector[Player]): String = {
   def defineGame(): MonopolyGame = {
     
     println("play with sound? (y/n)")
-    val soundBoolString = readLine()
-    val soundBool = soundBoolString match
-      case "y" => true
-      case "n" => false
-      case _ => false 
-    
-    if(soundBool){
-    SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
+    val soundBoolInput = readLine()
+    if(soundBoolInput.equals("y")){
+      val soundBool = true
+    } else {
+      val soundBool = false
     }
+
     println("How many Player? (2-4):")
     val playerAnz = readLine().toInt
     var playerVector = Vector[Player]()
@@ -680,3 +671,9 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: scala/Array#
