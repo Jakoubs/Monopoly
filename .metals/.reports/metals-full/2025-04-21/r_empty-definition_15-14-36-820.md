@@ -1,3 +1,19 @@
+error id: copy.
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+empty definition using pc, found symbol in pc: copy.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -player/copy.
+	 -player/copy#
+	 -player/copy().
+	 -scala/Predef.player.copy.
+	 -scala/Predef.player.copy#
+	 -scala/Predef.player.copy().
+offset: 23559
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
@@ -563,10 +579,9 @@ def getExtra(field: BoardField): String = {
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
+              val updatedPlayer = player.c@@opy(balance = player.balance - houseCost)
               val updatedPlayer = player.copy(balance = player.balance - houseCost)
-              val updatedPlayers = game.players.map(p =>
-                if (p.name == updatedPlayer.name) updatedPlayer else p
-            )    
+              val updatedPlayers = game.players
               val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
               println(s"${player.name} hat ein Haus auf ${field.name} gebaut.")
               (updatedGame)
@@ -684,3 +699,9 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: copy.
