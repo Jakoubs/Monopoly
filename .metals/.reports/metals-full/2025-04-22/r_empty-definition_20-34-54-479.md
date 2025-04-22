@@ -1,3 +1,14 @@
+error id: scala/PartialFunction#lift().
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+empty definition using pc, found symbol in pc: scala/PartialFunction#lift().
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 17739
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
@@ -411,24 +422,32 @@ def randomEmoji(vektor: Vector[Player]): String = {
     additionalLines.foreach(println)
   }
 
-def printFieldsData(game: MonopolyGame, x: Int): (Option[BoardField], Option[BoardField], Option[BoardField], Option[BoardField]) = {
-  // Calculate the batch index based on the current row
-  // For x values 12-15 (first row), we want batch 0 (fields 0-3)
-  // For x values 16-19 (second row), we want batch 1 (fields 4-7)
-  // For x=20 (third row), we want batch 2 (fields 8-11)
-  val batchIndex = (x - 12) 
-  val startIdx = batchIndex * 4 + 5
-  
-  // Get the field names from the batch
-  val fieldNames = game.board.fields.slice(startIdx, startIdx + 4)
-  
-  (
-    fieldNames.lift(0),
-    fieldNames.lift(1),
-    fieldNames.lift(2),
-    fieldNames.lift(3)
-  )
+def printFieldsData(startWert: Int, index: Int): Option[Int] = {
+  startWert match {
+    case 12 =>
+      val sequenz = Seq(0, 1, 2, 3, 4, 5, 6, 7)
+      sequenz.@@lift(index)
+    case 13 =>
+      val sequenz = Seq(8, 9, 10, 11, 12, 13, 14, 15)
+      sequenz.lift(index)
+    case 14 =>
+      val sequenz = Seq(16, 17, 18, 19, 20, 21, 22, 23) 
+      sequenz.lift(index)
+    case 15 =>
+      val sequenz = Seq(24, 25, 26, 27, 28, 29, 31, 32) 
+      sequenz.lift(index)
+    case 16 =>
+      val sequenz = Seq(33, 34, 35, 36, 37, 38, 39)
+      sequenz.lift(index)
+    case _ => None
+  }
 }
+
+val wert14_1 = gibWertAnStelle(14, 1)
+val wert15_3 = gibWertAnStelle(15, 3)
+
+println(s"Wert für Start 14 an Stelle 1: $wert14_1")
+println(s"Wert für Start 15 an Stelle 3: $wert15_3")
 
 
   def printSides(game: MonopolyGame): Unit = {
@@ -439,10 +458,10 @@ def printFieldsData(game: MonopolyGame, x: Int): (Option[BoardField], Option[Boa
       val (fieldData1,fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
 
       val lines = List(
-        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1,
-        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2, 
-        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3,
-        if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
+        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + fieldData1,
+        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + fieldData2, 
+        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + fieldData3,
+        if (a != 20) "+--------+                                                                                                  +--------+" + fieldData4
         else "+--------+--------+                                                                                +--------+--------+"
       )
 
@@ -705,3 +724,9 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: scala/PartialFunction#lift().

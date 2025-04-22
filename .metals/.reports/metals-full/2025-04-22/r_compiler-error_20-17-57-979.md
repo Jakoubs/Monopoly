@@ -1,3 +1,16 @@
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+### java.lang.AssertionError: assertion failed: position not set for nn(<empty>) # -1 of class dotty.tools.dotc.ast.Trees$Apply in <WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+
+
+action parameters:
+offset: 18089
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
@@ -411,22 +424,22 @@ def randomEmoji(vektor: Vector[Player]): String = {
     additionalLines.foreach(println)
   }
 
-def printFieldsData(game: MonopolyGame, x: Int): (Option[BoardField], Option[BoardField], Option[BoardField], Option[BoardField]) = {
+def printFieldsData(game: MonopolyGame, x: Int): (String, String, String, String) = {
   // Calculate the batch index based on the current row
   // For x values 12-15 (first row), we want batch 0 (fields 0-3)
   // For x values 16-19 (second row), we want batch 1 (fields 4-7)
   // For x=20 (third row), we want batch 2 (fields 8-11)
-  val batchIndex = (x - 12) 
-  val startIdx = batchIndex * 4 + 5
+  val batchIndex = (x - 12) / 4
+  val startIdx = batchIndex * 4
   
   // Get the field names from the batch
-  val fieldNames = game.board.fields.slice(startIdx, startIdx + 4)
+  val fieldNames = game.board.fields.slice(startIdx, startIdx + 4).map(_.@@)
   
   (
-    fieldNames.lift(0),
-    fieldNames.lift(1),
-    fieldNames.lift(2),
-    fieldNames.lift(3)
+    fieldNames.lift(0).getOrElse("kein Feld"),
+    fieldNames.lift(1).getOrElse("kein Feld"),
+    fieldNames.lift(2).getOrElse("kein Feld"),
+    fieldNames.lift(3).getOrElse("kein Feld")
   )
 }
 
@@ -439,10 +452,10 @@ def printFieldsData(game: MonopolyGame, x: Int): (Option[BoardField], Option[Boa
       val (fieldData1,fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
 
       val lines = List(
-        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1,
-        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2, 
-        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3,
-        if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
+        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + fieldData1,
+        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + fieldData2, 
+        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + fieldData3,
+        if (a != 20) "+--------+                                                                                                  +--------+" + fieldData4
         else "+--------+--------+                                                                                +--------+--------+"
       )
 
@@ -705,3 +718,35 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+
+#### Error stacktrace:
+
+```
+scala.runtime.Scala3RunTime$.assertFailed(Scala3RunTime.scala:8)
+	dotty.tools.dotc.typer.Typer$.assertPositioned(Typer.scala:72)
+	dotty.tools.dotc.typer.Typer.typed(Typer.scala:3272)
+	dotty.tools.dotc.typer.Applications.extMethodApply(Applications.scala:2458)
+	dotty.tools.dotc.typer.Applications.extMethodApply$(Applications.scala:380)
+	dotty.tools.dotc.typer.Typer.extMethodApply(Typer.scala:116)
+	dotty.tools.dotc.typer.Applications.tryApplyingExtensionMethod(Applications.scala:2503)
+	dotty.tools.dotc.typer.Applications.tryApplyingExtensionMethod$(Applications.scala:380)
+	dotty.tools.dotc.typer.Typer.tryApplyingExtensionMethod(Typer.scala:116)
+	dotty.tools.dotc.interactive.Completion$Completer.tryApplyingReceiverToExtension$1(Completion.scala:526)
+	dotty.tools.dotc.interactive.Completion$Completer.$anonfun$23(Completion.scala:569)
+	scala.collection.immutable.List.flatMap(List.scala:294)
+	scala.collection.immutable.List.flatMap(List.scala:79)
+	dotty.tools.dotc.interactive.Completion$Completer.extensionCompletions(Completion.scala:566)
+	dotty.tools.dotc.interactive.Completion$Completer.selectionCompletions(Completion.scala:446)
+	dotty.tools.dotc.interactive.Completion$.computeCompletions(Completion.scala:218)
+	dotty.tools.dotc.interactive.Completion$.rawCompletions(Completion.scala:78)
+	dotty.tools.pc.completions.Completions.enrichedCompilerCompletions(Completions.scala:114)
+	dotty.tools.pc.completions.Completions.completions(Completions.scala:136)
+	dotty.tools.pc.completions.CompletionProvider.completions(CompletionProvider.scala:135)
+	dotty.tools.pc.ScalaPresentationCompiler.complete$$anonfun$1(ScalaPresentationCompiler.scala:150)
+```
+#### Short summary: 
+
+java.lang.AssertionError: assertion failed: position not set for nn(<empty>) # -1 of class dotty.tools.dotc.ast.Trees$Apply in <WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
