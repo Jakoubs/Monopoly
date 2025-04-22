@@ -1,3 +1,16 @@
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+### java.lang.StringIndexOutOfBoundsException: Range [18753, 29713) out of bounds for length 29707
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+
+
+action parameters:
+offset: 18756
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
@@ -13,7 +26,7 @@ object Monopoly:
     var game = defineGame()
     printBoard(game)
     while (game.players.size > 1) {
-      println(s"${game.currentPlayer.name}'s turn    |    " + getInventory(game))
+      println(s"${game.currentPlayer.name}'s turn")
       val playerId = game.players.indexOf(game.currentPlayer)
       val updatedGame = handlePlayerTurn(game)
       val updatedPlayer = updatedGame.players(playerId)
@@ -28,6 +41,7 @@ object Monopoly:
       game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer,board = updatedBoard)
 
       printBoard(game)
+      print(game.players)
     }
   }
 
@@ -42,7 +56,8 @@ object Monopoly:
 
   def handleRegularTurn(game: MonopolyGame): MonopolyGame = {
     val player = game.currentPlayer
-    readLine("Press ENTER to roll a dice")
+    println(s"${player.name}'s regular turn")
+    readLine("Press anything to roll a dice")
     val (dice1, dice2) = Dice().rollDice(game.sound)
     val diceSum = dice1 + dice2
     println(s"You rolled $dice1 and $dice2 ($diceSum)")
@@ -250,6 +265,7 @@ def updateFreeParkingAmount(board: Board, amount: Int): Board = {
 }
 
 def handleTaxField(game: MonopolyGame, amount: Int): MonopolyGame = {
+  println("PlayerOnTax")
   val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
 
   if (playerIndex >= 0) {
@@ -372,14 +388,6 @@ def randomEmoji(vektor: Vector[Player]): String = {
   }
 
   def printTop(game: MonopolyGame): Unit = {
-    val fieldNames = game.board.fields.slice(0, 4)
-
-      val fieldData1 = formatField(fieldNames.lift(0))
-      val fieldData2 = formatField(fieldNames.lift(1))
-      val fieldData3 = formatField(fieldNames.lift(2))
-      val fieldData4 = formatField(fieldNames.lift(3))
-
-    
     val (stats1, stats2, stats3, stats4) = getStats(game)
 
     val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+" 
@@ -399,14 +407,14 @@ def randomEmoji(vektor: Vector[Player]): String = {
       line + fillSpace(getPrice(field), 8) + '|') + "__________       |"
 
     val line4 = fields2To10.foldLeft(baseLines(2))((line, field) =>
-      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |" + " " * 18 + "ALL FIELDS:"
+      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |"
 
     val additionalLines = List(
-      "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |" + " " * 20 + "Index: 2, GoField",
-      "|  ssssssssSSSS   |  " + fillSpace(stats1, 76) + "  |          |      |" + " " * 20 + fieldData1,
-      "|          ;:`    |  " + fillSpace(stats2, 76) + "  |          |      |" + " " * 20 + fieldData2,
-      "|" + fillSpace(playersOnIndex(1, game, false), 17) + "|  " + fillSpace(stats3, 76) + "  |" + fillSpace(playersOnIndex(11, game, true), 10) + "|" + fillSpace(playersOnIndex(11, game, false), 6) + "|" + " " * 20 + fieldData3,
-      "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+" + " " * 20 + fieldData4 
+      "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |",
+      "|  ssssssssSSSS   |  " + fillSpace(stats1, 76) + "  |          |      |",
+      "|          ;:`    |  " + fillSpace(stats2, 76) + "  |          |      |",
+      "|" + fillSpace(playersOnIndex(1, game, false), 17) + "|  " + fillSpace(stats3, 76) + "  |" + fillSpace(playersOnIndex(11, game, true), 10) + "|" + fillSpace(playersOnIndex(11, game, false), 6) + "|",
+      "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+"
     )
 
     println(line1)
@@ -416,29 +424,24 @@ def randomEmoji(vektor: Vector[Player]): String = {
     additionalLines.foreach(println)
   }
 
-def printFieldsData(game: MonopolyGame, x: Int): (String, String, String, String) = {
-  val batchIndex = x - 12
+def printFieldsData(game: MonopolyGame, x: Int): (BoardField, BoardField, BoardField, BoardField ) = {
+  // Calculate the batch index based on the current row
+  // For x values 12-15 (first row), we want batch 0 (fields 0-3)
+  // For x values 16-19 (second row), we want batch 1 (fields 4-7)
+  // For x=20 (third row), we want batch 2 (fields 8-11)
+  val batchIndex = (x - 12) 
   val startIdx = batchIndex * 4 + 5
   
+  // Get the field names from the batch
   val fieldNames = game.board.fields.slice(startIdx, startIdx + 4)
-
+  
   (
-    formatField(fieldNames.lift(0)),
-    formatField(fieldNames.lift(1)),
-    formatField(fieldNames.lift(2)),
-    formatField(fieldNames.lift(3))
+    fieldNames.lift(0).get,
+    fieldNames.lift(1).get,
+    fieldNames.lift(2).get,
+    fieldNames.lift(3).get
   )
 }
-
-def formatField(optField: Option[BoardField]): String = {
-  optField match {
-    case Some(field) =>
-      s"Index: ${field.index}, ${field.name}, Preis: ${getPrice(field)}"
-    case None =>
-      ""
-  }
-}
-
 
 
   def printSides(game: MonopolyGame): Unit = {
@@ -449,7 +452,7 @@ def formatField(optField: Option[BoardField]): String = {
       val (fieldData1,fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
 
       val lines = List(
-        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1,
+        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + /*fieldData1.index +*/ fieldData1.name + /*@@getPrice(fieldData1),
         '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2, 
         '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3,
         if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
@@ -492,7 +495,7 @@ def printBottom(game: MonopolyGame): Unit = {
       case None => line + fillSpace(" ", 8) + '|'
     }) + fillSpace(playersOnIndex(21, game, false), 17) + '|'
 
-  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
+  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
 
   fixedLines.foreach(println)
   println(line6)
@@ -567,27 +570,23 @@ def getExtra(field: BoardField): String = {
 
 
   def getInventory(game: MonopolyGame): String = {
-  val header = s"INVENTORY Player: ${game.currentPlayer.name}| "
-  val inventoryItems = StringBuilder(header)
+    val header = "INVENTORY Player: " + game.currentPlayer.name + "|"
 
-  for (field <- game.board.fields) {
-    field match {
-      case pf: PropertyField if pf.owner.contains(game.currentPlayer.name) =>
-        inventoryItems.append(s"idx:${pf.index}[${pf.house.amount}], ")
-      case ts: TrainStationField if ts.owner.contains(game.currentPlayer.name) =>
-        inventoryItems.append(s"idx:${ts.index}, ")
-      case uf: UtilityField if uf.owner.contains(game.currentPlayer.name) =>
-        inventoryItems.append(s"idx:${uf.index}, ")
-      case _ => // Tue nichts für Felder, die nicht dem aktuellen Spieler gehören
+    game.board.fields.foldLeft(header) { (acc, field) =>
+      field match {
+        case pf: PropertyField if pf.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + pf.index + "[" + pf.house.amount + "], "
+
+        case ts: TrainStationField if ts.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + ts.index + ", "
+
+        case uf: UtilityField if uf.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + uf.index + ", "
+
+        case _ => acc
+      }
     }
   }
-
-  if (inventoryItems.length > header.length) {
-    inventoryItems.delete(inventoryItems.length - 2, inventoryItems.length)
-  }
-
-  inventoryItems.toString
-}
 
 
   def buyHouse(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame) = {
@@ -728,3 +727,29 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+
+#### Error stacktrace:
+
+```
+java.base/jdk.internal.util.Preconditions$1.apply(Preconditions.java:55)
+	java.base/jdk.internal.util.Preconditions$1.apply(Preconditions.java:52)
+	java.base/jdk.internal.util.Preconditions$4.apply(Preconditions.java:213)
+	java.base/jdk.internal.util.Preconditions$4.apply(Preconditions.java:210)
+	java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:98)
+	java.base/jdk.internal.util.Preconditions.outOfBoundsCheckFromToIndex(Preconditions.java:112)
+	java.base/jdk.internal.util.Preconditions.checkFromToIndex(Preconditions.java:349)
+	java.base/java.lang.String.checkBoundsBeginEnd(String.java:4865)
+	java.base/java.lang.String.substring(String.java:2834)
+	dotty.tools.pc.completions.CompletionProvider.mkItem$1(CompletionProvider.scala:244)
+	dotty.tools.pc.completions.CompletionProvider.completionItems(CompletionProvider.scala:343)
+	dotty.tools.pc.completions.CompletionProvider.$anonfun$1(CompletionProvider.scala:145)
+	scala.collection.immutable.List.map(List.scala:247)
+	dotty.tools.pc.completions.CompletionProvider.completions(CompletionProvider.scala:137)
+	dotty.tools.pc.ScalaPresentationCompiler.complete$$anonfun$1(ScalaPresentationCompiler.scala:150)
+```
+#### Short summary: 
+
+java.lang.StringIndexOutOfBoundsException: Range [18753, 29713) out of bounds for length 29707

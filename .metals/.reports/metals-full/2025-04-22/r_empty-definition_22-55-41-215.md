@@ -1,3 +1,15 @@
+error id: house.
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+empty definition using pc, found symbol in pc: house.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -pf/house.
+	 -scala/Predef.pf.house.
+offset: 23871
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
@@ -13,7 +25,7 @@ object Monopoly:
     var game = defineGame()
     printBoard(game)
     while (game.players.size > 1) {
-      println(s"${game.currentPlayer.name}'s turn    |    " + getInventory(game))
+      println(s"${game.currentPlayer.name}'s turn")
       val playerId = game.players.indexOf(game.currentPlayer)
       val updatedGame = handlePlayerTurn(game)
       val updatedPlayer = updatedGame.players(playerId)
@@ -42,7 +54,7 @@ object Monopoly:
 
   def handleRegularTurn(game: MonopolyGame): MonopolyGame = {
     val player = game.currentPlayer
-    readLine("Press ENTER to roll a dice")
+    readLine("Press anything to roll a dice")
     val (dice1, dice2) = Dice().rollDice(game.sound)
     val diceSum = dice1 + dice2
     println(s"You rolled $dice1 and $dice2 ($diceSum)")
@@ -399,7 +411,7 @@ def randomEmoji(vektor: Vector[Player]): String = {
       line + fillSpace(getPrice(field), 8) + '|') + "__________       |"
 
     val line4 = fields2To10.foldLeft(baseLines(2))((line, field) =>
-      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |" + " " * 18 + "ALL FIELDS:"
+      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |" + " " * 19 + "ALL FIELDS:"
 
     val additionalLines = List(
       "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |" + " " * 20 + "Index: 2, GoField",
@@ -492,7 +504,7 @@ def printBottom(game: MonopolyGame): Unit = {
       case None => line + fillSpace(" ", 8) + '|'
     }) + fillSpace(playersOnIndex(21, game, false), 17) + '|'
 
-  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
+  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+                " + getInventory(game)
 
   fixedLines.foreach(println)
   println(line6)
@@ -567,27 +579,23 @@ def getExtra(field: BoardField): String = {
 
 
   def getInventory(game: MonopolyGame): String = {
-  val header = s"INVENTORY Player: ${game.currentPlayer.name}| "
-  val inventoryItems = StringBuilder(header)
+    val header = "INVENTORY Player: " + game.currentPlayer.name + "|"
 
-  for (field <- game.board.fields) {
-    field match {
-      case pf: PropertyField if pf.owner.contains(game.currentPlayer.name) =>
-        inventoryItems.append(s"idx:${pf.index}[${pf.house.amount}], ")
-      case ts: TrainStationField if ts.owner.contains(game.currentPlayer.name) =>
-        inventoryItems.append(s"idx:${ts.index}, ")
-      case uf: UtilityField if uf.owner.contains(game.currentPlayer.name) =>
-        inventoryItems.append(s"idx:${uf.index}, ")
-      case _ => // Tue nichts für Felder, die nicht dem aktuellen Spieler gehören
+    game.board.fields.foldLeft(header) { (acc, field) =>
+      field match {
+        case pf: PropertyField if pf.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + pf.index + "[" + pf.h@@ouse.amount + "], "
+
+        case ts: TrainStationField if ts.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + ts.index + ", "
+
+        case uf: UtilityField if uf.owner.equals(game.currentPlayer.name) =>
+          acc + "idx:" + uf.index + ", "
+
+        case _ => acc
+      }
     }
   }
-
-  if (inventoryItems.length > header.length) {
-    inventoryItems.delete(inventoryItems.length - 2, inventoryItems.length)
-  }
-
-  inventoryItems.toString
-}
 
 
   def buyHouse(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame) = {
@@ -728,3 +736,9 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: house.
