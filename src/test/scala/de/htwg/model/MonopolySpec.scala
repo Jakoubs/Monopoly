@@ -98,5 +98,25 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedProperty.owner shouldBe None
       updatedPlayer.balance shouldBe 250
     }
+
+    "not allow a Player to buy an owned PropertyField" in {
+      val player = Player("Alice", 500, position = 38)
+      val player2 = Player("Tim", 500, position = 22)
+      val property = PropertyField("Blue1", index = 38, price = 300, rent = 30, owner = Some("Tim"), color = DarkBlue)
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 38, player)
+
+      val updatedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 38 => p
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
+
+      updatedProperty.owner shouldBe Some("Tim")
+      updatedPlayer.balance shouldBe 500
+    }
+
   }
 }
