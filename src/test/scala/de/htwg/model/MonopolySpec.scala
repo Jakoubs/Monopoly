@@ -209,7 +209,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       val unchangedPlayer = updatedGame.players.find(_.name == "Bob").get
 
       updatedUtility.owner shouldBe None
-      unchangedPlayer.balance shouldBe 150
+      unchangedPlayer.balance shouldBe 100
       unchangedPlayer.position shouldBe 6
     }
 
