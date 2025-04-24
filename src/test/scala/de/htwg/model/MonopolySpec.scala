@@ -45,7 +45,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
     darkBlueProperty1
   ))
   val game = MonopolyGame(Vector(player1, player2), board, player1, false)
-   "handlePlayerTurn" should {
+  "handlePlayerTurn" should {
     "call handleRegularTurn if player is not in jail" in {
       val resultGame = Monopoly.handlePlayerTurn(game)
       // Assert that handleRegularTurn was called (similarly, check for a side effect)
@@ -58,6 +58,45 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       // Assert that handleJailTurn was called (we can't directly test the call,
       // but we can check a side effect or the return type if it's distinct)
       resultGame.currentPlayer.isInJail should be(true)
+    }
+  }
+
+  "buyProperty" should {
+    "allow a player to buy an unowned property if they have enough money" in {
+      val player = Player("Alice", 500, position = 38)
+      val property = PropertyField("Blue1", index = 38, price = 300, rent = 30, owner = None, color = DarkBlue)
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 38, player)
+
+      val updatedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 38 => p
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
+
+      updatedProperty.owner shouldBe Some("Alice")
+      updatedPlayer.balance shouldBe 200
+      updatedPlayer.position shouldBe 38
+    }
+
+    "not allow a player to buy an unowned property if they have enough money" in {
+      val player = Player("Alice", 250, position = 38)
+      val property = PropertyField("Blue1", index = 38, price = 300, rent = 30, owner = None, color = DarkBlue)
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 38, player)
+
+      val updatedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 38 => p
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
+
+      updatedProperty.owner shouldBe None
+      updatedPlayer.balance shouldBe 250
     }
   }
 }
