@@ -231,6 +231,28 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       unchangedPlayer.balance shouldBe 800
       unchangedPlayer.position shouldBe 6
     }
+
+    "not allow buying a non-purchasable field (e.g. GoField)" in {
+      val player = Player("Eve", balance = 500, position = 1)
+      val goField = GoField
+      val board = Board(Vector(goField)) // GoField hat index = 1
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 1, player)
+
+      updatedGame shouldBe game // Es darf sich nichts ändern
+    }
+
+    "not allow buying if the field index does not exist" in {
+      val player = Player("Frank", balance = 500, position = 1)
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = None, color = DarkBlue)
+      val board = Board(Vector(property)) // Es gibt kein Feld mit index = 99
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 99, player)
+
+      updatedGame shouldBe game
+    }
   }
 
 
