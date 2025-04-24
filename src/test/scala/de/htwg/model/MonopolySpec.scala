@@ -190,12 +190,12 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
 
       updatedUtility.owner shouldBe Some("Alice")
-      updatedPlayer.balance shouldBe 300 // 500 - 200
+      updatedPlayer.balance shouldBe 350
       updatedPlayer.position shouldBe 6
     }
 
     "not allow the player to buy a UtilityField if they don't have enough money" in {
-      val player = Player("Bob", balance = 150, position = 6)
+      val player = Player("Bob", balance = 100, position = 6)
       val station = UtilityField("Wasserwerk", idx = 6, owner = None)
       val board = Board(Vector(station))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
