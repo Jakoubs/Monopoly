@@ -181,6 +181,7 @@ def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
     case taxF: TaxField => handleTaxField(game, taxF.amount)
     case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
     case pf: PropertyField => handlePropertyField(game, pf)
+    //case tf: TrainStationField => handlePropertyField(game, tf)
     case _ => game
   }
   updatedGame

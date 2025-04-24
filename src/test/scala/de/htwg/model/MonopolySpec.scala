@@ -117,6 +117,76 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedProperty.owner shouldBe Some("Tim")
       updatedPlayer.balance shouldBe 500
     }
+  }
 
+  "buyHouse" should {
+
+    "allow the owner to buy a house if they have enough money" in {
+      val player = Player("Alice", balance = 500, position = 2)
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Alice"),
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyHouse(game, propertyIndex = 2, player)
+
+      val updatedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 2 => p
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
+
+      updatedProperty.house.amount shouldBe 1
+      updatedPlayer.balance shouldBe 450 // Haus kostet 50
+    }
+
+    "not allow a house purchase if the player does not own the property" in {
+      val player = Player("Bob", balance = 500, position = 2)
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("SomeoneElse"),
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val (updatedGame) = buyHouse(game, propertyIndex = 2, player)
+
+      val unchangedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 2 => p
+      }.get
+
+      val unchangedPlayer = updatedGame.players.find(_.name == "Bob").get
+
+      unchangedProperty.house.amount shouldBe 0
+      unchangedPlayer.balance shouldBe 500
+    }
+
+    "not allow a house purchase if the player has insufficient funds" in {
+      val player = Player("Carol", balance = 30, position = 2)
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyHouse(game, propertyIndex = 2, player)
+
+      val unchangedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 2 => p
+      }.get
+
+      val unchangedPlayer = updatedGame.players.find(_.name == "Carol").get
+
+      unchangedProperty.house.amount shouldBe 0
+      unchangedPlayer.balance shouldBe 30
+    }
+
+    "not allow building a house on a non-PropertyField" in {
+      val player = Player("Dave", balance = 500, position = 6)
+      val station = TrainStationField("Station", idx = 6, owner = Some("Dave"))
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val (updatedGame) = buyHouse(game, propertyIndex = 6, player)
+
+      updatedGame shouldBe game
+    }
   }
 }
