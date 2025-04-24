@@ -177,7 +177,7 @@ class BoardFieldSpec extends AnyWordSpec {
     "be correctly initialized with index and no owner" in {
       val trainStation = TrainStationField("kp", 5, None)
       trainStation.index shouldBe 5
-      trainStation.name shouldBe "TrainStationField"
+      trainStation.name shouldBe "kp"
       trainStation.owner shouldBe None
     }
 

@@ -1,3 +1,19 @@
+error id: name.
+file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+empty definition using pc, found symbol in pc: name.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -field/name.
+	 -field/name#
+	 -field/name().
+	 -scala/Predef.field.name.
+	 -scala/Predef.field.name#
+	 -scala/Predef.field.name().
+offset: 28100
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
@@ -204,7 +220,7 @@ def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGa
       val rent = calculateRent(property)
       println(s"Pay ${rent}$$ rent to ${ownerName}")
       val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
-      val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent, position = property.index)
+      val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent)
 
       val ownerIndex = game.players.indexWhere(_.name == ownerName)
       val owner = game.players(ownerIndex)
@@ -647,13 +663,13 @@ def getExtra(field: BoardField): String = {
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
-              val updatedPlayer = player.copy(balance = player.balance - field.price, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
-              if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
+
+              val updatedPlayer = player.copy(balance = player.balance - field.price)
+
+              val updatedGame = game.copy(board = updatedBoard)
+
               println(s"${player.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
-              (updatedGame)
+              (updatedGame, updatedPlayer)
             } else {
               println(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${player.name} hat nur ${player.balance}.")
               (game)
@@ -673,13 +689,11 @@ def getExtra(field: BoardField): String = {
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
 
-              val updatedPlayer = player.copy(balance = player.balance - stationPrice, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
-              if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
-              println(s"${player.name} hat den Bahnhof ${field.name} für $stationPrice gekauft.")
-              (updatedGame)
+              val updatedPlayer = player.copy(balance = player.balance - stationPrice)
+              val updatedGame = game.copy(board = updatedBoard)
+
+              println(s"${player.name} hat den Bahnhof ${field.na@@me} für $stationPrice gekauft.")
+              (updatedGame, updatedPlayer)
             } else {
               println(s"Nicht genug Geld! Der Bahnhof kostet $stationPrice, aber ${player.name} hat nur ${player.balance}.")
               (game)
@@ -702,13 +716,11 @@ def getExtra(field: BoardField): String = {
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
 
-              val updatedPlayer = player.copy(balance = player.balance - utilityPrice, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
-              if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
+              val updatedPlayer = player.copy(balance = player.balance - utilityPrice)
+              val updatedGame = game.copy(board = updatedBoard)
+
               println(s"${player.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
-              (updatedGame)
+              (updatedGame, updatedPlayer)
             } else {
               println(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${player.name} hat nur ${player.balance}.")
               (game)
@@ -732,3 +744,9 @@ case class MonopolyGame(
                          currentPlayer: Player,
                          sound: Boolean
                        )
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: name.
