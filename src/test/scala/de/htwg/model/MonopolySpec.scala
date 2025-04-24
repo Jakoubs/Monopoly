@@ -393,4 +393,53 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedGame shouldEqual "INVENTORY Player: Carol| "
     }
   }
+
+  "getStats" should {
+    "correctly split player info into four strings" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = false)
+      val player2 = Player("Bob", balance = 150, position = 8, isInJail = true)
+      val player3 = Player("Jane", balance = 300, position = 12, isInJail = false)
+      val player4 = Player("Steve", balance = 100, position = 4, isInJail = false)
+
+      val game = MonopolyGame(players = Vector(player1, player2, player3, player4), board = Board(Vector()), currentPlayer = player4, sound = false)
+
+      val (s1, s2, s3, s4) = getStats(game)
+
+      // Sicherstellen, dass jeder String weniger als oder gleich 20 Zeichen enthält
+      s1.length should be <= 20
+      s2.length should be <= 20
+      s3.length should be <= 20
+      s4.length should be <= 20
+    }
+
+    "correctly handle less than 4 players" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = false)
+      val player2 = Player("Bob", balance = 150, position = 8, isInJail = true)
+
+      val game = MonopolyGame(players = Vector(player1, player2), board = Board(Vector()), currentPlayer = player2, sound = false)
+
+      val (s1, s2, s3, s4) = getStats(game)
+
+      s1 should not be empty
+      s2 should not be empty
+      s3 shouldBe empty
+      s4 shouldBe empty
+    }
+
+    "handle long player info properly" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = false)
+      val player2 = Player("VincentDerTee", balance = 150, position = 8, isInJail = true)
+      val player3 = Player("JakobderDritteMann", balance = 300, position = 12, isInJail = false)
+      val player4 = Player("Steve", balance = 100, position = 4, isInJail = false)
+
+      val game = MonopolyGame(players = Vector(player1, player2, player3, player4), board = Board(Vector()), currentPlayer = player4, sound = false)
+
+      val (s1, s2, s3, s4) = getStats(game)
+
+      s1.length should be <= 20
+      s2.length should be <= 20
+      s3.length should be <= 20
+      s4.length should be <= 20
+    }
+  }
 }
