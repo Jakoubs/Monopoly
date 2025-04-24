@@ -339,4 +339,58 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedGame shouldBe game
     }
   }
+
+  "getInventory" should {
+    "only adds fields in inventory for current player" in {
+      val player = Player("Carol", balance = 30, position = 2)
+      val player2 = Player("Alice", balance = 140, position = 4)
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val GameOutput = getInventory(game)
+
+      GameOutput shouldEqual("INVENTORY Player: Carol| idx:2[0]")
+    }
+
+    "correctly display Property fields with house amounts" in {
+      val player = Player("Carol", balance = 30, position = 2)
+
+      val property = TrainStationField("Blue1", idx = 2, Some("Carol"))
+
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = getInventory(game)
+
+      updatedGame shouldEqual "INVENTORY Player: Carol| idx:2"
+    }
+
+    "correctly remove the trailing comma" in {
+      val player = Player("Carol", balance = 30, position = 2)
+
+      val property1 = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(1))
+      val property2 = UtilityField("Green1", idx = 4, owner = Some("Carol"))
+
+      val board = Board(Vector(property1, property2))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = getInventory(game)
+
+      updatedGame shouldEqual("INVENTORY Player: Carol| idx:2[1], idx:4")
+    }
+
+    "return an empty inventory if the player has no fields" in {
+      val player = Player("Carol", balance = 30, position = 2)
+
+      val board = Board(Vector())
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = getInventory(game)
+
+      updatedGame shouldEqual "INVENTORY Player: Carol| "
+    }
+  }
 }
