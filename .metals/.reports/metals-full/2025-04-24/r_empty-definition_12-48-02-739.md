@@ -1,3 +1,15 @@
+error id: currentPlayer.
+file://<WORKSPACE>/src/test/scala/de/htwg/model/MonopolySpec.scala
+empty definition using pc, found symbol in pc: currentPlayer.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -resultGame/currentPlayer.
+	 -scala/Predef.resultGame.currentPlayer.
+offset: 3968
+uri: file://<WORKSPACE>/src/test/scala/de/htwg/model/MonopolySpec.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.Monopoly
 
@@ -6,6 +18,11 @@ import org.scalatest.matchers.should.Matchers
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 
 class MonopolySpec extends AnyWordSpec with Matchers {
+  "Monopoly main" should {
+    "run without throwing an exception" in {
+      noException should be thrownBy Monopoly.main(Array.empty)
+    }
+  }
   val player1 = Player("Player1", 1500, 1)
   val player2 = Player("Player2", 1500, 1)
   val brownProperty1 = PropertyField("Brown1", 2, 100, 10, None, Brown)
@@ -46,11 +63,6 @@ class MonopolySpec extends AnyWordSpec with Matchers {
   ))
   val game = MonopolyGame(Vector(player1, player2), board, player1, false)
    "handlePlayerTurn" should {
-    "call handleRegularTurn if player is not in jail" in {
-      val resultGame = Monopoly.handlePlayerTurn(game)
-      // Assert that handleRegularTurn was called (similarly, check for a side effect)
-      resultGame.currentPlayer.isInJail should be(false)
-    }
     "call handleJailTurn if player is in jail" in {
       val jailedPlayer = player1.copy(isInJail = true)
       val updatedGame = game.copy(players = Vector(jailedPlayer, player2), currentPlayer = jailedPlayer)
@@ -59,5 +71,17 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       // but we can check a side effect or the return type if it's distinct)
       resultGame.currentPlayer.isInJail should be(true)
     }
+
+    "call handleRegularTurn if player is not in jail" in {
+      val resultGame = Monopoly.handlePlayerTurn(game)
+      // Assert that handleRegularTurn was called (similarly, check for a side effect)
+      resultGame.currentP@@layer.position should not be(player1.position)
+    }
   }
 }
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: currentPlayer.

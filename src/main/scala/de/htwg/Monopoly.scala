@@ -296,73 +296,73 @@ def randomEmoji(vektor: Vector[Player]): String = {
   def defineGame(): MonopolyGame = {
     
     println("play with sound? (y/n)")
-    val soundBoolString = readLine()
-    val soundBool = soundBoolString match
-      case "y" => true
-      case "n" => false
-      case _ => false 
+    val soundInput = readLine()
+    val isTestBoard = soundInput == "yT" || soundInput == "nT"
+    val soundBool = soundInput == "y" || soundInput == "yT"
     
     if(soundBool){
     SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     }
-    println("How many Player? (2-4):")
-    val playerAnz = readLine().toInt
-    var playerVector = Vector[Player]()
+    //if(!isTestBoard) {
+      println("How many Player? (2-4):")
+      val playerAnz = readLine().toInt
+      var playerVector = Vector[Player]()
 
-    for (i <- 1 to playerAnz) {
-      val playerName = randomEmoji(playerVector)
-      playerVector = playerVector.appended(Player(playerName, 1500, 1))
-      println(s"Spieler $playerName hinzugefügt.")
-    }
+      for (i <- 1 to playerAnz) {
+        val playerName = randomEmoji(playerVector)
+        playerVector = playerVector.appended(Player(playerName, 1500, 1))
+        println(s"Spieler $playerName hinzugefügt.")
+      }
 
 
-    val board = Board(
-      Vector(
-        GoField,
-        PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        CommunityChestField(3),
-        PropertyField("brown2",4,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        TaxField(100,5),
-        TrainStationField("Marklylebone Station",6,None),
-        PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        ChanceField(8),
-        PropertyField("lightBlue2",9,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("lightBlue3",10,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        JailField,
-        PropertyField("Pink1",12,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        UtilityField("Electric Company", 13, None),
-        PropertyField("Pink2",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Pink3",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        TrainStationField("Fenchurch ST Station",16,None),
-        PropertyField("Orange1",17,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        CommunityChestField(18),
-        PropertyField("Orange2",19,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Orange3",20,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        FreeParkingField(0),
-        PropertyField("Red1",22,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        ChanceField(23),
-        PropertyField("Red2",24,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Red3",25,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        TrainStationField("Kings Cross Station",26,None),
-        PropertyField("Yellow1",27,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Yellow2",28,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        UtilityField("Water Works",29,None),
-        PropertyField("Yellow3",30,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        GoToJailField(),
-        PropertyField("Green1",32,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        PropertyField("Green2",33,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        ChanceField(34),
-        PropertyField("Green3",35,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        TrainStationField("Liverpool ST Station",36,None),
-        ChanceField(37),
-        PropertyField("Blue1",38,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        TaxField(200,39),
-        PropertyField("Blue2",40,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+      val board = Board(
+        Vector(
+          GoField,
+          PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          CommunityChestField(3),
+          PropertyField("brown2",4,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          TaxField(100,5),
+          TrainStationField("Marklylebone Station",6,None),
+          PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          ChanceField(8),
+          PropertyField("lightBlue2",9,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("lightBlue3",10,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          JailField,
+          PropertyField("Pink1",12,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          UtilityField("Electric Company", 13, None),
+          PropertyField("Pink2",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("Pink3",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          TrainStationField("Fenchurch ST Station",16,None),
+          PropertyField("Orange1",17,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          CommunityChestField(18),
+          PropertyField("Orange2",19,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("Orange3",20,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          FreeParkingField(0),
+          PropertyField("Red1",22,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          ChanceField(23),
+          PropertyField("Red2",24,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("Red3",25,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          TrainStationField("Kings Cross Station",26,None),
+          PropertyField("Yellow1",27,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("Yellow2",28,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          UtilityField("Water Works",29,None),
+          PropertyField("Yellow3",30,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          GoToJailField(),
+          PropertyField("Green1",32,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("Green2",33,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          ChanceField(34),
+          PropertyField("Green3",35,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          TrainStationField("Liverpool ST Station",36,None),
+          ChanceField(37),
+          PropertyField("Blue1",38,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          TaxField(200,39),
+          PropertyField("Blue2",40,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+        )
       )
-    )
-    val game = MonopolyGame(playerVector, board, playerVector.head, soundBool)
-    println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
-    game
+      val game = MonopolyGame(playerVector, board, playerVector.head, soundBool)
+      println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
+      game
+    //} else {}
   }
 
   def printBoard(game: MonopolyGame): Unit = {

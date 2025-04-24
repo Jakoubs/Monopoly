@@ -45,26 +45,3 @@ class SoundPlayer {
     promise.future
   }
 }
-
-object SoundPlayerExample extends App {
-  val player = new SoundPlayer()
-  val soundFile1 = "path/to/your/background_sound.wav" // Ersetze durch den tatsächlichen Pfad
-  val soundFile2 = "path/to/your/foreground_sound.wav" // Ersetze durch den tatsächlichen Pfad
-
-  // Sound im Hintergrund abspielen
-  player.playBackground(soundFile1)
-  println("Hintergrundsound wird abgespielt...")
-
-  // Etwas Zeit vergehen lassen, während der Hintergrundsound spielt
-  Thread.sleep(3000)
-
-  // Sound abspielen und warten, bis er fertig ist
-  println("Starte Vordergrundsound und warte...")
-  val waitFuture = player.playAndWait(soundFile2)
-
-  // Blockiere den Haupt-Thread, bis der Vordergrundsound fertig ist
-  scala.concurrent.Await.result(waitFuture, scala.concurrent.duration.Duration.Inf)
-  println("Vordergrundsound ist fertig.")
-
-  println("Programmende.")
-}
