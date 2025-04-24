@@ -1,8 +1,20 @@
+file://<WORKSPACE>/src/test/scala/de/htwg/model/BoardFieldSpec.scala
+### java.lang.IndexOutOfBoundsException: -1
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+
+
+action parameters:
+offset: 2733
+uri: file://<WORKSPACE>/src/test/scala/de/htwg/model/BoardFieldSpec.scala
+text:
+```scala
 package de.htwg.model
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
-import de.htwg.model.PropertyField.*
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Red}
 import de.htwg.model.PropertyField.{House, Mortgage}
 class BoardFieldSpec extends AnyWordSpec {
@@ -63,58 +75,10 @@ class BoardFieldSpec extends AnyWordSpec {
       val f3 = PropertyField("Baltic Avenue", 5, 64, 4, Some("P3"), Brown, Mortgage(300))
       House().calculateHousePrice(f3.price) should be(40)
     }
-    "have a calculateRent method" which {
-      "return the base rent if there are no houses" in {
-        val field = PropertyField(
-          name = "Test Property",
-          index = 1,
-          price = 100,
-          rent = 20,
-          owner = None,
-          color = Color.Brown,
-          mortgage = Mortgage(),
-          house = House(0)
-        )
-        PropertyField.calculateRent(field) should be(20)
-      }
-
-      "return the base rent plus half the base rent per house" in {
-        val fieldWithOneHouse = PropertyField(
-          name = "Test Property",
-          index = 1,
-          price = 100,
-          rent = 20,
-          owner = None,
-          color = Color.Brown,
-          mortgage = Mortgage(),
-          house = House(1)
-        )
-        PropertyField.calculateRent(fieldWithOneHouse) should be(30)
-
-        val fieldWithTwoHouses = PropertyField(
-          name = "Another Property",
-          index = 5,
-          price = 200,
-          rent = 30,
-          owner = Some("Player1"),
-          color = Color.LightBlue,
-          mortgage = Mortgage(),
-          house = House(2)
-        )
-        PropertyField.calculateRent(fieldWithTwoHouses) should be(60)
-
-        val fieldWithMaxHouses = PropertyField(
-          name = "Expensive Property",
-          index = 10,
-          price = 500,
-          rent = 50,
-          owner = Some("Player2"),
-          color = Color.DarkBlue,
-          mortgage = Mortgage(),
-          house = House(5)
-        )
-        PropertyField.calculateRent(fieldWithMaxHouses) should be(175)
-      }
+    "calculate rent price vased on houseamound correctly" in {
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
+      House().calculateHousePrice(f1.price) should be(50)
+      PropertyField()@@calculateRent(f1) should be(20)
     }
   }
 
@@ -244,3 +208,22 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
 }
+```
+
+
+
+#### Error stacktrace:
+
+```
+scala.collection.LinearSeqOps.apply(LinearSeq.scala:129)
+	scala.collection.LinearSeqOps.apply$(LinearSeq.scala:128)
+	scala.collection.immutable.List.apply(List.scala:79)
+	dotty.tools.dotc.util.Signatures$.applyCallInfo(Signatures.scala:244)
+	dotty.tools.dotc.util.Signatures$.computeSignatureHelp(Signatures.scala:101)
+	dotty.tools.dotc.util.Signatures$.signatureHelp(Signatures.scala:88)
+	dotty.tools.pc.SignatureHelpProvider$.signatureHelp(SignatureHelpProvider.scala:46)
+	dotty.tools.pc.ScalaPresentationCompiler.signatureHelp$$anonfun$1(ScalaPresentationCompiler.scala:435)
+```
+#### Short summary: 
+
+java.lang.IndexOutOfBoundsException: -1

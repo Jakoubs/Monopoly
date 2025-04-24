@@ -1,8 +1,26 @@
+error id: calculateRent.
+file://<WORKSPACE>/src/test/scala/de/htwg/model/BoardFieldSpec.scala
+empty definition using pc, found symbol in pc: calculateRent.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -org/scalatest/matchers/should/Matchers.f1.calculateRent.
+	 -org/scalatest/matchers/should/Matchers.f1.calculateRent#
+	 -org/scalatest/matchers/should/Matchers.f1.calculateRent().
+	 -f1/calculateRent.
+	 -f1/calculateRent#
+	 -f1/calculateRent().
+	 -scala/Predef.f1.calculateRent.
+	 -scala/Predef.f1.calculateRent#
+	 -scala/Predef.f1.calculateRent().
+offset: 2751
+uri: file://<WORKSPACE>/src/test/scala/de/htwg/model/BoardFieldSpec.scala
+text:
+```scala
 package de.htwg.model
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
-import de.htwg.model.PropertyField.*
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Red}
 import de.htwg.model.PropertyField.{House, Mortgage}
 class BoardFieldSpec extends AnyWordSpec {
@@ -63,59 +81,10 @@ class BoardFieldSpec extends AnyWordSpec {
       val f3 = PropertyField("Baltic Avenue", 5, 64, 4, Some("P3"), Brown, Mortgage(300))
       House().calculateHousePrice(f3.price) should be(40)
     }
-    "have a calculateRent method" which {
-      "return the base rent if there are no houses" in {
-        val field = PropertyField(
-          name = "Test Property",
-          index = 1,
-          price = 100,
-          rent = 20,
-          owner = None,
-          color = Color.Brown,
-          mortgage = Mortgage(),
-          house = House(0)
-        )
-        PropertyField.calculateRent(field) should be(20)
-      }
-
-      "return the base rent plus half the base rent per house" in {
-        val fieldWithOneHouse = PropertyField(
-          name = "Test Property",
-          index = 1,
-          price = 100,
-          rent = 20,
-          owner = None,
-          color = Color.Brown,
-          mortgage = Mortgage(),
-          house = House(1)
-        )
-        PropertyField.calculateRent(fieldWithOneHouse) should be(30)
-
-        val fieldWithTwoHouses = PropertyField(
-          name = "Another Property",
-          index = 5,
-          price = 200,
-          rent = 30,
-          owner = Some("Player1"),
-          color = Color.LightBlue,
-          mortgage = Mortgage(),
-          house = House(2)
-        )
-        PropertyField.calculateRent(fieldWithTwoHouses) should be(60)
-
-        val fieldWithMaxHouses = PropertyField(
-          name = "Expensive Property",
-          index = 10,
-          price = 500,
-          rent = 50,
-          owner = Some("Player2"),
-          color = Color.DarkBlue,
-          mortgage = Mortgage(),
-          house = House(5)
-        )
-        PropertyField.calculateRent(fieldWithMaxHouses) should be(175)
-      }
-    }
+     val f1 = PropertyField("Schlossallee", 38, 100, 20, Some("P1"), Color.DarkBlue,
+                            PropertyField.Mortgage(10, false), PropertyField.House(0))
+      f1.house.calculateHousePrice(f1.price) should be(50)
+      f1.calc@@ulateRent(f1) should be(20)
   }
 
   "Mortgage" should {
@@ -244,3 +213,9 @@ class BoardFieldSpec extends AnyWordSpec {
   }
 
 }
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: calculateRent.
