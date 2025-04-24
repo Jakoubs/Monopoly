@@ -442,4 +442,55 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       s4.length should be <= 20
     }
   }
+
+  "playersOnIndex" should {
+
+    "return names of players on the specified index who are in jail" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = true)
+      val player2 = Player("Bob", balance = 150, position = 5, isInJail = false)
+      val player3 = Player("Alice", balance = 100, position = 5, isInJail = true)
+
+      val game = MonopolyGame(players = Vector(player1, player2, player3), board = Board(Vector()), currentPlayer = player3, sound = false)
+
+      val result = playersOnIndex(5, game, inJail = true)
+
+      result shouldEqual "Carol Alice "
+    }
+
+    "return names of players on the specified index who are not in jail" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = true)
+      val player2 = Player("Bob", balance = 150, position = 5, isInJail = false)
+      val player3 = Player("Alice", balance = 100, position = 5, isInJail = true)
+
+      val game = MonopolyGame(players = Vector(player1, player2, player3), board = Board(Vector()), currentPlayer = player3, sound = false)
+
+      val result = playersOnIndex(5, game, inJail = false)
+
+      result shouldEqual "Bob "
+    }
+
+    "return an empty string if no players are on the specified index" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = true)
+      val player2 = Player("Bob", balance = 150, position = 6, isInJail = false)
+      val player3 = Player("Alice", balance = 100, position = 7, isInJail = true)
+
+      val game = MonopolyGame(players = Vector(player1, player2, player3), board = Board(Vector()), currentPlayer = player3, sound = false)
+
+      val result = playersOnIndex(4, game, inJail = false)
+
+      result shouldEqual ""
+    }
+
+    "return names of players on the specified index even if there are multiple players" in {
+      val player1 = Player("Carol", balance = 200, position = 5, isInJail = false)
+      val player2 = Player("Bob", balance = 150, position = 5, isInJail = false)
+      val player3 = Player("Alice", balance = 100, position = 5, isInJail = false)
+
+      val game = MonopolyGame(players = Vector(player1, player2, player3), board = Board(Vector()), currentPlayer = player3, sound = false)
+
+      val result = playersOnIndex(5, game, inJail = false)
+
+      result shouldEqual "Carol Bob Alice "
+    }
+  }
 }
