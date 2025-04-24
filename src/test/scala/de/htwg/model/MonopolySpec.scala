@@ -117,7 +117,123 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedProperty.owner shouldBe Some("Tim")
       updatedPlayer.balance shouldBe 500
     }
+
+    "allow the player to buy an unowned train station if they have enough money" in {
+      val player = Player("Alice", balance = 500, position = 6)
+      val station = TrainStationField("Station1", idx = 6, owner = None)
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 6, player)
+
+      val updatedStation = updatedGame.board.fields.collectFirst {
+        case s: TrainStationField if s.index == 6 => s
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
+
+      updatedStation.owner shouldBe Some("Alice")
+      updatedPlayer.balance shouldBe 300 // 500 - 200
+      updatedPlayer.position shouldBe 6
+    }
+
+    "not allow the player to buy a train station if they don't have enough money" in {
+      val player = Player("Bob", balance = 150, position = 6)
+      val station = TrainStationField("Station1", idx = 6, owner = None)
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 6, player)
+
+      val unchangedStation = updatedGame.board.fields.collectFirst {
+        case s: TrainStationField if s.index == 6 => s
+      }.get
+
+      val unchangedPlayer = updatedGame.players.find(_.name == "Bob").get
+
+      unchangedStation.owner shouldBe None
+      unchangedPlayer.balance shouldBe 150
+      unchangedPlayer.position shouldBe 6
+    }
+
+    "not allow the player to buy a train station that is already owned" in {
+      val player = Player("Charlie", balance = 800, position = 6)
+      val station = TrainStationField("Station1", idx = 6, owner = Some("SomeoneElse"))
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 6, player)
+
+      val unchangedStation = updatedGame.board.fields.collectFirst {
+        case s: TrainStationField if s.index == 6 => s
+      }.get
+
+      val unchangedPlayer = updatedGame.players.find(_.name == "Charlie").get
+
+      unchangedStation.owner shouldBe Some("SomeoneElse")
+      unchangedPlayer.balance shouldBe 800
+      unchangedPlayer.position shouldBe 6
+    }
+
+    "allow the player to buy an unowned UtilityField if they have enough money" in {
+      val player = Player("Alice", balance = 500, position = 6)
+      val station = UtilityField("Wasserwerk", idx = 6, owner = None)
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 6, player)
+
+      val updatedUtility = updatedGame.board.fields.collectFirst {
+        case s: UtilityField if s.index == 6 => s
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
+
+      updatedUtility.owner shouldBe Some("Alice")
+      updatedPlayer.balance shouldBe 300 // 500 - 200
+      updatedPlayer.position shouldBe 6
+    }
+
+    "not allow the player to buy a UtilityField if they don't have enough money" in {
+      val player = Player("Bob", balance = 150, position = 6)
+      val station = UtilityField("Wasserwerk", idx = 6, owner = None)
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 6, player)
+
+      val updatedUtility = updatedGame.board.fields.collectFirst {
+        case s: UtilityField if s.index == 6 => s
+      }.get
+
+      val unchangedPlayer = updatedGame.players.find(_.name == "Bob").get
+
+      updatedUtility.owner shouldBe None
+      unchangedPlayer.balance shouldBe 150
+      unchangedPlayer.position shouldBe 6
+    }
+
+    "not allow the player to buy a UtilityField that is already owned" in {
+      val player = Player("Charlie", balance = 800, position = 6)
+      val station = UtilityField("Wasserwerk", idx = 6, owner = Some("SomeoneElse"))
+      val board = Board(Vector(station))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyProperty(game, propertyIndex = 6, player)
+
+      val updatedUtility = updatedGame.board.fields.collectFirst {
+        case s: UtilityField if s.index == 6 => s
+      }.get
+
+      val unchangedPlayer = updatedGame.players.find(_.name == "Charlie").get
+
+      updatedUtility.owner shouldBe Some("SomeoneElse")
+      unchangedPlayer.balance shouldBe 800
+      unchangedPlayer.position shouldBe 6
+    }
   }
+
+
 
   "buyHouse" should {
 
