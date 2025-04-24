@@ -72,6 +72,14 @@ class PlayerSpec extends AnyWordSpec {
       updatedPlayer.position shouldEqual 40
     }
 
+    "never be on index over 40" in {
+      val player = Player("TestPlayer", 2000, position = 35)
+      val mockRollDice = () => (2, 5)
+      val updatedPlayer = player.playerMove(mockRollDice)
+      updatedPlayer.position shouldEqual 2
+    }
+
+
     "earn 200 Money when go over Go" in {
       val player = Player("TestPlayer", 1000, position = 35)
       val mockRollDice = () => (4, 3)

@@ -43,7 +43,7 @@ case class Player(name: String,
       val updatedPlayer = if ((position + diceA + diceB) > 40) 
         this.copy(balance = balance + 200) else this 
       println(s"You rolled $diceA and $diceB! That's ${diceA + diceB} moves.")
-      println(s"Your new position is ${position + diceA + diceB}")
+      println(s"Your new position is ${updatedPlayer.position}")
 
       val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {

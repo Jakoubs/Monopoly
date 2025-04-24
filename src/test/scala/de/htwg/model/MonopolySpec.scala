@@ -188,5 +188,17 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       updatedGame shouldBe game
     }
+
+    "not allow building a house on a Property not existing" in {
+      val player = Player("Carol", balance = 30, position = 2)
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
+      val board = Board(Vector(property))
+      val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
+
+      val updatedGame = buyHouse(game, propertyIndex = 45, player)
+
+      updatedGame shouldBe game
+    }
   }
 }
