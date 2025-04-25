@@ -1,3 +1,15 @@
+error id: scala/Unit#
+file://<WORKSPACE>/src/main/scala/de/htwg/model/SoundPlayer.scala
+empty definition using pc, found symbol in pc: scala/Unit#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -Unit#
+	 -scala/Predef.Unit#
+offset: 635
+uri: file://<WORKSPACE>/src/main/scala/de/htwg/model/SoundPlayer.scala
+text:
+```scala
 package de.htwg.model
 
 import javax.sound.sampled.{AudioInputStream, AudioSystem, Clip, LineEvent}
@@ -16,7 +28,7 @@ class SoundPlayer {
     }
   }
   def playAndWait(filePath: String): Future[Unit] = {
-    val promise = Promise[Unit]()
+    val promise = Promise[Unit@@]()
       val soundFile = new File(filePath)
       val audioInputStream: AudioInputStream = AudioSystem.getAudioInputStream(soundFile)
       val clip: Clip = AudioSystem.getClip()
@@ -32,3 +44,9 @@ class SoundPlayer {
     promise.future
   }
 }
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: scala/Unit#
