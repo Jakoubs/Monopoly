@@ -295,7 +295,6 @@ def randomEmoji(vektor: Vector[Player]): String = {
 }
 
   def defineGame(): MonopolyGame = {
-    
     println("play with sound? (y/n)")
     val soundInput = readLine()
     val isTestBoard = soundInput == "yT" || soundInput == "nT"
@@ -305,9 +304,28 @@ def randomEmoji(vektor: Vector[Player]): String = {
     SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     }
     //if(!isTestBoard) {
+
+    var playerVector = Vector[Player]()
+
+    def askForPlayerCount(): Int = {
       println("How many Player? (2-4):")
-      val playerAnz = readLine().toInt
-      var playerVector = Vector[Player]()
+      val input = scala.io.StdIn.readLine()
+      try {
+        val playerCount = input.toInt
+        if (playerCount >= 2 && playerCount <= 4) {
+          playerCount
+        } else {
+          println("Invalid player count. Please enter a number between 2 and 4.")
+          askForPlayerCount()
+        }
+      } catch {
+        case _: NumberFormatException =>
+          println("Invalid input. Please enter a number.")
+          askForPlayerCount()
+      }
+    }
+
+    val playerAnz = askForPlayerCount()
 
       for (i <- 1 to playerAnz) {
         val playerName = randomEmoji(playerVector)
