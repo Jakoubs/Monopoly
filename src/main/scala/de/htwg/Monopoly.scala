@@ -56,6 +56,7 @@ object Monopoly:
     val finalGame = handleOptionalActions(gameRolled)
     finalGame
   }
+
   def handleOptionalActions(currentGame: MonopolyGame): MonopolyGame = {
     println("Do you want to do anything else? |1. Buy House|2.Trade|3.Mortage| => (1/2/3/x)")
     val input = readLine()
@@ -202,13 +203,13 @@ def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGa
       } else {
         game
       }
-    case Some(ownerName) if ownerName != game.currentPlayer.name =>
+    case Some(ownerName) if ownerName.name != game.currentPlayer.name =>
       val rent = calculateRent(property)
-      println(s"Pay ${rent}$$ rent to ${ownerName}")
+      println(s"Pay ${rent}$$ rent to ${ownerName.name}")
       val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
       val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent, position = property.index)
 
-      val ownerIndex = game.players.indexWhere(_.name == ownerName)
+      val ownerIndex = game.players.indexWhere(_.name == ownerName.name)
       val owner = game.players(ownerIndex)
       val updatedOwner = owner.copy(balance = owner.balance + rent)
 
@@ -337,6 +338,7 @@ def randomEmoji(vektor: Vector[Player]): String = {
 
       val board = Board(
         Vector(
+
           GoField,
           PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
           CommunityChestField(3),
@@ -547,17 +549,17 @@ def getExtra(field: BoardField): String = {
   field match {
     case pf: PropertyField =>
       pf.owner match {
-        case Some(ownerName) => s" $ownerName${pf.house.amount}"
+        case Some(ownerName) => s" ${ownerName.name}${pf.house.amount}"
         case None => ""
       }
     case ts: TrainStationField =>
       ts.owner match {
-        case Some(ownerName) => s" $ownerName"
+        case Some(ownerName) => s" ${ownerName.name}"
         case None => ""
       }
     case uf: UtilityField =>
       uf.owner match {
-        case Some(ownerName) => s" $ownerName"
+        case Some(ownerName) => s" ${ownerName.name}"
         case None => ""
       }
     case _ => ""
@@ -592,11 +594,11 @@ def getExtra(field: BoardField): String = {
 
   for (field <- game.board.fields) {
     field match {
-      case pf: PropertyField if pf.owner.contains(game.currentPlayer.name) =>
+      case pf: PropertyField if pf.owner.contains(game.currentPlayer) =>
         inventoryItems.append(s"idx:${pf.index}[${pf.house.amount}], ")
-      case ts: TrainStationField if ts.owner.contains(game.currentPlayer.name) =>
+      case ts: TrainStationField if ts.owner.contains(game.currentPlayer) =>
         inventoryItems.append(s"idx:${ts.index}, ")
-      case uf: UtilityField if uf.owner.contains(game.currentPlayer.name) =>
+      case uf: UtilityField if uf.owner.contains(game.currentPlayer) =>
         inventoryItems.append(s"idx:${uf.index}, ")
       case _ => // Tue nichts für Felder, die nicht dem aktuellen Spieler gehören
     }
@@ -616,7 +618,7 @@ def getExtra(field: BoardField): String = {
     fieldOption match {
       case Some(field: PropertyField) =>
         field.owner match {
-          case Some(owner) if owner == player.name =>
+          case Some(owner) if owner.name == player.name =>
 
             val colorProperties = game.board.fields.collect {
               case pf: PropertyField if pf.color == field.color => pf
@@ -675,7 +677,7 @@ def getExtra(field: BoardField): String = {
           case None =>
             if (player.balance >= field.price) {
               val updatedField = field.copy(
-                owner = Some(player.name)
+                owner = Some(player)
               )
 
               val updatedFields = game.board.fields.map { f =>
@@ -694,7 +696,7 @@ def getExtra(field: BoardField): String = {
               (game)
             }
           case Some(owner) =>
-            println(s"Diese Immobilie gehört bereits ${owner}.")
+            println(s"Diese Immobilie gehört bereits ${owner.name}.")
             (game)
         }
       case Some(field: TrainStationField) =>
@@ -702,7 +704,7 @@ def getExtra(field: BoardField): String = {
           case None =>
             val stationPrice = 200 // Typischer Preis für Bahnhöfe
             if (player.balance >= stationPrice) {
-              val updatedField = field.copy(owner = Some(player.name))
+              val updatedField = field.copy(owner = Some(player))
               val updatedFields = game.board.fields.map { f =>
                 if (f.index == propertyIndex) updatedField else f
               }
@@ -720,7 +722,7 @@ def getExtra(field: BoardField): String = {
               (game)
             }
           case Some(owner) =>
-            println(s"Dieser Bahnhof gehört bereits ${owner}.")
+            println(s"Dieser Bahnhof gehört bereits ${owner.name}.")
             (game)
         }
       case Some(field: UtilityField) =>
@@ -729,7 +731,7 @@ def getExtra(field: BoardField): String = {
             val utilityPrice = 150 // Typischer Preis für Versorgungswerke
             if (player.balance >= utilityPrice) {
               val updatedField = field.copy(
-                owner = Some(player.name)
+                owner = Some(player)
               )
 
               val updatedFields = game.board.fields.map { f =>
@@ -749,7 +751,7 @@ def getExtra(field: BoardField): String = {
               (game)
             }
           case Some(owner) =>
-            println(s"Dieses Versorgungswerk gehört bereits ${owner}.")
+            println(s"Dieses Versorgungswerk gehört bereits ${owner.name}.")
             (game)
         }
       case Some(_) =>

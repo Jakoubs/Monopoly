@@ -8,17 +8,17 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 class MonopolySpec extends AnyWordSpec with Matchers {
-  val player1 = Player("Player1", 1500, 1)
+  val player1 = Player("Player1", 1500, 12)
   val player2 = Player("Player2", 1500, 1)
   val brownProperty1 = PropertyField("Brown1", 2, 100, 10, None, Brown)
-  val brownProperty1Owned = brownProperty1.copy(owner = Some(player1.name))
+  val brownProperty1Owned = brownProperty1.copy(owner = Some(player1))
   val brownProperty1WithHouse = brownProperty1Owned.copy(house = PropertyField.House(1))
   val darkBlueProperty1 = PropertyField("DarkBlue1", 38, 200, 20, None, DarkBlue)
-  val darkBlueProperty1Owned = darkBlueProperty1.copy(owner = Some(player1.name))
+  val darkBlueProperty1Owned = darkBlueProperty1.copy(owner = Some(player1))
   val trainStation = TrainStationField("Station1", 6, None)
-  val trainStationOwned = trainStation.copy(owner = Some(player1.name))
+  val trainStationOwned = trainStation.copy(owner = Some(player1))
   val utility = UtilityField("Utility1", 13, None)
-  val utilityOwned = utility.copy(owner = Some(player1.name))
+  val utilityOwned = utility.copy(owner = Some(player1))
   val goToJail = GoToJailField()
   val taxField = TaxField(100, 5)
   val freeParkingField = FreeParkingField(50)
@@ -26,9 +26,9 @@ class MonopolySpec extends AnyWordSpec with Matchers {
     PropertyField("LightBlue1", 7, 120, 12, None, PropertyField.Color.LightBlue), ChanceField(8),
     PropertyField("LightBlue2", 9, 120, 12, None, PropertyField.Color.LightBlue),
     PropertyField("LightBlue3", 10, 120, 12, None, PropertyField.Color.LightBlue), JailField,
-    PropertyField("Pink1", 12, 140, 14, None, PropertyField.Color.Pink), utility,
-    PropertyField("Pink2", 14, 140, 14, None, PropertyField.Color.Pink),
-    PropertyField("Pink3", 15, 140, 14, None, PropertyField.Color.Pink),
+    PropertyField("Pink1", 12, 140, 14, Some(player1), PropertyField.Color.Pink), utility,
+    PropertyField("Pink2", 14, 140, 14, Some(player1), PropertyField.Color.Pink),
+    PropertyField("Pink3", 15, 140, 14, Some(player1), PropertyField.Color.Pink),
     TrainStationField("Station2", 16, None),
     PropertyField("Orange1", 17, 160, 16, None, PropertyField.Color.Orange), CommunityChestField(18),
     PropertyField("Orange2", 19, 160, 16, None, PropertyField.Color.Orange),
@@ -78,7 +78,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
 
-      updatedProperty.owner shouldBe Some("Alice")
+      updatedProperty.owner shouldBe Some(player)
       updatedPlayer.balance shouldBe 200
       updatedPlayer.position shouldBe 38
     }
@@ -100,11 +100,11 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedProperty.owner shouldBe None
       updatedPlayer.balance shouldBe 250
     }
-    "AskForplayerCound"
+
     "not allow a Player to buy an owned PropertyField" in {
       val player = Player("Alice", 500, position = 38)
       val player2 = Player("Tim", 500, position = 22)
-      val property = PropertyField("Blue1", index = 38, price = 300, rent = 30, owner = Some("Tim"), color = DarkBlue)
+      val property = PropertyField("Blue1", index = 38, price = 300, rent = 30, owner = Some(player2), color = DarkBlue)
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
 
@@ -116,7 +116,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
 
-      updatedProperty.owner shouldBe Some("Tim")
+      updatedProperty.owner shouldBe Some(player2)
       updatedPlayer.balance shouldBe 500
     }
 
@@ -134,7 +134,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
 
-      updatedStation.owner shouldBe Some("Alice")
+      updatedStation.owner shouldBe Some(player)
       updatedPlayer.balance shouldBe 300 // 500 - 200
       updatedPlayer.position shouldBe 6
     }
@@ -160,7 +160,8 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
     "not allow the player to buy a train station that is already owned" in {
       val player = Player("Charlie", balance = 800, position = 6)
-      val station = TrainStationField("Station1", idx = 6, owner = Some("SomeoneElse"))
+      val player2 = Player("Tim", 500, 0)
+      val station = TrainStationField("Station1", idx = 6, owner = Some(player2))
       val board = Board(Vector(station))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
 
@@ -172,7 +173,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val unchangedPlayer = updatedGame.players.find(_.name == "Charlie").get
 
-      unchangedStation.owner shouldBe Some("SomeoneElse")
+      unchangedStation.owner shouldBe Some(player2)
       unchangedPlayer.balance shouldBe 800
       unchangedPlayer.position shouldBe 6
     }
@@ -191,7 +192,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
 
-      updatedUtility.owner shouldBe Some("Alice")
+      updatedUtility.owner shouldBe Some(player)
       updatedPlayer.balance shouldBe 350
       updatedPlayer.position shouldBe 6
     }
@@ -217,7 +218,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
     "not allow the player to buy a UtilityField that is already owned" in {
       val player = Player("Charlie", balance = 800, position = 6)
-      val station = UtilityField("Wasserwerk", idx = 6, owner = Some("SomeoneElse"))
+      val station = UtilityField("Wasserwerk", idx = 6, owner = Some(player1))
       val board = Board(Vector(station))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
 
@@ -229,7 +230,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val unchangedPlayer = updatedGame.players.find(_.name == "Charlie").get
 
-      updatedUtility.owner shouldBe Some("SomeoneElse")
+      updatedUtility.owner shouldBe Some(player1)
       unchangedPlayer.balance shouldBe 800
       unchangedPlayer.position shouldBe 6
     }
@@ -262,9 +263,24 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
   "buyHouse" should {
 
-    "allow the owner to buy a house if they have enough money" in {
+    "allow the owner to buy a house if they have enough money and own all Streets of same Color" in {
+      val game = MonopolyGame(players = Vector(player1), board = board, currentPlayer = player1, sound = false)
+
+      val updatedGame = buyHouse(game, propertyIndex = 14, player1)
+
+      val updatedProperty = updatedGame.board.fields.collectFirst {
+        case p: PropertyField if p.index == 14 => p
+      }.get
+
+      val updatedPlayer = updatedGame.players.find(_.name == "Player1").get
+
+      updatedProperty.house.amount shouldBe 1
+      updatedPlayer.balance shouldBe 450 // Haus kostet 50
+    }
+
+    "not allow the owner to buy a house if they have enough money butdo not own all Streets of same Color" in {
       val player = Player("Alice", balance = 500, position = 2)
-      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Alice"),
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some(player),
         color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
@@ -277,13 +293,14 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val updatedPlayer = updatedGame.players.find(_.name == "Alice").get
 
-      updatedProperty.house.amount shouldBe 1
-      updatedPlayer.balance shouldBe 450 // Haus kostet 50
+      updatedProperty.house.amount shouldBe 0
+      updatedPlayer.balance shouldBe 500 // Haus kostet 50
     }
+
 
     "not allow a house purchase if the player does not own the property" in {
       val player = Player("Bob", balance = 500, position = 2)
-      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("SomeoneElse"),
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some(player2),
         color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
@@ -302,7 +319,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
     "not allow a house purchase if the player has insufficient funds" in {
       val player = Player("Carol", balance = 30, position = 2)
-      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some(player),
         color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
@@ -321,7 +338,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
     "not allow building a house on a non-PropertyField" in {
       val player = Player("Dave", balance = 500, position = 6)
-      val station = TrainStationField("Station", idx = 6, owner = Some("Dave"))
+      val station = TrainStationField("Station", idx = 6, owner = Some(player))
       val board = Board(Vector(station))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
 
@@ -332,7 +349,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
     "not allow building a house on a Property not existing" in {
       val player = Player("Carol", balance = 30, position = 2)
-      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some(player),
         color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
@@ -347,7 +364,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
     "only adds fields in inventory for current player" in {
       val player = Player("Carol", balance = 30, position = 2)
       val player2 = Player("Alice", balance = 140, position = 4)
-      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+      val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some(player),
         color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
@@ -360,7 +377,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
     "correctly display Property fields with house amounts" in {
       val player = Player("Carol", balance = 30, position = 2)
 
-      val property = TrainStationField("Blue1", idx = 2, Some("Carol"))
+      val property = TrainStationField("Blue1", idx = 2, Some(player))
 
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
@@ -373,9 +390,9 @@ class MonopolySpec extends AnyWordSpec with Matchers {
     "correctly remove the trailing comma" in {
       val player = Player("Carol", balance = 30, position = 2)
 
-      val property1 = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("Carol"),
+      val property1 = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some(player),
         color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(1))
-      val property2 = UtilityField("Green1", idx = 4, owner = Some("Carol"))
+      val property2 = UtilityField("Green1", idx = 4, owner = Some(player))
 
       val board = Board(Vector(property1, property2))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
