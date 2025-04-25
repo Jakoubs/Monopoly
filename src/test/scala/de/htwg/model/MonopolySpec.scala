@@ -100,7 +100,6 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedProperty.owner shouldBe None
       updatedPlayer.balance shouldBe 250
     }
-    "AskForplayerCound"
     "not allow a Player to buy an owned PropertyField" in {
       val player = Player("Alice", 500, position = 38)
       val player2 = Player("Tim", 500, position = 22)
@@ -256,10 +255,12 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedGame shouldBe game
     }
   }
- "create the specified number of players (2-4)" in {
-        val game = defineGame()
-      game.players.length should (be >= 2 and be <= 4)    }
-
+  "defineGame" should {
+    "create the specified number of players (2-4)" in {
+      val game = defineGame()
+      game.players.length should (be >= 2 and be <= 4)
+    }
+  }
   "buyHouse" should {
 
     "allow the owner to buy a house if they have enough money" in {
@@ -495,6 +496,4 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       result shouldEqual "Carol Bob Alice "
     }
   }
-
-  "get"
 }
