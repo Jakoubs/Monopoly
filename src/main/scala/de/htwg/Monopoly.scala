@@ -51,9 +51,10 @@ object Monopoly:
     println(s"Moving to position $newPosition")
     val updatedPlayer = player.copy(position = newPosition)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
-    val updatedGame = game.copy(players = updatedPlayers)
+    val updatedGame = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
     val gameRolled =  handleFieldAction(updatedGame, newPosition)
-    handleOptionalActions(gameRolled)
+    val finalGame = handleOptionalActions(gameRolled)
+    finalGame
   }
   def handleOptionalActions(currentGame: MonopolyGame): MonopolyGame = {
     println("Do you want to do anything else? |1. Buy House|2.Trade|3.Mortage| => (1/2/3/x)")
@@ -626,11 +627,14 @@ def getExtra(field: BoardField): String = {
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
-              val updatedPlayer = player.copy(balance = player.balance - houseCost)
+              val updatedPlayer = player.copy(
+                balance = player.balance - houseCost,
+                position = game.currentPlayer.position
+              )
               val updatedPlayers = game.players.map(p =>
                 if (p.name == updatedPlayer.name) updatedPlayer else p
             )    
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
+              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
               println(s"${player.name} hat ein Haus auf ${field.name} gebaut.")
               (updatedGame)
             } else {
