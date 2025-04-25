@@ -387,13 +387,13 @@ def randomEmoji(vektor: Vector[Player]): String = {
     //} else {}
   }
 
-  def printBoard(game: MonopolyGame): Unit = {
-    printTop(game)
-    printSides(game)
-    printBottom(game)
+  def printBoard(game: MonopolyGame): String = {
+    var AllLines = printTop(game) + printSides(game) + printBottom(game)
+    print(AllLines)
+    AllLines
   }
 
-  def printTop(game: MonopolyGame): Unit = {
+  def printTop(game: MonopolyGame): String = {
     val fieldNames = game.board.fields.slice(0, 4)
 
       val fieldData1 = formatField(fieldNames.lift(0))
@@ -428,14 +428,9 @@ def randomEmoji(vektor: Vector[Player]): String = {
       "|  ssssssssSSSS   |  " + fillSpace(stats1, 76) + "  |          |      |" + " " * 20 + fieldData1,
       "|          ;:`    |  " + fillSpace(stats2, 76) + "  |          |      |" + " " * 20 + fieldData2,
       "|" + fillSpace(playersOnIndex(1, game, false), 17) + "|  " + fillSpace(stats3, 76) + "  |" + fillSpace(playersOnIndex(11, game, true), 10) + "|" + fillSpace(playersOnIndex(11, game, false), 6) + "|" + " " * 20 + fieldData3,
-      "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+" + " " * 20 + fieldData4 
+      "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+" + " " * 20 + fieldData4 + "\n"
     )
-
-    println(line1)
-    println(line2)
-    println(line3)
-    println(line4)
-    additionalLines.foreach(println)
+    List(line1, line2, line3, line4) ++ additionalLines mkString "\n"  
   }
 
 def printFieldsData(game: MonopolyGame, x: Int): (String, String, String, String) = {
@@ -463,26 +458,25 @@ def formatField(optField: Option[BoardField]): String = {
 
 
 
-  def printSides(game: MonopolyGame): Unit = {
-    (12 to 20).foreach { a =>
+  def printSides(game: MonopolyGame): String = {
+    val sideRows = (12 to 20).map { a =>
       val fieldA = game.board.fields.find(_.index == 52 - a).get
       val fieldB = game.board.fields.find(_.index == a).get
 
-      val (fieldData1,fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
+      val (fieldData1, fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
 
-      val lines = List(
-        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1,
-        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2, 
-        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3,
-        if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
-        else "+--------+--------+                                                                                +--------+--------+"
-      )
+      val line1 = '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1
+      val line2 = '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2
+      val line3 = '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3
+      val line4 = if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
+                  else "+--------+--------+                                                                                +--------+--------+\n"
 
-      lines.foreach(println)
+      List(line1, line2, line3, line4).mkString("\n")
     }
+    sideRows.mkString("\n")
   }
 
-def printBottom(game: MonopolyGame): Unit = {
+def printBottom(game: MonopolyGame): String = {
   val fixedLines = List(
     "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |",
     "|     ---->       |                                                                                |   ______        |",
@@ -514,13 +508,9 @@ def printBottom(game: MonopolyGame): Unit = {
       case None => line + fillSpace(" ", 8) + '|'
     }) + fillSpace(playersOnIndex(21, game, false), 17) + '|'
 
-  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
-
-  fixedLines.foreach(println)
-  println(line6)
-  println(line7)
-  println(line8)
-  println(line9)
+  val line9 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+\n"
+  
+  fixedLines ++ List(line6, line7, line8, line9) mkString "\n"  
 }
 
   def fillSpace(input: String, maxChar: Int): String = {
