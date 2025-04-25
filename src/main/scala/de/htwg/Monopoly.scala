@@ -617,6 +617,18 @@ def getExtra(field: BoardField): String = {
       case Some(field: PropertyField) =>
         field.owner match {
           case Some(owner) if owner == player.name =>
+
+            val colorProperties = game.board.fields.collect {
+              case pf: PropertyField if pf.color == field.color => pf
+            }
+
+            val playerStreets = colorProperties.forall(_.owner.contains(player.name))
+
+            if (!playerStreets) {
+              println(s"${player.name} besitzt nicht alle Straßen der Farbe ${field.color}.")
+              return game
+            }
+
             val houseCost = 50
             if (player.balance >= houseCost) {
               val updatedField = field.copy(
