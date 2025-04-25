@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 [0m[[0m[0mdebug[0m] [0m[0mnot up to date. inChanged = true, force = false[0m
 [0m[[0m[0mdebug[0m] [0m[0mUpdating ProjectRef(uri("file:/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/project/"), "projekt-build")...[0m
 [0m[[0m[0mdebug[0m] [0m[0mDone updating ProjectRef(uri("file:/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/project/"), "projekt-build")[0m
+=======
+[debug] not up to date. inChanged = true, force = false
+[debug] Updating ProjectRef(uri("file:/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/project/"), "projekt-build")...
+[debug] Done updating ProjectRef(uri("file:/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/project/"), "projekt-build")
+>>>>>>> 280c85b (added folder structure for Observer Pattern)
