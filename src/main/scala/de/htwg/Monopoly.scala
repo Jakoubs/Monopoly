@@ -287,10 +287,7 @@ def handleFreeParkingField(game: MonopolyGame, freeP: FreeParkingField): Monopol
 
 def randomEmoji(vektor: Vector[Player]): String = {
   val emojis = List(
-    "🐶", "🐱", "🐯", "🦁", "🐻", "🐼", "🦊", "🐺", "🦄", "🐲", "🦉",
-    "🦅", "🐝", "🦋", "🐙", "🦑", "🦈", "🐊", "🦖", "🦓", "🦒", "🐘",
-    "🦔", "🐢", "🐸", "🦜", "👑", "🤖", "👽", "🧙", "🧛", "🧟", "👻",
-    "🦸", "🧚", "🥷")
+    "🐶", "🐱", "🐯", "🦁")
   val availableEmojis = emojis.filterNot(e => vektor.exists(_.name == e))
   Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
 }
@@ -338,9 +335,9 @@ def randomEmoji(vektor: Vector[Player]): String = {
       val board = Board(
         Vector(
           GoField,
-          PropertyField("brown1",2,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("brown1",2,100,10,Some("🐶"),color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
           CommunityChestField(3),
-          PropertyField("brown2",4,100,10,None,color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
+          PropertyField("brown2",4,100,10,Some("🐶"),color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
           TaxField(100,5),
           TrainStationField("Marklylebone Station",6,None),
           PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
