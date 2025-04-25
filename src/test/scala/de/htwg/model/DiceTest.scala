@@ -4,6 +4,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class DiceTest extends AnyWordSpec {
   "Dice" should {
     "be in range 1-6" in {
+      
       val (d1, d2) = Dice().rollDice(false)
       d1 should (be >= 1 and be <= 6)
       d2 should (be >= 1 and be <= 6)

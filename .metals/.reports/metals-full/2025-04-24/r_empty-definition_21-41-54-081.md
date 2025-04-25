@@ -1,11 +1,25 @@
+error id: House.
+file://<WORKSPACE>/src/test/scala/de/htwg/model/MonopolySpec.scala
+empty definition using pc, found symbol in pc: House.
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+	 -PropertyField.House.
+	 -PropertyField.House#
+	 -PropertyField.House().
+	 -scala/Predef.PropertyField.House.
+	 -scala/Predef.PropertyField.House#
+	 -scala/Predef.PropertyField.House().
+offset: 13657
+uri: file://<WORKSPACE>/src/test/scala/de/htwg/model/MonopolySpec.scala
+text:
+```scala
 package de.htwg.model
 import de.htwg.model.Monopoly
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
 
 class MonopolySpec extends AnyWordSpec with Matchers {
   val player1 = Player("Player1", 1500, 1)
@@ -256,9 +270,17 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedGame shouldBe game
     }
   }
- "create the specified number of players (2-4)" in {
-        val game = defineGame()
-      game.players.length should (be >= 2 and be <= 4)    }
+ "gameDefinition" should{
+   "defined right" in {
+     val game = defineGame()
+     game.board.fields.length should be(40)
+     game.currentPlayer.name should be("Player1")
+   }
+   "have players between 2-4" {
+    val players = askForPlayerCount()
+    players should (be > 1 and be < 5)   }
+ }
+
 
   "buyHouse" should {
 
@@ -284,7 +306,7 @@ class MonopolySpec extends AnyWordSpec with Matchers {
     "not allow a house purchase if the player does not own the property" in {
       val player = Player("Bob", balance = 500, position = 2)
       val property = PropertyField("Blue1", index = 2, price = 300, rent = 30, owner = Some("SomeoneElse"),
-        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House(0))
+        color = DarkBlue, mortgage = PropertyField.Mortgage(10, false), house = PropertyField.House@@(0))
       val board = Board(Vector(property))
       val game = MonopolyGame(players = Vector(player), board = board, currentPlayer = player, sound = false)
 
@@ -408,10 +430,11 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val (s1, s2, s3, s4) = getStats(game)
 
-      s1.length should be <= 80
-      s2.length should be <= 80
-      s3.length should be <= 80
-      s4.length should be <= 80
+      // Sicherstellen, dass jeder String weniger als oder gleich 20 Zeichen enthält
+      s1.length should be <= 20
+      s2.length should be <= 20
+      s3.length should be <= 20
+      s4.length should be <= 20
     }
 
     "correctly handle less than 4 players" in {
@@ -438,10 +461,10 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
       val (s1, s2, s3, s4) = getStats(game)
 
-      s1.length should be <= 80
-      s2.length should be <= 80
-      s3.length should be <= 80
-      s4.length should be <= 80
+      s1.length should be <= 20
+      s2.length should be <= 20
+      s3.length should be <= 20
+      s4.length should be <= 20
     }
   }
 
@@ -495,6 +518,10 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       result shouldEqual "Carol Bob Alice "
     }
   }
-
-  "get"
 }
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: House.
