@@ -34,6 +34,12 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 
     enum Color:
       case Brown, LightBlue, Pink, Orange, Red, Yellow, Green, DarkBlue
+
+    def calculateRent(property: PropertyField): Int = {
+      val rent = property.rent
+      val finalRent =  property.rent + property.house.amount * (rent / 2)
+      finalRent
+    }
   }
 
 case object GoField extends BoardField {
