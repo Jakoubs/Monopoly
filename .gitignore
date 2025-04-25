@@ -8,6 +8,10 @@
 *.iws
 .idea
 
+#VSCode
+.vscode
+.metals
+
 # scala 3
 .tasty
 .bsp
