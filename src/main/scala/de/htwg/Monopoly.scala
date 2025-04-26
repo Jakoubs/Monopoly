@@ -30,6 +30,7 @@ object Monopoly:
     if (soundBool) {
       SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     }
+    //if(!isTestBoard) {
 
     var playerVector = Vector[Player]()
 
