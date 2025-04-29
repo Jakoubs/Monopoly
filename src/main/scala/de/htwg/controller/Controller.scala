@@ -6,7 +6,7 @@ import de.htwg.util.util.Observable
 
 import scala.util.Random
 
-class Controller(var game: MonopolyGame) extends Observable{
+class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
   def currentPlayer: Player = game.currentPlayer
   def board: Board = game.board
@@ -15,7 +15,7 @@ class Controller(var game: MonopolyGame) extends Observable{
 
   def handlePlayerTurn(): Unit = {
     if (game.currentPlayer.isInJail) {
-      //handleJailTurn()
+      handleJailTurn()
     } else {
       handleRegularTurn()
     }
@@ -24,7 +24,7 @@ class Controller(var game: MonopolyGame) extends Observable{
 
   def handleRegularTurn(): Unit = {
     val player = game.currentPlayer
-    val (dice1, dice2) = Dice().rollDice(game.sound)
+    val (dice1, dice2) = dice.rollDice(game.sound)
     val diceSum = dice1 + dice2
 
     val newPosition = (player.position + diceSum - 1) % game.board.fields.size + 1
@@ -54,7 +54,7 @@ class Controller(var game: MonopolyGame) extends Observable{
           val updatedPlayers = game.players.updated(game.players.indexOf(player), updatedPlayer)
           game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
 
-          val (dice1, dice2) = Dice().rollDice(game.sound)
+          val (dice1, dice2) = dice.rollDice(game.sound)
           val diceSum = dice1 + dice2
           val newPosition = (updatedPlayer.position + diceSum) % game.board.fields.size
           handleFieldAction(newPosition)
@@ -62,7 +62,7 @@ class Controller(var game: MonopolyGame) extends Observable{
 
       case 3 =>
         // Try rolling doubles
-        val (dice1, dice2) = Dice().rollDice(game.sound)
+        val (dice1, dice2) = dice.rollDice(game.sound)
         val isDoubles = dice1 == dice2
 
         if (isDoubles) {
@@ -92,7 +92,7 @@ class Controller(var game: MonopolyGame) extends Observable{
               game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
 
               // Roll dice and move
-              val (dice1, dice2) = Dice().rollDice(game.sound)
+              val (dice1, dice2) = dice.rollDice(game.sound)
               val diceSum = dice1 + dice2
               val newPosition = (updatedPlayer.position + diceSum) % game.board.fields.size
               handleFieldAction(newPosition)
@@ -136,49 +136,43 @@ class Controller(var game: MonopolyGame) extends Observable{
     }
   }
 
-
   def buyHouse(propertyIndex: Int): Unit = {
-    val fieldOption = game.board.fields.find(_.index == propertyIndex)
+    if (!isValidFieldIndex(propertyIndex)) return
 
-    fieldOption match {
+    game.board.fields.find(_.index == propertyIndex) match {
       case Some(field: PropertyField) =>
-        field.owner match {
-          case Some(owner) if owner.name == game.currentPlayer.name =>
-            val colorProperties = game.board.fields.collect {
-              case pf: PropertyField if pf.color == field.color => pf
-            }
+        if (field.owner.exists(_.name == currentPlayer.name)) {
+          val colorGroup = game.board.fields.collect {
+            case pf: PropertyField if pf.color == field.color => pf
+          }
+          val ownsAll = colorGroup.forall(_.owner.exists(_.name == currentPlayer.name))
 
-            val playerOwnsAllProperties = colorProperties.forall(_.owner.exists(_.name == game.currentPlayer.name))
-
-            if (playerOwnsAllProperties) {
-              val houseCost = 50
-              if (game.currentPlayer.balance >= houseCost) {
-                val updatedField = field.copy(
-                  house = PropertyField.House(field.house.amount + 1)
-                )
-
-                val updatedFields = game.board.fields.map { f =>
-                  if (f.index == propertyIndex) updatedField else f
-                }
-
-                val updatedBoard = game.board.copy(fields = updatedFields)
-                val updatedPlayer = game.currentPlayer.copy(
-                  balance = game.currentPlayer.balance - houseCost
-                )
-
-                val updatedPlayers = game.players.map(p =>
-                  if (p.name == updatedPlayer.name) updatedPlayer else p
-                )
-
-                game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
-              }
-
-            }
-            notifyObservers()
-
-          case _ => // Not the owner or not owned
+          if (ownsAll && canAfford(currentPlayer, 50)) {
+            updateGameWithNewHouse(field, 50)
+          }
         }
-      case _ => // Not a property field
+      case _ => // Nicht gültiges Feld
     }
   }
+
+  private def updateGameWithNewHouse(field: PropertyField, cost: Int): Unit = {
+    val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
+    val updatedFields = game.board.fields.map {
+      case f if f.index == field.index => updatedField
+      case f => f
+    }
+
+    val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - cost)
+    val updatedPlayers = players.map(p => if (p.name == currentPlayer.name) updatedPlayer else p)
+
+    game = game.copy(board = game.board.copy(fields = updatedFields), players = updatedPlayers, currentPlayer = updatedPlayer)
+    notifyObservers()
+  }
+
+  def isValidFieldIndex(index: Int): Boolean =
+    index >= 1 && index <= game.board.fields.size
+
+  def canAfford(player: Player, amount: Int): Boolean =
+    player.balance >= amount
+
 }
