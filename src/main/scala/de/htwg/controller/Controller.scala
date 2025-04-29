@@ -1,9 +1,10 @@
 package de.htwg.controller
 
-import de.htwg.model._
-import de.htwg.model.Monopoly.*
+import de.htwg.model.*
+import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
 
+import scala.io.StdIn.readLine
 import scala.util.Random
 
 class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
@@ -17,8 +18,10 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     if (game.currentPlayer.isInJail) {
       handleJailTurn()
     } else {
+      readLine("Press ENTER to roll a dice")
       handleRegularTurn()
     }
+    switchToNextPlayer()
     notifyObservers()
   }
 
@@ -32,7 +35,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
     handleFieldAction(newPosition)
-    handleOptionalActions()
+    notifyObservers()
   }
 
   def handleJailTurn(): Unit = {
@@ -110,30 +113,38 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
 
     val updatedGame = field match {
-      case goToJail: GoToJailField => handleGoToJailField(game)
-      case taxF: TaxField => handleTaxField(game, taxF.amount)
-      case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
-      case pf: PropertyField => handlePropertyField(game, pf)
+      case goToJail: GoToJailField => handleGoToJailField()
+      //case taxF: TaxField => handleTaxField(game, taxF.amount)
+      //case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
+      //case pf: PropertyField => handlePropertyField(game, pf)
       //case tf: TrainStationField => handlePropertyField(game, tf)
+
       case _ => game
     }
   }
 
-  def handleOptionalActions(): Unit = {
-    val input = 1 // normalerweie von view bekommen
-    val fieldIndex = 10 // später irgendwie implementieren
+  def handleGoToJailField(): Unit = {
+    val index = game.players.indexWhere(_.name == game.currentPlayer.name)
+    val updatedPlayer = game.currentPlayer.goToJail()
+    val updatedPlayers = game.players.updated(index, updatedPlayer)
+    game.copy(players = updatedPlayers,currentPlayer = updatedPlayer)
+  }
+
+  def handleOptionalActions(input: Int, fieldIndex: Int): Unit = {
+
     input match {
       case 1 =>
         buyHouse(fieldIndex)
-        handleOptionalActions()
       case 2 =>
-        handleOptionalActions()
+        println("not implemented")
       case 3 =>
-        handleOptionalActions()
-      case 4 => game
-      case _ =>
-        handleOptionalActions()
+        println("not implemented")
+      case -1 =>
     }
+  }
+
+  def isGameOver: Boolean = {
+    game.players.count(_.balance > 0) <= 1
   }
 
   def buyHouse(propertyIndex: Int): Unit = {
@@ -175,4 +186,11 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def canAfford(player: Player, amount: Int): Boolean =
     player.balance >= amount
 
+  def switchToNextPlayer(): Unit = {
+    val currentIndex = game.players.indexOf(game.currentPlayer)
+    val nextIndex = (currentIndex + 1) % game.players.size
+    val nextPlayer = game.players(nextIndex)
+    game = game.copy(currentPlayer = nextPlayer)
+    notifyObservers()
+  }
 }
