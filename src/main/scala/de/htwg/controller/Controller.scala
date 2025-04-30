@@ -1,6 +1,7 @@
 package de.htwg.controller
 
 import de.htwg.model.*
+import de.htwg.model.PropertyField.calculateRent
 import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
 
@@ -13,6 +14,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def board: Board = game.board
   def players: Vector[Player] = game.players
   def sound: Boolean = game.sound
+
 
   def handlePlayerTurn(): Unit = {
     if (game.currentPlayer.isInJail) {
@@ -107,6 +109,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           }
         }
     }
+    notifyObservers()
   }
 
   def handleFieldAction(position: Int): Unit = {
@@ -116,7 +119,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       case goToJail: GoToJailField => handleGoToJailField()
       //case taxF: TaxField => handleTaxField(game, taxF.amount)
       //case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
-      //case pf: PropertyField => handlePropertyField(game, pf)
+      case pf: PropertyField => handlePropertyField(pf)
       //case tf: TrainStationField => handlePropertyField(game, tf)
 
       case _ => game
@@ -143,6 +146,121 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     }
   }
 
+  def handlePropertyField(property: PropertyField): Unit = {
+    property.owner match {
+      case None =>
+        println("Feld kaufen")  // irgendwie in Tui einbauen
+        val response = readLine().trim.toLowerCase // umschreiben readline aus Tui bekommen
+        if (response == "y") {
+          buyProperty(property.index)
+          if (game.sound) {
+            SoundPlayer().playAndWait("src/main/resources/Money.wav")
+          }
+        }
+      case Some(ownerName) if !ownerName.equals(game.currentPlayer.name) =>
+        val rent = calculateRent(property)
+        println(s"Pay ${rent}$$ rent to ${ownerName}")
+        val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
+        val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent, position = property.index)
+
+        val ownerIndex = game.players.indexWhere(_.name.equals(ownerName))
+        val owner = game.players(ownerIndex)
+        val updatedOwner = owner.copy(balance = owner.balance + rent)
+
+        // Aktualisiere die Spielerliste
+        val updatedPlayers = game.players
+          .updated(playerIndex, updatedPlayer)
+          .updated(ownerIndex, updatedOwner)
+
+        game.copy(players = updatedPlayers)
+      case Some(_) =>
+
+    }
+  }
+
+  def buyProperty(propertyIndex: Int): Unit = {
+    val fieldOption = game.board.fields.find(_.index == propertyIndex)
+
+    fieldOption match {
+      case Some(field: PropertyField) =>
+        field.owner match {
+          case None =>
+            if (currentPlayer.balance >= field.price) {
+              val updatedField = field.copy(
+                owner = Some(currentPlayer)
+              )
+
+              val updatedFields = game.board.fields.map { f =>
+                if (f.index == propertyIndex) updatedField else f
+              }
+              val updatedBoard = game.board.copy(fields = updatedFields)
+              val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - field.price, position = propertyIndex)
+              val updatedPlayers = game.players.map(p =>
+                if (p.name == updatedPlayer.name) updatedPlayer else p
+              )
+              game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
+              println(s"${currentPlayer.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
+            } else {
+              println(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
+            }
+          case Some(owner) =>
+            println(s"Diese Immobilie gehört bereits ${owner.name}.")
+        }
+      case Some(field: TrainStationField) =>
+        field.owner match {
+          case None =>
+            val stationPrice = 200 // Typischer Preis für Bahnhöfe
+            if (currentPlayer.balance >= stationPrice) {
+              val updatedField = field.copy(owner = Some(currentPlayer))
+              val updatedFields = game.board.fields.map { f =>
+                if (f.index == propertyIndex) updatedField else f
+              }
+              val updatedBoard = game.board.copy(fields = updatedFields)
+
+              val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - stationPrice, position = propertyIndex)
+              val updatedPlayers = game.players.map(p =>
+                if (p.name == updatedPlayer.name) updatedPlayer else p
+              )
+              game.copy(board = updatedBoard, players = updatedPlayers)
+              println(s"${currentPlayer.name} hat den Bahnhof ${field.name} für $stationPrice gekauft.")
+            } else {
+              println(s"Nicht genug Geld! Der Bahnhof kostet $stationPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
+            }
+          case Some(owner) =>
+            println(s"Dieser Bahnhof gehört bereits ${owner}.")
+        }
+      case Some(field: UtilityField) =>
+        field.owner match {
+          case None =>
+            val utilityPrice = 150 // Typischer Preis für Versorgungswerke
+            if (currentPlayer.balance >= utilityPrice) {
+              val updatedField = field.copy(
+                owner = Some(currentPlayer)
+              )
+
+              val updatedFields = game.board.fields.map { f =>
+                if (f.index == propertyIndex) updatedField else f
+              }
+              val updatedBoard = game.board.copy(fields = updatedFields)
+
+              val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - utilityPrice, position = propertyIndex)
+              val updatedPlayers = game.players.map(p =>
+                if (p.name == updatedPlayer.name) updatedPlayer else p
+              )
+              game.copy(board = updatedBoard, players = updatedPlayers)
+              println(s"${currentPlayer.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
+            } else {
+              println(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
+            }
+          case Some(owner) =>
+            println(s"Dieses Versorgungswerk gehört bereits ${owner}.")
+        }
+      case Some(_) =>
+        println(s"Das Feld mit Index $propertyIndex kann nicht gekauft werden.")
+      case None =>
+        println(s"Feld mit Index $propertyIndex nicht gefunden.")
+    }
+  }
   def isGameOver: Boolean = {
     game.players.count(_.balance > 0) <= 1
   }
