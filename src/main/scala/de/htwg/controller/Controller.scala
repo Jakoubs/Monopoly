@@ -20,7 +20,6 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     if (game.currentPlayer.isInJail) {
       handleJailTurn()
     } else {
-      readLine("Press ENTER to roll a dice")
       handleRegularTurn()
     }
     switchToNextPlayer()
@@ -30,13 +29,11 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def handleRegularTurn(): Unit = {
     val player = game.currentPlayer
     val (dice1, dice2) = dice.rollDice(game.sound)
-    val diceSum = dice1 + dice2
 
-    val newPosition = (player.position + diceSum - 1) % game.board.fields.size + 1
-    val updatedPlayer = player.copy(position = newPosition)
+    val updatedPlayer = player.playerMove(() => (dice1,dice2))
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
-    handleFieldAction(newPosition)
+    handleFieldAction()
     notifyObservers()
   }
 
@@ -62,7 +59,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           val (dice1, dice2) = dice.rollDice(game.sound)
           val diceSum = dice1 + dice2
           val newPosition = (updatedPlayer.position + diceSum) % game.board.fields.size
-          handleFieldAction(newPosition)
+          handleFieldAction()
         }
 
       case 3 =>
@@ -81,7 +78,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           )
           val updatedPlayers = game.players.updated(game.players.indexOf(player), updatedPlayer)
           game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
-          handleFieldAction(newPosition)
+          handleFieldAction()
         } else {
           // Increment jail turns
           val jailTurns = player.jailTurns + 1
@@ -100,7 +97,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
               val (dice1, dice2) = dice.rollDice(game.sound)
               val diceSum = dice1 + dice2
               val newPosition = (updatedPlayer.position + diceSum) % game.board.fields.size
-              handleFieldAction(newPosition)
+              handleFieldAction()
             }
           } else {
             val updatedPlayer = player.copy(jailTurns = jailTurns)
@@ -112,8 +109,8 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     notifyObservers()
   }
 
-  def handleFieldAction(position: Int): Unit = {
-    val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
+  def handleFieldAction(): Unit = {
+    val field = game.board.fields.find(_.index == currentPlayer.position).getOrElse(throw new Exception(s"Field at position ${currentPlayer.position} not found"))
 
     val updatedGame = field match {
       case goToJail: GoToJailField => handleGoToJailField()
