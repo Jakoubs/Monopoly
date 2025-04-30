@@ -40,8 +40,8 @@ case class Player(name: String,
       println("press enter to roll dice")
       readLine("Rolling dice...")
       val (diceA, diceB) = rollDice()
-      val updatedPlayer = if ((position + diceA + diceB) > 40) 
-        this.copy(balance = balance + 200) else this 
+      val updatedPlayer = if ((position + diceA + diceB) > 40)
+        this.copy(balance = balance + 200) else this
       println(s"You rolled $diceA and $diceB! That's ${diceA + diceB} moves.")
       println(s"Your new position is ${(position + diceA + diceB) % 40}")
 
