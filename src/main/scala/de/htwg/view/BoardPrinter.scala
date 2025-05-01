@@ -5,8 +5,8 @@ import de.htwg.model.{BoardField, CommunityChestField, FreeParkingField, Propert
 
 object BoardPrinter {
   def printBoard(game: MonopolyGame): Unit = {
-    printTop(game)
-    printSides(game)
+    var top = printTop(game)
+    var = printSides(game)
     printBottom(game)
   }
 
