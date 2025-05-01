@@ -93,7 +93,7 @@ object BoardPrinter {
     }
     val line7 = fields22To30Options.foldLeft("|                 |")((line, fieldOption) =>
       fieldOption match {
-        case Some(field) => line + fillSpace(getPrice(field), 8) + '|'
+        case Some(field) => line +  fillSpace(getPrice(field), 8) + '|'
         case None => line + fillSpace("N/A", 8) + '|'
       }) + s"   Money [$freeParkingMoney]    |"
 
