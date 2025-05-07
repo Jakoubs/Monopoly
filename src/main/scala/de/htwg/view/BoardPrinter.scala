@@ -162,17 +162,17 @@ object BoardPrinter {
     field match {
       case pf: PropertyField =>
         pf.owner match {
-          case Some(ownerName) => s" $ownerName${pf.house.amount}"
+          case Some(ownerName) => s" ${ownerName.name}${pf.house.amount}"
           case None => ""
         }
       case ts: TrainStationField =>
         ts.owner match {
-          case Some(ownerName) => s" $ownerName"
+          case Some(ownerName) => s" ${ownerName.name}"
           case None => ""
         }
       case uf: UtilityField =>
         uf.owner match {
-          case Some(ownerName) => s" $ownerName"
+          case Some(ownerName) => s" ${ownerName.name}"
           case None => ""
         }
       case _ => ""
