@@ -1,4 +1,4 @@
-/*package de.htwg.model
+package de.htwg.model
 import de.htwg.model.Monopoly
 
 import org.scalatest.wordspec.AnyWordSpec
@@ -515,5 +515,3 @@ class MonopolySpec extends AnyWordSpec with Matchers {
 
   "get"
 }
-
- */
