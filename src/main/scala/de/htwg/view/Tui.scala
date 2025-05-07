@@ -2,7 +2,6 @@ package de.htwg.view
 
 import de.htwg.Monopoly
 import de.htwg.controller.Controller
-import de.htwg.model.*
 import de.htwg.util.util.Observer
 
 import scala.io.StdIn.readLine
@@ -16,7 +15,7 @@ class Tui(controller: Controller) extends Observer {
 
     while (!controller.isGameOver) {
       val current = controller.currentPlayer
-      showPlayerStatus(current)
+      showPlayerStatus()
 
       controller.handlePlayerTurn(
         ask = msg => readLine(msg + " (j/n): ").trim.toLowerCase == "j",
@@ -48,10 +47,6 @@ class Tui(controller: Controller) extends Observer {
 
    */
 
-  def showPlayerStatus(player: Player): Unit = {
-    println(s"\n--- ${player.name}'s turn ---")
-    println(s"Balance: ${player.balance} | Position: ${player.position} | In Jail: ${player.isInJail}")
-  }
 
 /*
   def handleJailTurn(): Unit = {
@@ -60,12 +55,9 @@ class Tui(controller: Controller) extends Observer {
     controller.handleJailTurn()
     getJailChoice()
   }
-
-
  */
-  def printDiceResult(): Unit = {
-    val (dice1, dice2) = Dice().rollDice(controller.sound) // Assuming Dice().rollDice is accessible
-    println(s"You rolled $dice1 and $dice2 (${dice1 + dice2})")
+  def showPlayerStatus(): Unit = {
+    println(controller.getCurrentPlayerStatus)
   }
 
   def printNewPosition(): Unit = {
