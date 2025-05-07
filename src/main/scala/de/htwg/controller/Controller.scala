@@ -189,7 +189,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       case Some(field: PropertyField) =>
         field.owner match {
           case None =>
-            if (currentPlayer.balance >= field.price) {
+            if (game.currentPlayer.balance >= field.price) {
               val updatedField = field.copy(
                 owner = Some(currentPlayer)
               )
@@ -198,7 +198,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
-              val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - field.price, position = propertyIndex)
+              val updatedPlayer = game.currentPlayer.copy(balance = currentPlayer.balance - field.price, position = propertyIndex)
               val updatedPlayers = game.players.map(p =>
                 if (p.name == updatedPlayer.name) updatedPlayer else p
               )
@@ -313,5 +313,16 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val nextIndex = (currentIndex + 1) % game.players.size
     val nextPlayer = game.players(nextIndex)
     game = game.copy(currentPlayer = nextPlayer)
+  }
+
+  def getCurrentPlayerName: String = currentPlayer.name
+  def getCurrentPlayerBalance: Int = currentPlayer.balance
+  def getCurrentPlayerPosition: Int = currentPlayer.position
+  def isCurrentPlayerInJail: Boolean = currentPlayer.isInJail
+
+  def getCurrentPlayerStatus: String = {
+    val p = currentPlayer
+    s"${p.name} | Balance: ${p.balance}€ | Position: ${p.position} | " +
+      s"In Jail: ${if (p.isInJail) "Yes" else "No"}"
   }
 }
