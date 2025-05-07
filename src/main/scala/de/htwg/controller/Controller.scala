@@ -5,8 +5,8 @@ import de.htwg.model.PropertyField.calculateRent
 import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
 
+import java.awt.Choice
 import scala.io.StdIn.readLine
-import scala.util.Random
 
 class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
@@ -16,37 +16,44 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def sound: Boolean = game.sound
 
 
-  def handlePlayerTurn(): Unit = {
+  def handlePlayerTurn(
+                        ask: String => Boolean,
+                        print: String => Unit,
+                        choice: () => Int
+                      ): Unit = {
     if (game.currentPlayer.isInJail) {
-      handleJailTurn()
+      handleJailTurn(ask, print, choice)
     } else {
-      handleRegularTurn()
+      handleRegularTurn(ask, print,choice)
     }
     switchToNextPlayer()
     notifyObservers()
   }
 
-  def handleRegularTurn(): Unit = {
+  def handleRegularTurn(ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
     val player = game.currentPlayer
     val (dice1, dice2) = dice.rollDice(game.sound)
+    //print(s"${player.name} würfelt $dice1 und $dice2 (${dice1 + dice2})")
 
-    val updatedPlayer = player.playerMove(() => (dice1,dice2))
+    val updatedPlayer = player.playerMove(() => (0, 0))
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
-    handleFieldAction()
-    notifyObservers()
+
+    print(s"${player.name} landet auf Feld ${updatedPlayer.position}")
+    handleFieldAction(ask, print,choice)
   }
 
-  def handleJailTurn(): Unit = {
+  def handleJailTurn(ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
 
     val player = game.currentPlayer
-
-    // Handle jail options (this is simplified - expand as needed)
-    val jailChoice = 3  // This would come from the view in a real implementation
+    print("Du bist im Gefängnis.")
+    print("1. Zahle 50$ um rauszukommen")
+    print("2. (Nicht implementiert) Karte verwenden")
+    print("3. Versuche Pasch zu würfeln")
+    val jailChoice = choice()
 
     jailChoice match {
       case 1 =>
-        // Pay €50 to get out
         if (player.balance >= 50) {
           val updatedPlayer = player.copy(
             isInJail = false,
@@ -59,7 +66,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           val (dice1, dice2) = dice.rollDice(game.sound)
           val diceSum = dice1 + dice2
           val newPosition = (updatedPlayer.position + diceSum) % game.board.fields.size
-          handleFieldAction()
+          handleFieldAction(ask, print, choice)
         }
 
       case 3 =>
@@ -78,7 +85,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           )
           val updatedPlayers = game.players.updated(game.players.indexOf(player), updatedPlayer)
           game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
-          handleFieldAction()
+          handleFieldAction(ask, print, choice)
         } else {
           // Increment jail turns
           val jailTurns = player.jailTurns + 1
@@ -97,7 +104,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
               val (dice1, dice2) = dice.rollDice(game.sound)
               val diceSum = dice1 + dice2
               val newPosition = (updatedPlayer.position + diceSum) % game.board.fields.size
-              handleFieldAction()
+              handleFieldAction(ask, print, choice)
             }
           } else {
             val updatedPlayer = player.copy(jailTurns = jailTurns)
@@ -106,17 +113,16 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           }
         }
     }
-    notifyObservers()
   }
 
-  def handleFieldAction(): Unit = {
+  def handleFieldAction(ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
     val field = game.board.fields.find(_.index == currentPlayer.position).getOrElse(throw new Exception(s"Field at position ${currentPlayer.position} not found"))
 
     val updatedGame = field match {
       case goToJail: GoToJailField => handleGoToJailField()
       //case taxF: TaxField => handleTaxField(game, taxF.amount)
       //case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
-      case pf: PropertyField => handlePropertyField(pf)
+      case pf: PropertyField => handlePropertyField(pf,ask, print, choice)
       //case tf: TrainStationField => handlePropertyField(game, tf)
 
       case _ => game
@@ -143,20 +149,21 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     }
   }
 
-  def handlePropertyField(property: PropertyField): Unit = {
+  def handlePropertyField(property: PropertyField, ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
     property.owner match {
       case None =>
-        println("Feld kaufen")  // irgendwie in Tui einbauen
-        val response = readLine().trim.toLowerCase // umschreiben readline aus Tui bekommen
-        if (response == "y") {
+        val response = ask("Möchtest du das Feld kaufen?")
+        if (response) {
           buyProperty(property.index)
           if (game.sound) {
             SoundPlayer().playAndWait("src/main/resources/Money.wav")
           }
+        } else {
+          print("Keine Feld gekauft!")
         }
       case Some(ownerName) if !ownerName.equals(game.currentPlayer.name) =>
         val rent = calculateRent(property)
-        println(s"Pay ${rent}$$ rent to ${ownerName}")
+        print(s"Pay ${rent}$$ rent to ${ownerName}")
         val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
         val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent, position = property.index)
 
@@ -306,6 +313,5 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val nextIndex = (currentIndex + 1) % game.players.size
     val nextPlayer = game.players(nextIndex)
     game = game.copy(currentPlayer = nextPlayer)
-    notifyObservers()
   }
 }
