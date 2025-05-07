@@ -176,7 +176,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           .updated(playerIndex, updatedPlayer)
           .updated(ownerIndex, updatedOwner)
 
-        game.copy(players = updatedPlayers)
+        game = game.copy(players = updatedPlayers)
       case Some(_) =>
 
     }
@@ -198,11 +198,11 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
                 if (f.index == propertyIndex) updatedField else f
               }
               val updatedBoard = game.board.copy(fields = updatedFields)
-              val updatedPlayer = game.currentPlayer.copy(balance = currentPlayer.balance - field.price, position = propertyIndex)
+              val updatedPlayer =  game.currentPlayer.copy(balance = currentPlayer.balance - field.price, position = propertyIndex)
               val updatedPlayers = game.players.map(p =>
                 if (p.name == updatedPlayer.name) updatedPlayer else p
               )
-              game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
+              game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
               printText(s"${currentPlayer.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
             } else {
               printText(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
@@ -315,6 +315,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     game = game.copy(currentPlayer = nextPlayer)
   }
 
+  def getGameStatus: MonopolyGame = game
   def getCurrentPlayerName: String = currentPlayer.name
   def getCurrentPlayerBalance: Int = currentPlayer.balance
   def getCurrentPlayerPosition: Int = currentPlayer.position
