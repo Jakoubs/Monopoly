@@ -16,27 +16,28 @@ class Tui(controller: Controller) extends Observer {
 
     while (!controller.isGameOver) {
       val current = controller.currentPlayer
-      println(s"\n--- ${current.name}'s turn ---")
-      println(s"Balance: ${current.balance} | Position: ${current.position} | In Jail: ${current.isInJail}")
+      showPlayerStatus(current)
 
-      if (current.isInJail) {
-        handleJailTurn()
-      } else {
-        handleRegularTurn()
-      }
-      controller.switchToNextPlayer()
-      // Optional: Hier könntest du eine Pause einbauen
-      // readLine("Press ENTER to continue...")
+      controller.handlePlayerTurn(
+        ask = msg => readLine(msg + " (j/n): ").trim.toLowerCase == "j",
+        print = msg => println(msg),
+        choice = () => {
+            readLine("Deine Wahl (1-3): ").trim match {
+              case "1" => 1
+              case "2" => 2
+              case "3" => 3
+              case _ =>
+                println("Ungültige Eingabe.")
+                1 // Fallback oder erneut fragen (rekursiv, je nach Geschmack)
+            }
+        }
+      )
     }
+
     val winner = controller.game.players.find(_.balance > 0).getOrElse(controller.game.players.head)
     println(s"\n${winner.name} wins the game!")
   }
-
-  def handlePlayerTurn(): Unit = {
-    controller.handlePlayerTurn() // Controller steuert den Zug
-  }
-
-
+  /*
   def handleRegularTurn(): Unit = {
     readLine("Press ENTER to roll a dice")
     controller.handleRegularTurn()
@@ -45,14 +46,23 @@ class Tui(controller: Controller) extends Observer {
     handleOptionalActions()
   }
 
+   */
 
+  def showPlayerStatus(player: Player): Unit = {
+    println(s"\n--- ${player.name}'s turn ---")
+    println(s"Balance: ${player.balance} | Position: ${player.position} | In Jail: ${player.isInJail}")
+  }
 
+/*
   def handleJailTurn(): Unit = {
-    controller.handleJailTurn()
     printJailOptions()
+    readLine()
+    controller.handleJailTurn()
     getJailChoice()
   }
 
+
+ */
   def printDiceResult(): Unit = {
     val (dice1, dice2) = Dice().rollDice(controller.sound) // Assuming Dice().rollDice is accessible
     println(s"You rolled $dice1 and $dice2 (${dice1 + dice2})")
@@ -118,7 +128,7 @@ class Tui(controller: Controller) extends Observer {
     println("2. Use a 'Get Out of Jail Free' card (if available) - Not Implemented")
     println("3. Try to roll doubles")
   }
-
+/*
   def getJailChoice(): Unit = {
     val choice = readLine("Enter your choice (1-3): ").trim
     // Die Logik für die Gefängniswahl sollte im Controller sein
@@ -130,6 +140,8 @@ class Tui(controller: Controller) extends Observer {
       case _ =>  controller.handleJailTurn() // Controller würfelt und entscheidet
     }
   }
+
+ */
 
 
   override def update(): Unit = BoardPrinter.printBoard(controller.game)
