@@ -154,7 +154,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       case None =>
         val response = ask("Möchtest du das Feld kaufen?")
         if (response) {
-          buyProperty(property.index)
+          buyProperty(property.index, print)
           if (game.sound) {
             SoundPlayer().playAndWait("src/main/resources/Money.wav")
           }
@@ -182,7 +182,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     }
   }
 
-  def buyProperty(propertyIndex: Int): Unit = {
+  def buyProperty(propertyIndex: Int, printText: String => Unit): Unit = {
     val fieldOption = game.board.fields.find(_.index == propertyIndex)
 
     fieldOption match {
@@ -203,12 +203,12 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
                 if (p.name == updatedPlayer.name) updatedPlayer else p
               )
               game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
-              println(s"${currentPlayer.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
+              printText(s"${currentPlayer.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
             } else {
-              println(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
+              printText(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
             }
           case Some(owner) =>
-            println(s"Diese Immobilie gehört bereits ${owner.name}.")
+            printText(s"Diese Immobilie gehört bereits ${owner.name}.")
         }
       case Some(field: TrainStationField) =>
         field.owner match {
@@ -226,12 +226,12 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
                 if (p.name == updatedPlayer.name) updatedPlayer else p
               )
               game.copy(board = updatedBoard, players = updatedPlayers)
-              println(s"${currentPlayer.name} hat den Bahnhof ${field.name} für $stationPrice gekauft.")
+              printText(s"${currentPlayer.name} hat den Bahnhof ${field.name} für $stationPrice gekauft.")
             } else {
-              println(s"Nicht genug Geld! Der Bahnhof kostet $stationPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
+              printText(s"Nicht genug Geld! Der Bahnhof kostet $stationPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
             }
           case Some(owner) =>
-            println(s"Dieser Bahnhof gehört bereits ${owner}.")
+            printText(s"Dieser Bahnhof gehört bereits ${owner}.")
         }
       case Some(field: UtilityField) =>
         field.owner match {
@@ -252,17 +252,17 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
                 if (p.name == updatedPlayer.name) updatedPlayer else p
               )
               game.copy(board = updatedBoard, players = updatedPlayers)
-              println(s"${currentPlayer.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
+              printText(s"${currentPlayer.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
             } else {
-              println(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
+              printText(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
             }
           case Some(owner) =>
-            println(s"Dieses Versorgungswerk gehört bereits ${owner}.")
+            printText(s"Dieses Versorgungswerk gehört bereits ${owner}.")
         }
       case Some(_) =>
-        println(s"Das Feld mit Index $propertyIndex kann nicht gekauft werden.")
+        printText(s"Das Feld mit Index $propertyIndex kann nicht gekauft werden.")
       case None =>
-        println(s"Feld mit Index $propertyIndex nicht gefunden.")
+        printText(s"Feld mit Index $propertyIndex nicht gefunden.")
     }
   }
   def isGameOver: Boolean = {
