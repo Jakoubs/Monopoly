@@ -33,13 +33,15 @@ case class Player(name: String,
   }
 
   def playerMove(rollDice: () => (Int, Int),
-                 rollcount: Int = 1): Player = {
+                 rollcount: Int = 0): Player = {
     if (rollcount == 3) {
       this.goToJail()
     } else if(!isInJail) {
       println("press enter to roll dice")
       readLine("Rolling dice...")
-      val (diceA, diceB) = rollDice()
+      val rand = new scala.util.Random
+      val rollNewDice = () => (rand.nextInt(6) + 1, rand.nextInt(6) + 1)
+      val (diceA, diceB) = rollNewDice()
       val updatedPlayer = if ((position + diceA + diceB) > 40)
         this.copy(balance = balance + 200) else this
       println(s"You rolled $diceA and $diceB! That's ${diceA + diceB} moves.")
