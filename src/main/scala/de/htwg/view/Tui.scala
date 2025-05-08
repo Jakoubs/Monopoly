@@ -10,7 +10,7 @@ class Tui(controller: Controller) extends Observer {
   controller.add(this)
 
   def run(): Unit = {
-    BoardPrinter.printBoard(controller.game)
+    println(controller.getBoardString)
 
     while (!controller.isGameOver) {
       val current = controller.currentPlayer
@@ -57,7 +57,7 @@ class Tui(controller: Controller) extends Observer {
   }
  */
   def showPlayerStatus(): Unit = {
-    println(controller.getCurrentPlayerStatus+ " || " + BoardPrinter.getInventory(controller.getGameStatus))
+    println(controller.getCurrentPlayerStatus+ " || " + controller.getInventoryString)
   }
 
   /*
@@ -135,5 +135,5 @@ class Tui(controller: Controller) extends Observer {
  */
 
 
-  override def update(): Unit = BoardPrinter.printBoard(controller.game)
+  override def update(): Unit = println(controller.getBoardString)
 }

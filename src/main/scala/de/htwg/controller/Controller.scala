@@ -1,6 +1,6 @@
 package de.htwg.controller
 
-import de.htwg.model.*
+import de.htwg.model.{BoardPrinter, Player, SoundPlayer, *}
 import de.htwg.model.PropertyField.calculateRent
 import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
@@ -336,6 +336,14 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val nextIndex = (currentIndex + 1) % game.players.size
     val nextPlayer = game.players(nextIndex)
     game = game.copy(currentPlayer = nextPlayer)
+  }
+
+  def getBoardString: String = {
+    BoardPrinter.getBoardAsString(game)
+  }
+
+  def getInventoryString: String = {
+    BoardPrinter.getInventoryString(game)
   }
 
   def getGameStatus: MonopolyGame = game
