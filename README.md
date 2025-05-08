@@ -1,7 +1,8 @@
-# Monopoly Skala
+[![Coverage Status](https://coveralls.io/repos/github/Jakoubs/Monopoly/badge.svg)](https://coveralls.io/github/Jakoubs/Monopoly)
 
-Welcome to the Monopoly project! This is a Scala implementation of the classic board game Monopoly.
+# Monopoly
 
+Welcome to the Monopoly project! This is a Scala implementation of the game Monopoly
 ## Contents
 
 - [About the Project](#about-the-project)
@@ -42,3 +43,4 @@ To start the game, simply run the main class:
 ```sh
 sbt run
 ```
+
