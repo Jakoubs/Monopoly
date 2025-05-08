@@ -1,6 +1,5 @@
 package de.htwg.view
 
-import de.htwg.Monopoly
 import de.htwg.controller.Controller
 import de.htwg.util.util.Observer
 
@@ -18,18 +17,19 @@ class Tui(controller: Controller) extends Observer {
       showPlayerStatus()
 
       controller.handlePlayerTurn(
-        ask = msg => readLine(msg + " (j/n): ").trim.toLowerCase == "j",
+        ask = msg => readLine(msg + " (j/N): ").trim.toLowerCase == "j",
         print = msg => println(msg),
         choice = () => {
-            readLine("Deine Wahl (1-3): ").trim match {
-              case "1" => 1
-              case "2" => 2
-              case "3" => 3
+            readLine("Deine Wahl (1-3): ").trim.toIntOption.getOrElse(-1) match {
+              case 1 => 1
+              case 2 => 2
+              case 3 => 3
               case _ =>
-                println("Ungültige Eingabe.")
-                1 // Fallback oder erneut fragen (rekursiv, je nach Geschmack)
+                println("Weiter")
+                -1 // Fallback oder erneut fragen (rekursiv, je nach Geschmack)
             }
-        }
+        },
+        idxInput = () => readLine("Auf welcher Strße Willst du bauen? (index)").trim.toIntOption.getOrElse(-1)
       )
     }
 
@@ -60,9 +60,11 @@ class Tui(controller: Controller) extends Observer {
     println(controller.getCurrentPlayerStatus+ " || " + BoardPrinter.getInventory(controller.getGameStatus))
   }
 
+  /*
   def printNewPosition(): Unit = {
     println(s"Moving to position ${controller.currentPlayer.position}")
   }
+
 
   def handleOptionalActions(): Unit = {
     println("Do you want to do anything else? |1. Buy House|2. Trade|3. Mortgage| => (1/2/3/x)")
@@ -96,10 +98,12 @@ class Tui(controller: Controller) extends Observer {
       -1
     }
 
-    controller.handleOptionalActions(input, fieldIndex)
+    controller.handleOptionalActions(, fieldIndex)
 
     if (input != -1) handleOptionalActions()
   }
+
+   */
 
 
   def handleGoToJailField(): Unit = {
