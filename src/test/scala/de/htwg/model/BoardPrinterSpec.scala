@@ -17,7 +17,7 @@ class BoardPrinterSpec extends AnyWordSpec {
   val darkBlueProperty1Owned = darkBlueProperty1.copy(owner = Some(player1))
   val trainStation = TrainStationField("Station1", 6, 200,None)
   val trainStationOwned = trainStation.copy(owner = Some(player1))
-  val utility = UtilityField("Utility1", 13, None)
+  val utility = UtilityField("Utility1", 13,150,UtilityField.UtilityCheck.utility, None)
   val utilityOwned = utility.copy(owner = Some(player1))
   val goToJail = GoToJailField()
   val taxField = TaxField(100, 5)
@@ -38,7 +38,8 @@ class BoardPrinterSpec extends AnyWordSpec {
     PropertyField("Red3", 25, 180, 18, None, PropertyField.Color.Red),
     TrainStationField("Station3", 26,200, None),
     PropertyField("Yellow1", 27, 200, 20, None, PropertyField.Color.Yellow),
-    PropertyField("Yellow2", 28, 200, 20, None, PropertyField.Color.Yellow), UtilityField("Utility2", 29, None),
+    PropertyField("Yellow2", 28, 200, 20, None, PropertyField.Color.Yellow), 
+    UtilityField("Utility2", 29,150, UtilityField.UtilityCheck.utility, None),
     PropertyField("Yellow3", 30, 200, 20, None, PropertyField.Color.Yellow), goToJail,
     PropertyField("Green1", 32, 220, 22, None, PropertyField.Color.Green),
     PropertyField("Green2", 33, 220, 22, None, PropertyField.Color.Green), ChanceField(34),

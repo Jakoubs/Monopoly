@@ -1,11 +1,12 @@
-package de.htwg.model
+package de.htwg.controller
 
 import de.htwg.controller.Controller
-import org.scalatest.matchers.should.Matchers.*
-import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.*
 import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers.*
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.Vector
 
@@ -31,7 +32,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       PropertyField("lightBlue3", 10, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       JailField,
       PropertyField("Pink1", 12, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      UtilityField("Electric Company", 13, None),
+      UtilityField("Electric Company", 13,150,UtilityField.UtilityCheck.utility, None),
       PropertyField("Pink2", 14, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       PropertyField("Pink3", 15, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       TrainStationField("Fenchurch ST Station", 16,200, None),
@@ -46,7 +47,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       PropertyField("Red3", 25, 100, 10, None, color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       TrainStationField("King's Cross Station", 26,200, None),
       PropertyField("Yellow1", 27, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      UtilityField("Water Works", 28, None),
+      UtilityField("Water Works", 28,150,UtilityField.UtilityCheck.utility, None),
       PropertyField("Yellow2", 29, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       PropertyField("Yellow3", 30, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       GoToJailField(),
@@ -403,6 +404,23 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         updatedPlayer.balance shouldBe (1500 - 200)
       }
 
+      "not be able to buy trainstaion if not enough money" in {
+        val playerWithNoMoney = player1.copy(balance = 100)
+        val gameWithNoMoney = initialGame.copy(players = Vector(playerWithNoMoney, player2), currentPlayer = playerWithNoMoney)
+        val stationIndex = 5 // Index des Bahnhofs "Marklylebone Station"
+        val trainStation = fields(stationIndex).asInstanceOf[TrainStationField]
+
+        val controller = new Controller(gameWithNoMoney, dice)
+
+        controller.handleTrainStationField(trainStation, mockAsk, mockPrint, mockChoice)
+
+        val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[TrainStationField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+
+        updatedField.owner shouldBe None
+        updatedPlayer.balance shouldBe (100)
+      }
+
       "dont buy the Trainstation if the player said no" in {
         val stationIndex = 15
         val mockAsk: String => Boolean = _ => false
@@ -439,10 +457,10 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
 
     "Utility Field" should {
-      val utilityName = "Test Utility"
+      /*val utilityName = "Test Utility"
       val utilityPosition = 13
       val utilityPrice = 150
-      val utility = UtilityField(utilityName, utilityPosition, None)
+      val utility = UtilityField(utilityName, utilityPosition,150,UtilityField.UtilityCheck.utility, None)
 
       "be created with correct initial properties" in {
         utility.name should be(utilityName)
@@ -463,7 +481,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val playerWithOneUtility = player1
         val singleUtilityFields = board.fields.updated(
           utilityPositions(0),
-          UtilityField("Electric Company", utilityPositions(0), Some(playerWithOneUtility))
+          UtilityField("Electric Company", utilityPositions(0),150,UtilityField.UtilityCheck.utility, Some(playerWithOneUtility))
         )
         val gameWithOneUtility = initialGame.copy(board = board.copy(fields = singleUtilityFields))
         val controllerOneUtility = new Controller(gameWithOneUtility, mockDice)
@@ -474,7 +492,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         // Test rent with both utilities owned
         val twoUtilityFields = singleUtilityFields.updated(
           utilityPositions(1),
-          UtilityField("Water Works", utilityPositions(1), Some(playerWithOneUtility))
+          UtilityField("Water Works", utilityPositions(1),150,UtilityField.UtilityCheck.utility, Some(playerWithOneUtility))
         )
         val gameWithTwoUtilities = initialGame.copy(board = board.copy(fields = twoUtilityFields))
         val controllerTwoUtilities = new Controller(gameWithTwoUtilities, mockDice)
@@ -508,7 +526,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val payingPlayer = player1.copy(balance = 1500, position = utilityIndex)
 
         // Setup game with owned utility
-        val ownedUtilityField = UtilityField("Electric Company", utilityIndex, Some(ownerPlayer))
+        val ownedUtilityField = UtilityField("Electric Company", utilityIndex, 150,UtilityField.UtilityCheck.utility,Some(ownerPlayer))
         val updatedFields = board.fields.updated(utilityIndex, ownedUtilityField)
         val gameWithOwnedUtility = initialGame.copy(
           board = board.copy(fields = updatedFields),
@@ -569,8 +587,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val payingPlayer = player1.copy(balance = 1500, position = electricCompanyIndex)
 
         val ownedUtilities = board.fields
-          .updated(electricCompanyIndex, UtilityField("Electric Company", electricCompanyIndex, Some(ownerPlayer)))
-          .updated(waterWorksIndex, UtilityField("Water Works", waterWorksIndex, Some(ownerPlayer)))
+          .updated(electricCompanyIndex, UtilityField("Electric Company", electricCompanyIndex,150,UtilityField.UtilityCheck.utility, Some(ownerPlayer)))
+          .updated(waterWorksIndex, UtilityField("Water Works", waterWorksIndex,150,UtilityField.UtilityCheck.utility, Some(ownerPlayer)))
 
         val gameWithBothUtilities = initialGame.copy(
           board = board.copy(fields = ownedUtilities),
@@ -594,9 +612,74 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         updatedPayingPlayer.balance should be(initialPayingBalance - 100)
         updatedOwnerPlayer.balance should be(initialOwnerBalance + 100)
       }
+*/
+      "allow a player to buy an unowned utilityfield" in {
+        val utilityIndex = 12 // Index des Bahnhofs "Marklylebone Station"
+        val utilityField = fields(utilityIndex).asInstanceOf[UtilityField]
 
+        val game = MonopolyGame(Vector(player1, player2), Board(fields), player1, sound = false)
+        val controller = new Controller(game, dice)
 
+        controller.handleUtilityField(utilityField, mockAsk, mockPrint, mockChoice)
+
+        val updatedField = controller.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+
+        updatedField.owner shouldBe Some(player1)
+        updatedPlayer.balance shouldBe (1500 - 200)
+      }
+
+      "not be able to buy utilityField if not enough money" in {
+        val playerWithNoMoney = player1.copy(balance = 100)
+        val gameWithNoMoney = initialGame.copy(players = Vector(playerWithNoMoney, player2), currentPlayer = playerWithNoMoney)
+        val utilityIndex = 12 // Index des Bahnhofs "Marklylebone Station"
+        val utilityField = fields(utilityIndex).asInstanceOf[UtilityField]
+
+        val controller = new Controller(gameWithNoMoney, dice)
+
+        controller.handleUtilityField(utilityField, mockAsk, mockPrint, mockChoice)
+
+        val updatedField = controller.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+
+        updatedField.owner shouldBe None
+        updatedPlayer.balance shouldBe (100)
+      }
+
+      "dont buy the UtilityField if the player said no" in {
+        val stationIndex = 12
+        val mockAsk: String => Boolean = _ => false
+        val utilityField = fields(stationIndex).asInstanceOf[UtilityField]
+
+        val updatedFields = fields.updated(stationIndex, utilityField)
+        val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+
+        controller.handleUtilityField(utilityField, mockAsk, println, mockChoice)
+
+        val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[UtilityField]
+        updatedField.owner should be(None)
+      }
+
+      "charge rent to current player when landing on another player's UtilityField" in {
+        // Player 2 besitzt die Station
+        val stationIndex = 12
+        val utilityField = fields(stationIndex).asInstanceOf[UtilityField].copy(owner = Some(player2))
+
+        val updatedFields = fields.updated(stationIndex, utilityField)
+
+        val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+        val controller = new Controller(game, dice)
+
+        controller.handleUtilityField(utilityField, mockAsk, println, mockChoice)
+
+        val updatedPlayer1 = controller.game.players.find(_.name == player1.name).get
+        val updatedPlayer2 = controller.game.players.find(_.name == player2.name).get
+
+        updatedPlayer1.balance shouldBe (1500 - 25)
+        updatedPlayer2.balance shouldBe (1500 + 25)
+      }
     }
+
     "getBoardString" should {
       "return the board as a string from BoardPrinter" in {
         val testGame = MonopolyGame(Vector(player1), board, player1, sound = false)

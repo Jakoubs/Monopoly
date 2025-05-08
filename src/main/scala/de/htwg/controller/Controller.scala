@@ -36,7 +36,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val (dice1, dice2) = dice.rollDice(game.sound)
     //print(s"${player.name} würfelt $dice1 und $dice2 (${dice1 + dice2})")
 
-    val updatedPlayer = player.playerMove(() => (1,2))
+    val updatedPlayer = player.playerMove(() => (dice1,dice2))
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
 
@@ -132,6 +132,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       //case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
       case pf: PropertyField => handlePropertyField(pf, ask, print, choice)
       case tf: TrainStationField => handleTrainStationField(tf,ask, print, choice)
+      case uf: UtilityField => handleUtilityField(uf,ask, print, choice)
       case _ => game
 
     }
@@ -243,6 +244,52 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
     }
   }
+
+  def handleUtilityField(utility: UtilityField, ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
+    utility.owner match {
+      case None =>
+        val response = ask("Möchtest du das Feld kaufen?")
+        if (response) {
+          buyProperty(utility.index, print)
+          if (game.sound) {
+            SoundPlayer().playAndWait("src/main/resources/Money.wav")
+          }
+        } else {
+          print("Keine Feld gekauft!")
+        }
+      case Some(ownerName) if !ownerName.name.equals(game.currentPlayer.name) =>
+        val rent = 0
+        val utilityFields = game.board.fields.collect {
+          case uf: UtilityField => uf
+        }
+
+        val ownsAll = utilityFields.forall(_.owner.exists(_.name == currentPlayer.name))
+        if (ownsAll) {
+          // not implemented yet
+        }
+        print(s"Pay ${rent}$$ rent to ${ownerName.name}")
+
+        // Finde den zahlenden Spieler
+        val playerIndex = game.players.indexWhere(_.name == currentPlayer.name)
+        val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - rent)
+
+        // Finde den Besitzer
+        val ownerIndex = game.players.indexWhere(_.name == ownerName.name)
+        if (ownerIndex >= 0 && playerIndex >= 0) {
+          val owner = game.players(ownerIndex)
+          val updatedOwner = owner.copy(balance = owner.balance + rent)
+
+          // Aktualisiere beide Spieler
+          val updatedPlayers = game.players
+            .updated(playerIndex, updatedPlayer)
+            .updated(ownerIndex, updatedOwner)
+
+          game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
+        }
+      case Some(_) =>
+    }
+  }
+
 
   def buyProperty(propertyIndex: Int, printText: String => Unit): Unit = {
     val fieldOption = game.board.fields.find(_.index == propertyIndex)
