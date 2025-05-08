@@ -114,7 +114,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           } else {
             val updatedPlayer = player.copy(jailTurns = jailTurns)
             val updatedPlayers = game.players.updated(game.players.indexOf(player), updatedPlayer)
-            game = game.copy(players = updatedPlayers)
+            game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
           }
         }
     }

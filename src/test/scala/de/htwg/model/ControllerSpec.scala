@@ -65,6 +65,18 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
     val controller = new Controller(initialGame, dice)
 
+    "provide game status information" in {
+
+      //Noch anpassen
+      controller.getGameStatus should be(initialGame)
+      controller.getCurrentPlayerName should be(controller.currentPlayer.name)
+      controller.getCurrentPlayerBalance should be(controller.currentPlayer.balance)
+      controller.getCurrentPlayerPosition should be(controller.currentPlayer.position)
+      controller.isCurrentPlayerInJail should be(controller.currentPlayer.isInJail)
+
+      val statusString = controller.getCurrentPlayerStatus
+    }
+
     "have a current player" in {
       controller.currentPlayer should be(player1)
     }
@@ -303,18 +315,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       updatedPlayer.isInJail should be(false)
       updatedPlayer.jailTurns should be(0)
       updatedPlayer.balance should be(initialBalance - 50) // Should have paid 50 after 3rd turn
-    }
-
-    "provide game status information" in {
-      val stat = controller.getGameStatus
-      //Noch anpassen
-      controller.getGameStatus should be(stat)
-      controller.getCurrentPlayerName should be(player1.name)
-      controller.getCurrentPlayerBalance should be(player1.balance)
-      controller.getCurrentPlayerPosition should be(player1.position)
-      controller.isCurrentPlayerInJail should be(player1.isInJail)
-
-      val statusString = controller.getCurrentPlayerStatus
     }
 
     "handle buying a house on a property" in {
