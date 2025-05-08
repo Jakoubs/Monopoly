@@ -35,7 +35,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val (dice1, dice2) = dice.rollDice(game.sound)
     //print(s"${player.name} würfelt $dice1 und $dice2 (${dice1 + dice2})")
 
-    val updatedPlayer = player.playerMove(() => (0, 0))
+    val updatedPlayer = player.playerMove(() => (dice1,dice2))
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
 
