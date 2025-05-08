@@ -1,4 +1,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/Jakoubs/Monopoly/badge.svg)](https://coveralls.io/github/Jakoubs/Monopoly)
+[![Build Status](https://github.com/Jakoubs/Monopoly/actions/workflows/scala.yml/badge.svg)](https://github.com/Jakoubs/Monopoly/actions/workflows/scala.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/Jakoubs/Monopoly.svg?color=blue)](https://github.com/Jakoubs/Monopoly/commits/main)
+
 
 # Monopoly
 
