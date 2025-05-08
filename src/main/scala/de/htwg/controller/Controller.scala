@@ -117,6 +117,9 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
             game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
           }
         }
+      case -1 =>
+        println("Ungültige Auswahl.")
+        handleJailTurn(ask, print, choice)
     }
   }
 
@@ -146,7 +149,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val input = choice()
     input match {
       case 1 =>
-        val houseIndex = idxInput()
+        val houseIndex = idxInput() -1
         if (houseIndex >= 1 && houseIndex <= 40) {
           buyHouse(houseIndex, printText)
         } else {
@@ -289,9 +292,9 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def buyHouse(propertyIndex: Int, printText: String => Unit): Unit = {
     if (!isValidFieldIndex(propertyIndex)) return
 
-    game.board.fields.find(_.index == propertyIndex) match {
-      case Some(field: PropertyField) =>
-        if (field.owner.contains(currentPlayer)) {
+    game.board.fields(propertyIndex) match {
+      case field: PropertyField =>
+        if (field.owner.exists(_.name == currentPlayer.name)) {
           val colorGroup = game.board.fields.collect {
             case pf: PropertyField if pf.color == field.color => pf
           }
@@ -322,7 +325,6 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val updatedPlayers = players.map(p => if (p.name == currentPlayer.name) updatedPlayer else p)
 
     game = game.copy(board = game.board.copy(fields = updatedFields), players = updatedPlayers, currentPlayer = updatedPlayer)
-    notifyObservers()
   }
 
   def isValidFieldIndex(index: Int): Boolean =

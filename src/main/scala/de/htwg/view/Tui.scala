@@ -29,7 +29,7 @@ class Tui(controller: Controller) extends Observer {
                 -1 // Fallback oder erneut fragen (rekursiv, je nach Geschmack)
             }
         },
-        idxInput = () => readLine("Auf welcher Strße Willst du bauen? (index)").trim.toIntOption.getOrElse(-1)
+        idxInput = () => readLine("Auf welcher Strße Willst du bauen? (Nr)").trim.toIntOption.getOrElse(-1)
       )
     }
 
