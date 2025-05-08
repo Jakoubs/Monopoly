@@ -258,7 +258,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           print("Keine Feld gekauft!")
         }
       case Some(ownerName) if !ownerName.name.equals(game.currentPlayer.name) =>
-        val rent = 0
+        val rent = 25
         val utilityFields = game.board.fields.collect {
           case uf: UtilityField => uf
         }
@@ -344,30 +344,25 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
             printText(s"Dieser Bahnhof gehört bereits ${owner}.")
         }
       case Some(field: UtilityField) =>
-        field.owner match {
-          case None =>
-            val utilityPrice = 150 // Typischer Preis für Versorgungswerke
-            if (currentPlayer.balance >= utilityPrice) {
-              val updatedField = field.copy(
-                owner = Some(currentPlayer)
-              )
-
-              val updatedFields = game.board.fields.map { f =>
-                if (f.index == propertyIndex) updatedField else f
-              }
-              val updatedBoard = game.board.copy(fields = updatedFields)
-
-              val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - utilityPrice, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
-                if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              game.copy(board = updatedBoard, players = updatedPlayers)
-              printText(s"${currentPlayer.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
-            } else {
-              printText(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")
-            }
-          case Some(owner) =>
-            printText(s"Dieses Versorgungswerk gehört bereits ${owner}.")
+        if (currentPlayer.balance >= field.price && field.owner.isEmpty) {
+          // Neues Utility Field mit neuem Besitzer erstellen
+          val updatedUtility = field.copy(owner = Some(currentPlayer))
+          // Neues Board mit aktualisiertem Feld erstellen
+          val updatedFields = board.fields.updated(propertyIndex-1, updatedUtility)
+          val updatedBoard = board.copy(fields = updatedFields)
+          // Spieler mit reduziertem Kontostand erstellen
+          val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - field.price)
+          // Spielerliste aktualisieren
+          val updatedPlayers = players.map(p =>
+            if (p.name == currentPlayer.name) updatedPlayer else p
+          )
+          // Spielzustand aktualisieren
+          game = game.copy(
+            players = updatedPlayers,
+            board = updatedBoard,
+            currentPlayer = updatedPlayer
+          )
+          print(s"${currentPlayer.name} hat das Versorgungswerk ${field.name} für ${field.price} gekauft.")
         }
       case Some(_) =>
         printText(s"Das Feld mit Index $propertyIndex kann nicht gekauft werden.")
