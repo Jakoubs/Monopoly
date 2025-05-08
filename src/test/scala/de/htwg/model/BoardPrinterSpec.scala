@@ -63,5 +63,30 @@ class BoardPrinterSpec extends AnyWordSpec {
         println(inv)
         inv should be("INVENTORY Player: A| ")
       }
+      "getName method" should {
+        "return the name of a PropertyField" in {
+          BoardPrinter.getName(brownProperty1) should be("Brown1")
+        }
+
+        "return the name of a TrainStationField" in {
+          BoardPrinter.getName(trainStation) should be("Station1")
+        }
+
+        "return 'FreeParking' for a FreeParkingField" in {
+          BoardPrinter.getName(freeParkingField) should be("FreeParking")
+        }
+
+        "return 'CommunityChest' for a CommunityChestField" in {
+          BoardPrinter.getName(CommunityChestField(1)) should be("CommunityChest")
+        }
+
+        "return an empty string for other BoardField types" in {
+          BoardPrinter.getName(GoField) should be("")
+          BoardPrinter.getName(JailField) should be("")
+          BoardPrinter.getName(GoToJailField()) should be("")
+          BoardPrinter.getName(taxField) should be("")
+          BoardPrinter.getName(ChanceField(1)) should be("")
+        }
       }
+    }
 }
