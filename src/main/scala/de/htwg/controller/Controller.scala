@@ -19,18 +19,19 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def handlePlayerTurn(
                         ask: String => Boolean,
                         print: String => Unit,
-                        choice: () => Int
+                        choice: () => Int,
+                        idxInput: () => Int = () => -1
                       ): Unit = {
     if (game.currentPlayer.isInJail) {
       handleJailTurn(ask, print, choice)
     } else {
-      handleRegularTurn(ask, print,choice)
+      handleRegularTurn(ask, print,choice,idxInput)
     }
     switchToNextPlayer()
     notifyObservers()
   }
 
-  def handleRegularTurn(ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
+  def handleRegularTurn(ask: String => Boolean, print: String => Unit, choice: () => Int,idxInput: () => Int = () => -1): Unit = {
     val player = game.currentPlayer
     val (dice1, dice2) = dice.rollDice(game.sound)
     //print(s"${player.name} würfelt $dice1 und $dice2 (${dice1 + dice2})")
@@ -41,6 +42,10 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
     print(s"${player.name} landet auf Feld ${updatedPlayer.position}")
     handleFieldAction(ask, print,choice)
+    if (updatedPlayer.isInJail) {
+      return
+    }
+    handleOptionalActions( print, choice,idxInput)
   }
 
   def handleJailTurn(ask: String => Boolean, print: String => Unit, choice: () => Int): Unit = {
@@ -122,7 +127,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       case goToJail: GoToJailField => handleGoToJailField()
       //case taxF: TaxField => handleTaxField(game, taxF.amount)
       //case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
-      case pf: PropertyField => handlePropertyField(pf,ask, print, choice)
+      case pf: PropertyField => handlePropertyField(pf, ask, print, choice)
       //case tf: TrainStationField => handlePropertyField(game, tf)
 
       case _ => game
@@ -136,15 +141,22 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     game.copy(players = updatedPlayers,currentPlayer = updatedPlayer)
   }
 
-  def handleOptionalActions(input: Int, fieldIndex: Int): Unit = {
-
+  def handleOptionalActions(printText: String => Unit, choice: () => Int, idxInput: () => Int = () => -1): Unit = {
+    printText("Möchtest du eine Weiter aktion ausführen? 1 = Haus kaufen, 2 = nichts, 3 = nichts, Enter = weiter")
+    val input = choice()
     input match {
       case 1 =>
-        buyHouse(fieldIndex)
+        val houseIndex = idxInput()
+        if (houseIndex >= 1 && houseIndex <= 40) {
+          buyHouse(houseIndex, printText)
+        } else {
+          printText("Ungültiger Index! Bitte wählen Sie eine Zahl zwischen 1 und 40.")
+          handleOptionalActions(printText, choice, idxInput)
+        }
       case 2 =>
-        println("not implemented")
+        printText("not implemented")
       case 3 =>
-        println("not implemented")
+        printText("not implemented")
       case -1 =>
     }
   }
@@ -163,20 +175,25 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
         }
       case Some(ownerName) if !ownerName.equals(game.currentPlayer.name) =>
         val rent = calculateRent(property)
-        print(s"Pay ${rent}$$ rent to ${ownerName}")
-        val playerIndex = game.players.indexWhere(_.name == game.currentPlayer.name)
-        val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance - rent, position = property.index)
+        print(s"Pay ${rent}$$ rent to ${ownerName.name}")
 
-        val ownerIndex = game.players.indexWhere(_.name.equals(ownerName))
-        val owner = game.players(ownerIndex)
-        val updatedOwner = owner.copy(balance = owner.balance + rent)
+        // Finde den zahlenden Spieler
+        val playerIndex = game.players.indexWhere(_.name == currentPlayer.name)
+        val updatedPlayer = currentPlayer.copy(balance = currentPlayer.balance - rent)
 
-        // Aktualisiere die Spielerliste
-        val updatedPlayers = game.players
-          .updated(playerIndex, updatedPlayer)
-          .updated(ownerIndex, updatedOwner)
+        // Finde den Besitzer
+        val ownerIndex = game.players.indexWhere(_.name == ownerName.name)
+        if (ownerIndex >= 0 && playerIndex >= 0) {
+          val owner = game.players(ownerIndex)
+          val updatedOwner = owner.copy(balance = owner.balance + rent)
 
-        game = game.copy(players = updatedPlayers)
+          // Aktualisiere beide Spieler
+          val updatedPlayers = game.players
+            .updated(playerIndex, updatedPlayer)
+            .updated(ownerIndex, updatedOwner)
+
+          game = game.copy(players = updatedPlayers)
+        }
       case Some(_) =>
 
     }
@@ -269,12 +286,12 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     game.players.count(_.balance > 0) <= 1
   }
 
-  def buyHouse(propertyIndex: Int): Unit = {
+  def buyHouse(propertyIndex: Int, printText: String => Unit): Unit = {
     if (!isValidFieldIndex(propertyIndex)) return
 
     game.board.fields.find(_.index == propertyIndex) match {
       case Some(field: PropertyField) =>
-        if (field.owner.exists(_.name == currentPlayer.name)) {
+        if (field.owner.contains(currentPlayer)) {
           val colorGroup = game.board.fields.collect {
             case pf: PropertyField if pf.color == field.color => pf
           }
@@ -282,9 +299,15 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
           if (ownsAll && canAfford(currentPlayer, 50)) {
             updateGameWithNewHouse(field, 50)
+          } else {
+            printText("Entweder hast du nicht alle Immobilien dieser Farbe oder nicht genug Geld.")
           }
+          printText(s"")
+        } else {
+          printText("Das Feld gehört dir nicht!!!")
         }
-      case _ => // Nicht gültiges Feld
+      case _ => printText("Das Feld ist keine Immobilie.")
+        //handleOptionalActions(printText, choice, idxInput)
     }
   }
 
