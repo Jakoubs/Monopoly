@@ -15,7 +15,7 @@ class BoardPrinterSpec extends AnyWordSpec {
   val brownProperty1WithHouse = brownProperty1Owned.copy(house = PropertyField.House(1))
   val darkBlueProperty1 = PropertyField("DarkBlue1", 38, 200, 20, None, DarkBlue)
   val darkBlueProperty1Owned = darkBlueProperty1.copy(owner = Some(player1))
-  val trainStation = TrainStationField("Station1", 6, None)
+  val trainStation = TrainStationField("Station1", 6, 200,None)
   val trainStationOwned = trainStation.copy(owner = Some(player1))
   val utility = UtilityField("Utility1", 13, None)
   val utilityOwned = utility.copy(owner = Some(player1))
@@ -29,21 +29,21 @@ class BoardPrinterSpec extends AnyWordSpec {
     PropertyField("Pink1", 12, 140, 14, Some(player1), PropertyField.Color.Pink), utility,
     PropertyField("Pink2", 14, 140, 14, Some(player1), PropertyField.Color.Pink),
     PropertyField("Pink3", 15, 140, 14, Some(player1), PropertyField.Color.Pink),
-    TrainStationField("Station2", 16, None),
+    TrainStationField("Station2", 16,200, None),
     PropertyField("Orange1", 17, 160, 16, None, PropertyField.Color.Orange), CommunityChestField(18),
     PropertyField("Orange2", 19, 160, 16, None, PropertyField.Color.Orange),
     PropertyField("Orange3", 20, 160, 16, None, PropertyField.Color.Orange), freeParkingField,
     PropertyField("Red1", 22, 180, 18, None, PropertyField.Color.Red), ChanceField(23),
     PropertyField("Red2", 24, 180, 18, None, PropertyField.Color.Red),
     PropertyField("Red3", 25, 180, 18, None, PropertyField.Color.Red),
-    TrainStationField("Station3", 26, None),
+    TrainStationField("Station3", 26,200, None),
     PropertyField("Yellow1", 27, 200, 20, None, PropertyField.Color.Yellow),
     PropertyField("Yellow2", 28, 200, 20, None, PropertyField.Color.Yellow), UtilityField("Utility2", 29, None),
     PropertyField("Yellow3", 30, 200, 20, None, PropertyField.Color.Yellow), goToJail,
     PropertyField("Green1", 32, 220, 22, None, PropertyField.Color.Green),
     PropertyField("Green2", 33, 220, 22, None, PropertyField.Color.Green), ChanceField(34),
     PropertyField("Green3", 35, 220, 22, None, PropertyField.Color.Green),
-    TrainStationField("Station4", 36, None), ChanceField(37), darkBlueProperty1, taxField,
+    TrainStationField("Station4", 36,200, None), ChanceField(37), darkBlueProperty1, taxField,
     darkBlueProperty1
   ))
   val game = MonopolyGame(Vector(player1, player2), board, player1, false)
