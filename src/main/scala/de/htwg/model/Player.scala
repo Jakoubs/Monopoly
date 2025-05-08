@@ -3,7 +3,7 @@ import scala.io.StdIn.readLine
 
 case class Player(name: String,
                   balance: Int,
-                  position: Int = 0,
+                  position: Int = 1,
                   isInJail: Boolean = false,
                   jailTurns: Int = 0
                   //properties: List[PropertyField] = List()
@@ -33,17 +33,17 @@ case class Player(name: String,
   }
 
   def playerMove(rollDice: () => (Int, Int),
-                 rollcount: Int = 1): Player = {
+                 rollcount: Int = 0): Player = {
     if (rollcount == 3) {
       this.goToJail()
     } else if(!isInJail) {
       println("press enter to roll dice")
       readLine("Rolling dice...")
       val (diceA, diceB) = rollDice()
-      val updatedPlayer = if ((position + diceA + diceB) > 40) 
-        this.copy(balance = balance + 200) else this 
+      val updatedPlayer = if ((position + diceA + diceB) > 40)
+        this.copy(balance = balance + 200) else this
       println(s"You rolled $diceA and $diceB! That's ${diceA + diceB} moves.")
-      println(s"Your new position is ${updatedPlayer.position}")
+      println(s"Your new position is ${(position + diceA + diceB) % 40}")
 
       val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {

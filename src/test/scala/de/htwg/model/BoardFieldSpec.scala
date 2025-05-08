@@ -8,12 +8,13 @@ import de.htwg.model.PropertyField.{House, Mortgage}
 class BoardFieldSpec extends AnyWordSpec {
   "PropertyField" should {
     "build a property field" in {
-      val f1 = PropertyField("kpAlee", 10, 100, 20, Some("p1"), Red, Mortgage(1000))
+      val player = Player("Tim", 500, 0)
+      val f1 = PropertyField("kpAlee", 10, 100, 20, Some(player), Red, Mortgage(1000))
       f1.name should be("kpAlee")
       f1.index should be(10)
       f1.price should be(100)
       f1.rent should be(20)
-      f1.owner should be(Some("p1"))
+      f1.owner should be(Some(player))
       f1.color should be(Red)
       f1.mortgage.price should be(1000)
       f1.house.amount should be(0)
@@ -32,35 +33,35 @@ class BoardFieldSpec extends AnyWordSpec {
       f1.mortgage.active should be(false)
     }
     "buildHomes" in {
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
       val p1 = Player("TestPlayer", 1000, 5)
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000))
       val (newf1, newp1) = f1.house.buyHouse(p1, f1)
       newf1.house.amount should be(1)
       newp1.balance should be(950)
     }
     "not buildHomes if balance is to low" in {
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
       val p1 = Player("TestPlayer", 0, 5)
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000))
       val (newf1, newp1) = f1.house.buyHouse(p1, f1)
       newf1.house.amount should be(0)
       newp1.balance should be(0)
     }
     "not buildHomes if max Hotel" in {
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000), House(5))
       val p1 = Player("TestPlayer", 1000, 5)
+      val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000), House(5))
       val (newf1, newp1) = f1.house.buyHouse(p1, f1)
       newf1.house.amount should be(5)
       newp1.balance should be(1000)
     }
 
     "calculate house price based on rent correctly" in {
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some("P1"), Red, Mortgage(1000))
+      val f1 = PropertyField("kpAlee", 4, 100, 20, None, Red, Mortgage(1000))
       House().calculateHousePrice(f1.price) should be(50)
 
-      val f2 = PropertyField("Park Place", 5, 350, 35, Some("P2"), DarkBlue, Mortgage(1750))
+      val f2 = PropertyField("Park Place", 5, 350, 35, None, DarkBlue, Mortgage(1750))
       House().calculateHousePrice(f2.price) should be(180)
 
-      val f3 = PropertyField("Baltic Avenue", 5, 64, 4, Some("P3"), Brown, Mortgage(300))
+      val f3 = PropertyField("Baltic Avenue", 5, 64, 4, None, Brown, Mortgage(300))
       House().calculateHousePrice(f3.price) should be(40)
     }
     "have a calculateRent method" which {
@@ -91,12 +92,13 @@ class BoardFieldSpec extends AnyWordSpec {
         )
         PropertyField.calculateRent(fieldWithOneHouse) should be(30)
 
+        val player = Player("Tim", 500)
         val fieldWithTwoHouses = PropertyField(
           name = "Another Property",
           index = 5,
           price = 200,
           rent = 30,
-          owner = Some("Player1"),
+          owner = Some(player),
           color = Color.LightBlue,
           mortgage = Mortgage(),
           house = House(2)
@@ -108,7 +110,7 @@ class BoardFieldSpec extends AnyWordSpec {
           index = 10,
           price = 500,
           rent = 50,
-          owner = Some("Player2"),
+          owner = Some(player),
           color = Color.DarkBlue,
           mortgage = Mortgage(),
           house = House(5)
@@ -120,7 +122,8 @@ class BoardFieldSpec extends AnyWordSpec {
 
   "Mortgage" should {
     "toggle the mortgage status in a PropertyField" in {
-      val originalField = PropertyField("TestStreet", 1, 100, 10, Some("Player1"), Red, Mortgage(100))
+      val Player1 = Player("Tim",500)
+      val originalField = PropertyField("TestStreet", 1, 100, 10, Some(Player1), Red, Mortgage(100))
       val toggledMortgage = originalField.mortgage.toggle()
       val updatedField = originalField.copy(mortgage = toggledMortgage)
 
@@ -237,9 +240,9 @@ class BoardFieldSpec extends AnyWordSpec {
 
     "be able to have an owner" in {
       val player = Player("Alice", 1500)
-      val trainStation = TrainStationField("kp", 15, Some(player.name))
+      val trainStation = TrainStationField("kp", 15, Some(player))
       trainStation.owner shouldBe defined
-      trainStation.owner.get shouldBe "Alice"
+      trainStation.owner.get shouldBe player
     }
   }
 

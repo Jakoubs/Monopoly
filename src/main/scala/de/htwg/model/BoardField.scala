@@ -5,7 +5,7 @@ sealed trait BoardField {
 val name: String
 val index: Int
 }
-case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner: Option[String] = None,
+case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner: Option[Player] = None,
                          color: PropertyField.Color, mortgage: PropertyField.Mortgage = PropertyField.Mortgage(),
                          house:PropertyField.House = PropertyField.House()) extends BoardField{ }
   object PropertyField {
@@ -91,11 +91,11 @@ case class TaxField(amount: Int, idx: Int) extends BoardField {
   override val index: Int = idx
   override val name: String = "TaxField"
 }
-case class TrainStationField(nm: String ,idx: Int, owner: Option[String]) extends BoardField {
+case class TrainStationField(nm: String ,idx: Int, owner: Option[Player]) extends BoardField {
   override val index: Int = idx
   override val name: String = nm
 }
-case class UtilityField(nm: String, idx: Int, owner: Option[String]) extends BoardField{
+case class UtilityField(nm: String, idx: Int, owner: Option[Player]) extends BoardField{
   override val index: Int = idx
   override val name: String = nm
 }

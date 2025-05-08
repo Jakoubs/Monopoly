@@ -45,7 +45,7 @@ class PlayerSpec extends AnyWordSpec {
       val player = Player("TestPlayer", 100)
       val mockRollDice = () => (3, 4)
       val updatedPlayer = player.playerMove(mockRollDice)
-      updatedPlayer.position shouldEqual 7
+      updatedPlayer.position shouldEqual 8
     }
 
     "remain in jail when trying to move while jailed" in {
