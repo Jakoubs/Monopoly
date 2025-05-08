@@ -52,7 +52,8 @@ object Monopoly:
     }
 
     val playerAnz = askForPlayerCount()
-    }
+    
+
 
     val board = Board(
       Vector(
