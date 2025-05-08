@@ -57,7 +57,7 @@ class Tui(controller: Controller) extends Observer {
   }
  */
   def showPlayerStatus(): Unit = {
-    println(controller.getCurrentPlayerStatus)
+    println(controller.getCurrentPlayerStatus+ " || " + BoardPrinter.getInventory(controller.getGameStatus))
   }
 
   def printNewPosition(): Unit = {
@@ -107,11 +107,6 @@ class Tui(controller: Controller) extends Observer {
     print("you landet on \"go to jail\", Press any key to continue the game")
   }
 
-  def getInventory(): String = {
-    val player = controller.currentPlayer
-    s"${player.name} | Balance: ${player.balance} | Position: ${player.position}"
-    // Erweitere dies, um den Besitz des Spielers anzuzeigen
-  }
 
   def printJailOptions(): Unit = {
     println(s"${controller.currentPlayer.name}, you are in jail!")
