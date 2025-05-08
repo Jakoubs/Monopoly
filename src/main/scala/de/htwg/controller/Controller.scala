@@ -151,7 +151,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           buyHouse(houseIndex, printText)
         } else {
           printText("Ungültiger Index! Bitte wählen Sie eine Zahl zwischen 1 und 40.")
-          handleOptionalActions(printText, choice, idxInput)
+          //handleOptionalActions(printText, choice, idxInput)
         }
       case 2 =>
         printText("not implemented")

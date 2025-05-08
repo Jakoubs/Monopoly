@@ -134,12 +134,9 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val player = playerAtGoToJail.goToJail()
       player.isInJail should be(true)
       player.position should be(jailPosition)
-    }
-    val prop = PropertyField("brown1", 2, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
+      val prop = PropertyField("brown1", 2, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
       controller.handlePropertyField(prop, mockAsk, mockPrint, mockChoice)
-      
     }
-
     "not allow buying a property if the player doesn't have enough money" in {
       val unownedPropertyIndex = 1
       val unownedProperty = board.fields(unownedPropertyIndex).asInstanceOf[PropertyField]
@@ -195,8 +192,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val updatedPlayer2 = testController.game.players.find(_.name == player2.name).get
       val rent = PropertyField.calculateRent(property)
 
-      updatedPlayer1.balance should be(initialBalancePlayer1 - rent)
-      updatedPlayer2.balance should be(initialBalancePlayer2 + rent)
+      gameWithOwnedPropertyAndPlayer.currentPlayer.balance should be(initialBalancePlayer1 - rent)
+      gameWithOwnedPropertyAndPlayer.players(1).balance should be(initialBalancePlayer2 + rent)
     }
 
     "handle landing on their own owned property field" in {
@@ -335,7 +332,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
       val testController = new Controller(gameWithOwnedProperties, dice)
 
-      testController.buyHouse(propertyIndex)
+      testController.buyHouse(propertyIndex, mockPrint)
 
       // Check that house was added to property and money was deducted
       val updatedProperty = testController.game.board.fields(propertyIndex).asInstanceOf[PropertyField]
