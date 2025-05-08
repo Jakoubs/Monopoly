@@ -135,9 +135,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       player.isInJail should be(true)
       player.position should be(jailPosition)
     }
-
-    "allow buying a property if it's not owned" in {
-      controller.handlePropertyField()
+    val prop = PropertyField("brown1", 2, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
+      controller.handlePropertyField(prop, mockAsk, mockPrint, mockChoice)
       
     }
 
@@ -345,5 +344,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val updatedPlayer = testController.game.players.find(_.name == player1.name).get
       updatedPlayer.balance should be(playerWithProperties.balance - 50) // House cost
     }
+
   }
 }
