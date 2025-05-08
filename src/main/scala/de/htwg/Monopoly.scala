@@ -52,11 +52,6 @@ object Monopoly:
     }
 
     val playerAnz = askForPlayerCount()
-
-    for (i <- 1 to playerAnz) {
-      val playerName = randomEmoji(playerVector)
-      playerVector = playerVector.appended(Player(playerName, 1500, 1))
-      println(s"Spieler $playerName hinzugefügt.")
     }
 
     val board = Board(

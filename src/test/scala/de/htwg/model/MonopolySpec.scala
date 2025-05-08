@@ -257,10 +257,12 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       updatedGame shouldBe game
     }
   }
- "create the specified number of players (2-4)" in {
-        val game = defineGame()
-      game.players.length should (be >= 2 and be <= 4)    }
-
+  "defineGame" should {
+    "create the specified number of players (2-4)" in {
+      val game = defineGame()
+      game.players.length should (be >= 2 and be <= 4)
+    }
+  }
   "buyHouse" should {
 
     "allow the owner to buy a house if they have enough money and own all Streets of same Color" in {
@@ -512,8 +514,3 @@ class MonopolySpec extends AnyWordSpec with Matchers {
       result shouldEqual "Carol Bob Alice "
     }
   }
-
-  "get"
-}
-
- */
