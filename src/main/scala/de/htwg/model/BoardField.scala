@@ -95,20 +95,6 @@ case class TrainStationField(name: String ,index: Int, price: Int, owner: Option
 
 
 case class UtilityField(name: String, index: Int, price: Int,utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField{ }
-
-def calculateRent(dice: (Int, Int), game: MonopolyGame): Int = {
-  val diceSum = dice._1 + dice._2
-  val utilityCount = game.board.fields.count {
-    case u: UtilityField => u.owner.contains(game.currentPlayer)
-    case _ => false
-  }
-
-  utilityCount match {
-    case 1 => diceSum * 4 // Ein Versorgungswerk: 4 x Würfelaugen
-    case 2 => diceSum * 10 // Beide Versorgungswerke: 10 x Würfelaugen
-    case _ => 0
-  }
-}
 object UtilityField {
 
     enum UtilityCheck:
