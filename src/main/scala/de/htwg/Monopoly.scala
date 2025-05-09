@@ -35,8 +35,8 @@ object Monopoly:
 
     def askForPlayerCount(): Int = {
       println("How many Player? (2-4):")
-      val input = scala.io.StdIn.readLine().toIntOption.getOrElse(-1)
-      if (input != -1) {
+      val input = scala.io.StdIn.readLine()
+      try {
         val playerCount = input.toInt
         if (playerCount >= 2 && playerCount <= 4) {
           playerCount
@@ -44,8 +44,10 @@ object Monopoly:
           println("Invalid player count. Please enter a number between 2 and 4.")
           askForPlayerCount()
         }
-      } else {
-          4
+      } catch {
+        case _: NumberFormatException =>
+          println("Invalid input. Please enter a number.")
+          2
       }
     }
 
