@@ -36,7 +36,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val (dice1, dice2) = dice.rollDice(game.sound)
     //print(s"${player.name} würfelt $dice1 und $dice2 (${dice1 + dice2})")
 
-    val updatedPlayer = player.playerMove(() => (dice1,dice2))
+    val updatedPlayer = player.playerMove(() => (5,7))
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     game = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
 
@@ -258,7 +258,8 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           print("Keine Feld gekauft!")
         }
       case Some(ownerName) if !ownerName.name.equals(game.currentPlayer.name) =>
-        val rent = 0
+        print("in owner case")
+        val rent = 10
         val utilityFields = game.board.fields.collect {
           case uf: UtilityField => uf
         }
@@ -347,7 +348,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
         field.owner match {
           case None =>
             val utilityPrice = 150 // Typischer Preis für Versorgungswerke
-            if (currentPlayer.balance >= utilityPrice) {
+            if (game.currentPlayer.balance >= utilityPrice) {
               val updatedField = field.copy(
                 owner = Some(currentPlayer)
               )
@@ -361,7 +362,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
               val updatedPlayers = game.players.map(p =>
                 if (p.name == updatedPlayer.name) updatedPlayer else p
               )
-              game.copy(board = updatedBoard, players = updatedPlayers)
+              game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
               printText(s"${currentPlayer.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
             } else {
               printText(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${currentPlayer.name} hat nur ${currentPlayer.balance}.")

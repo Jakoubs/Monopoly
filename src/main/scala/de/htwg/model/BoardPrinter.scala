@@ -144,8 +144,9 @@ object BoardPrinter {
   def getPrice(field: BoardField): String = {
     field match {
       case pf: PropertyField => pf.price.toString + '$'
-      case tf: TrainStationField => "200$"
+      case tf: TrainStationField => tf.price.toString + '$'
       case fp: FreeParkingField => fp.amount.toString + '$'
+      case uf: UtilityField => uf.price.toString + '$'
       case _ => ""
     }
   }

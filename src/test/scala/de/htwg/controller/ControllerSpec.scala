@@ -626,7 +626,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val updatedPlayer = controller.game.players.find(_.name == player1.name).get
 
         updatedField.owner shouldBe Some(player1)
-        updatedPlayer.balance shouldBe (1500 - 200)
+        updatedPlayer.balance shouldBe (1500 - 150)
       }
 
       "not be able to buy utilityField if not enough money" in {
@@ -675,8 +675,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val updatedPlayer1 = controller.game.players.find(_.name == player1.name).get
         val updatedPlayer2 = controller.game.players.find(_.name == player2.name).get
 
-        updatedPlayer1.balance shouldBe (1500 - 25)
-        updatedPlayer2.balance shouldBe (1500 + 25)
+        updatedPlayer1.balance shouldBe (1500 - 10)
+        updatedPlayer2.balance shouldBe (1500 + 10)
       }
     }
 

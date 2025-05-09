@@ -93,7 +93,7 @@ case class TrainStationField(name: String ,index: Int, price: Int, owner: Option
 }
 
 
-case class UtilityField(name: String, index: Int, price: Int,utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField{ }
+case class UtilityField(name: String, index: Int, price: Int, utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField{ }
   object UtilityField {
 
     enum UtilityCheck:
