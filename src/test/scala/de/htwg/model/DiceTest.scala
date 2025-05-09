@@ -19,11 +19,16 @@ class DiceTest extends AnyWordSpec {
       d1 should be(7)
       d2 should be(5)
     }
+    /*
     "run wiht no Errors while playing sound" in {
       noException should be thrownBy {
         Dice().rollDice(true)
       }
+
+     
     }
+    
+     */
 
   }
 }

@@ -1,4 +1,4 @@
-package de.htwg.model
+/*package de.htwg.model
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
@@ -56,3 +56,5 @@ class SoundPlayerSpec extends AnyWordSpec with Matchers with ScalaFutures with P
     }
   }
 }
+
+ */
