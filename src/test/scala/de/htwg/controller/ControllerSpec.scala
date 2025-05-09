@@ -614,16 +614,28 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       }
 */
       "allow a player to buy an unowned utilityfield" in {
-        val utilityIndex = 12 // Index des Bahnhofs "Marklylebone Station"
+        val utilityIndex = 12
         val utilityField = fields(utilityIndex).asInstanceOf[UtilityField]
+        println(s"Initial utility field: ${utilityField}") // Debug
+        println(s"Initial player balance: ${player1.balance}") // Debug
+        println(s"Utility price: ${utilityField.price}") // Debug
 
         val game = MonopolyGame(Vector(player1, player2), Board(fields), player1, sound = false)
         val controller = new Controller(game, dice)
 
-        controller.handleUtilityField(utilityField, mockAsk, mockPrint, mockChoice)
+        // Überprüfen Sie, ob mockAsk wirklich true zurückgibt
+        val debugMockAsk: String => Boolean = { question =>
+          println(s"Asked question: $question") // Debug
+          true
+        }
+
+        controller.handleUtilityField(utilityField, debugMockAsk, println, mockChoice)
 
         val updatedField = controller.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
         val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+
+        println(s"Updated field owner: ${updatedField.owner}") // Debug
+        println(s"Updated player balance: ${updatedPlayer.balance}") // Debug
 
         updatedField.owner shouldBe Some(player1)
         updatedPlayer.balance shouldBe (1500 - 150)
@@ -634,7 +646,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val gameWithNoMoney = initialGame.copy(players = Vector(playerWithNoMoney, player2), currentPlayer = playerWithNoMoney)
         val utilityIndex = 12 // Index des Bahnhofs "Marklylebone Station"
         val utilityField = fields(utilityIndex).asInstanceOf[UtilityField]
-
         val controller = new Controller(gameWithNoMoney, dice)
 
         controller.handleUtilityField(utilityField, mockAsk, mockPrint, mockChoice)
