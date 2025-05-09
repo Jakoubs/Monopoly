@@ -258,7 +258,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
           print("Keine Feld gekauft!")
         }
       case Some(ownerName) if !ownerName.name.equals(game.currentPlayer.name) =>
-        val rent = 0
+        val rent = 10
         val utilityFields = game.board.fields.collect {
           case uf: UtilityField => uf
         }
