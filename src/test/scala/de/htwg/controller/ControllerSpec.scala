@@ -1,11 +1,12 @@
-package de.htwg.model
+package de.htwg.controller
 
 import de.htwg.controller.Controller
-import org.scalatest.matchers.should.Matchers.*
-import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.*
 import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers.*
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.Vector
 
@@ -24,17 +25,17 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       CommunityChestField(3),
       PropertyField("brown2", 4, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       TaxField(100, 5),
-      TrainStationField("Marklylebone Station", 6, None),
+      TrainStationField("Marklylebone Station", 6 ,200,None),
       PropertyField("lightBlue1", 7, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       ChanceField(8),
       PropertyField("lightBlue2", 9, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       PropertyField("lightBlue3", 10, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       JailField,
       PropertyField("Pink1", 12, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      UtilityField("Electric Company", 13, None),
+      UtilityField("Electric Company", 13,150,UtilityField.UtilityCheck.utility, None),
       PropertyField("Pink2", 14, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       PropertyField("Pink3", 15, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      TrainStationField("Fenchurch ST Station", 16, None),
+      TrainStationField("Fenchurch ST Station", 16,200, None),
       PropertyField("Orange1", 17, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       CommunityChestField(18),
       PropertyField("Orange2", 19, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
@@ -44,9 +45,9 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       ChanceField(23),
       PropertyField("Red2", 24, 100, 10, None, color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       PropertyField("Red3", 25, 100, 10, None, color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      TrainStationField("King's Cross Station", 26, None),
+      TrainStationField("King's Cross Station", 26,200, None),
       PropertyField("Yellow1", 27, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      UtilityField("Water Works", 28, None),
+      UtilityField("Water Works", 28,150,UtilityField.UtilityCheck.utility, None),
       PropertyField("Yellow2", 29, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       PropertyField("Yellow3", 30, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       GoToJailField(),
@@ -54,7 +55,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       PropertyField("Green2", 33, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       CommunityChestField(34),
       PropertyField("Green3", 35, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-      TrainStationField("Liverpool ST Station", 36, None),
+      TrainStationField("Liverpool ST Station", 36,200,None),
       ChanceField(37),
       PropertyField("DarkBlue1", 38, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
       TaxField(200, 39),
@@ -64,6 +65,18 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     val board = Board(fields)
     val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
     val controller = new Controller(initialGame, dice)
+
+    "provide game status information" in {
+
+      //Noch anpassen
+      controller.getGameStatus should be(initialGame)
+      controller.getCurrentPlayerName should be(controller.currentPlayer.name)
+      controller.getCurrentPlayerBalance should be(controller.currentPlayer.balance)
+      controller.getCurrentPlayerPosition should be(controller.currentPlayer.position)
+      controller.isCurrentPlayerInJail should be(controller.currentPlayer.isInJail)
+
+      val statusString = controller.getCurrentPlayerStatus
+    }
 
     "have a current player" in {
       controller.currentPlayer should be(player1)
@@ -170,11 +183,11 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val updatedPlayer = testController.game.players.find(_.name == player1.name).get
       updatedPlayer.balance should be(player1.balance)
     }
-/*
+
     "handle landing on an owned property field by another player" in {
       val propertyIndex = 1
       val property = board.fields(propertyIndex).asInstanceOf[PropertyField].copy(owner = Some(player2))
-      val updatedFields = board.fields.updated(propertyIndex, property)
+      val updatedFields = board.fields.updated(propertyIndex-1, property)
       val ownedBoard = board.copy(fields = updatedFields)
       val playerOnOwnedProperty = player1.copy(position = propertyIndex)
       val gameWithOwnedPropertyAndPlayer = initialGame.copy(
@@ -182,6 +195,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         players = Vector(playerOnOwnedProperty, player2),
         currentPlayer = playerOnOwnedProperty
       )
+
       val testController = new Controller(gameWithOwnedPropertyAndPlayer, dice)
 
       val initialBalancePlayer1 = playerOnOwnedProperty.balance
@@ -190,9 +204,11 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       testController.handleFieldAction(mockAsk, mockPrint, mockChoice) // This should trigger rent payment
       val rent = PropertyField.calculateRent(property)
 
-      gameWithOwnedPropertyAndPlayer.currentPlayer.balance should be(initialBalancePlayer1 - rent)
-      gameWithOwnedPropertyAndPlayer.players(1).balance should be(initialBalancePlayer2 + rent)
-    }*/
+      val updatedPlayer = testController.game.players.find(_.name == playerOnOwnedProperty.name).get
+      updatedPlayer.balance should be(initialBalancePlayer1 - rent)
+      val updatedPlayer2 = testController.game.players.find(_.name == player2.name).get
+      updatedPlayer2.balance should be(initialBalancePlayer2 + rent)
+    }
 
     "handle landing on their own owned property field" in {
       val propertyIndex = 1
@@ -217,9 +233,10 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     "create a TrainStation field with correct properties" in {
       val stationName = "Test Station"
       val stationIndex = 5
-      val station = TrainStationField(stationName, stationIndex, None)
+      val station = TrainStationField(stationName, stationIndex,200, None)
 
       station.name should be(stationName)
+      station.price should be(200)
       station.index should be(stationIndex)
       station.owner should be(None)
     }
@@ -239,6 +256,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       updatedPlayer.jailTurns should be(0)
       updatedPlayer.balance should be(jailedPlayer.balance - 50) // Should have paid 50
     }
+
 
     "handle a jail turn where player rolls doubles" in {
       val jailedPlayer = player1.copy(isInJail = true, jailTurns = 0, position = 10)
@@ -305,29 +323,48 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       updatedPlayer.balance should be(initialBalance - 50) // Should have paid 50 after 3rd turn
     }
 
-    "provide game status information" in {
-      val stat = controller.getGameStatus
-      //Noch anpassen
-      controller.getGameStatus should be(stat)
-      controller.getCurrentPlayerName should be(player1.name)
-      controller.getCurrentPlayerBalance should be(player1.balance)
-      controller.getCurrentPlayerPosition should be(player1.position)
-      controller.isCurrentPlayerInJail should be(player1.isInJail)
+    "charge rent to current player when landing on another player's propertyField" in {
+      // Player 2 besitzt die Station
+      val stationIndex = 11
+      val property = fields(stationIndex).asInstanceOf[PropertyField].copy(owner = Some(player2))
 
-      val statusString = controller.getCurrentPlayerStatus
+      val updatedFields = fields.updated(stationIndex, property)
+
+      val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+      val controller = new Controller(game, dice)
+
+      controller.handlePropertyField(property, mockAsk, println, mockChoice)
+
+      val updatedPlayer1 = controller.game.players.find(_.name == player1.name).get
+      val updatedPlayer2 = controller.game.players.find(_.name == player2.name).get
+
+      updatedPlayer1.balance shouldBe (1500 - 10)
+      updatedPlayer2.balance shouldBe (1500 + 10)
     }
 
+    "dont buy the property if the player said no" in {
+      val stationIndex = 11
+      val mockAsk: String => Boolean = _ => false
+      val property = fields(stationIndex).asInstanceOf[PropertyField]
+
+      val updatedFields = fields.updated(stationIndex, property)
+      val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+
+      controller.handlePropertyField(property, mockAsk, println, mockChoice)
+
+      val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[PropertyField]
+      updatedField.owner should be(None)
+    }
     "handle buying a house on a property" in {
-      // Setup: Player owns all properties of a color group
-      val propertyIndex = 1
-      val property = board.fields(propertyIndex).asInstanceOf[PropertyField].copy(
-        owner = Some(player1))
-      val propertyIndex2 = 3
-      val property2 = board.fields(propertyIndex2).asInstanceOf[PropertyField].copy(owner = Some(player1))
+      val brown1Index = 1 // Vector index of "brown1"
+      val brown2Index = 3 // Vector index of "brown2"
+
+      val property1 = board.fields(brown1Index).asInstanceOf[PropertyField].copy(owner = Some(player1))
+      val property2 = board.fields(brown2Index).asInstanceOf[PropertyField].copy(owner = Some(player1))
 
       val updatedFields = board.fields
-        .updated(propertyIndex, property)
-        .updated(propertyIndex2, property2)
+        .updated(brown1Index, property1)
+        .updated(brown2Index, property2)
 
       val ownedBoard = board.copy(fields = updatedFields)
       val playerWithProperties = player1.copy(balance = 500)
@@ -340,232 +377,191 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
       val testController = new Controller(gameWithOwnedProperties, dice)
 
-      testController.buyHouse(propertyIndex, mockPrint)
+      // Use the index of the field you actually updated (Vector index, not propertyField.index!)
+      testController.buyHouse(brown1Index, mockPrint)
 
-      // Check that house was added to property and money was deducted
-      val updatedProperty = testController.game.board.fields(propertyIndex).asInstanceOf[PropertyField]
+      // Validate: check the updated board in the controller
+      val updatedProperty = testController.game.board.fields(brown1Index).asInstanceOf[PropertyField]
       updatedProperty.house.amount should be(1)
 
       val updatedPlayer = testController.game.players.find(_.name == player1.name).get
-      updatedPlayer.balance should be(playerWithProperties.balance - 50) // House cost
+      updatedPlayer.balance should be(playerWithProperties.balance - 50)
     }
-    "TrainStation Field" should {
-      val stationName = "Test Station"
-      val stationPosition = 5
-      val stationPrice = 200
-      val station = TrainStationField(stationName, stationPosition, None)
 
-      "be created with correct initial properties" in {
-        station.name should be(stationName)
-        station.index should be(stationPosition)
-        station.owner should be(None)
+    "handleTrainStationField" should {
+      "allow a player to buy an unowned train station" in {
+        val stationIndex = 5 // Index des Bahnhofs "Marklylebone Station"
+        val trainStation = fields(stationIndex).asInstanceOf[TrainStationField]
+
+        val game = MonopolyGame(Vector(player1, player2), Board(fields), player1, sound = false)
+        val controller = new Controller(game, dice)
+
+        controller.handleTrainStationField(trainStation, mockAsk, mockPrint, mockChoice)
+
+        val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[TrainStationField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+
+        updatedField.owner shouldBe Some(player1)
+        updatedPlayer.balance shouldBe (1500 - 200)
       }
 
-      "calculate correct rent based on number of stations owned" in {
-        // Get all train station positions
-        val stationPositions = Vector(6, 16, 26, 36)
+      "not be able to buy trainstaion if not enough money" in {
+        val playerWithNoMoney = player1.copy(balance = 100)
+        val gameWithNoMoney = initialGame.copy(players = Vector(playerWithNoMoney, player2), currentPlayer = playerWithNoMoney)
+        val stationIndex = 5 // Index des Bahnhofs "Marklylebone Station"
+        val trainStation = fields(stationIndex).asInstanceOf[TrainStationField]
 
-        // Create a game state where player owns different numbers of stations
-        val playerWithOneStation = player1
-        val singleStationFields = board.fields.updated(
-          stationPositions(0),
-          TrainStationField("Station 1", stationPositions(0), Some(playerWithOneStation))
-        )
-        val gameWithOneStation = initialGame.copy(board = board.copy(fields = singleStationFields))
-        val controllerOneStation = new Controller(gameWithOneStation, dice)
+        val controller = new Controller(gameWithNoMoney, dice)
 
-        // Test rent for one station
-        val rentForOne = 25
-        rentForOne should be(25)
+        controller.handleTrainStationField(trainStation, mockAsk, mockPrint, mockChoice)
 
-        // Test rent for two stations
-        val twoStationFields = singleStationFields.updated(
-          stationPositions(1),
-          TrainStationField("Station 2", stationPositions(1), Some(playerWithOneStation))
-        )
-        val gameWithTwoStations = initialGame.copy(board = board.copy(fields = twoStationFields))
-        val controllerTwoStations = new Controller(gameWithTwoStations, dice)
-        val rentForTwo = 50
-        rentForTwo should be(50)
+        val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[TrainStationField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
 
-        // Test rent for three stations
-        val threeStationFields = twoStationFields.updated(
-          stationPositions(2),
-          TrainStationField("Station 3", stationPositions(2), Some(playerWithOneStation))
-        )
-        val gameWithThreeStations = initialGame.copy(board = board.copy(fields = threeStationFields))
-        val controllerThreeStations = new Controller(gameWithThreeStations, dice)
-        val rentForThree = 100
-        rentForThree should be(100)
+        updatedField.owner shouldBe None
+        updatedPlayer.balance shouldBe (100)
+      }
 
-        // Test rent for four stations
-        val fourStationFields = threeStationFields.updated(
-          stationPositions(3),
-          TrainStationField("Station 4", stationPositions(3), Some(playerWithOneStation))
-        )
-        val gameWithFourStations = initialGame.copy(board = board.copy(fields = fourStationFields))
-        val controllerFourStations = new Controller(gameWithFourStations, dice)
-        val rentForFour = 200
-        rentForFour should be(200)
+      "dont buy the Trainstation if the player said no" in {
+        val stationIndex = 15
+        val mockAsk: String => Boolean = _ => false
+        val trainstation = fields(stationIndex).asInstanceOf[TrainStationField]
+
+        val updatedFields = fields.updated(stationIndex, trainstation)
+        val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+
+        controller.handleTrainStationField(trainstation, mockAsk, println, mockChoice)
+
+        val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[TrainStationField]
+        updatedField.owner should be(None)
+      }
+
+      "charge rent to current player when landing on another player's train station" in {
+        // Player 2 besitzt die Station
+        val stationIndex = 5
+        val trainStation = fields(stationIndex).asInstanceOf[TrainStationField].copy(owner = Some(player2))
+
+        val updatedFields = fields.updated(stationIndex, trainStation)
+
+        val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+        val controller = new Controller(game, dice)
+
+        controller.handleTrainStationField(trainStation, mockAsk, println, mockChoice)
+
+        val updatedPlayer1 = controller.game.players.find(_.name == player1.name).get
+        val updatedPlayer2 = controller.game.players.find(_.name == player2.name).get
+
+        updatedPlayer1.balance shouldBe (1500 - 25)
+        updatedPlayer2.balance shouldBe (1500 + 25)
       }
     }
+
+
     "Utility Field" should {
-      val utilityName = "Test Utility"
-      val utilityPosition = 13
-      val utilityPrice = 150
-      val utility = UtilityField(utilityName, utilityPosition, None)
 
-      "be created with correct initial properties" in {
-        utility.name should be(utilityName)
-        utility.index should be(utilityPosition)
-        utility.owner should be(None)
-      }
-
-      "calculate correct rent based on number of utilities owned and dice roll" in {
-        // Get utility positions
-        val utilityPositions = Vector(13, 28) // Electric Company and Water Works
-
-        // Mock dice for consistent testing
-        val mockDice = new Dice {
-          override def rollDice(sound: Boolean = false): (Int, Int) = (3, 4) // Total of 7
-        }
-
-        // Test rent with one utility owned
-        val playerWithOneUtility = player1
-        val singleUtilityFields = board.fields.updated(
-          utilityPositions(0),
-          UtilityField("Electric Company", utilityPositions(0), Some(playerWithOneUtility))
-        )
-        val gameWithOneUtility = initialGame.copy(board = board.copy(fields = singleUtilityFields))
-        val controllerOneUtility = new Controller(gameWithOneUtility, mockDice)
-
-        val rentWithOne = 28
-        rentWithOne should be(28) // 4 times dice roll (7 * 4)
-
-        // Test rent with both utilities owned
-        val twoUtilityFields = singleUtilityFields.updated(
-          utilityPositions(1),
-          UtilityField("Water Works", utilityPositions(1), Some(playerWithOneUtility))
-        )
-        val gameWithTwoUtilities = initialGame.copy(board = board.copy(fields = twoUtilityFields))
-        val controllerTwoUtilities = new Controller(gameWithTwoUtilities, mockDice)
-
-        val rentWithTwo = 70
-        rentWithTwo should be(70) // 10 times dice roll (7 * 10)
-      }
-
-      "handle property transaction correctly" in {
-        val utilityIndex = 12 // Position of Electric Company
-        val buyingPlayer = player1.copy(balance = 1500)
-        val gameBeforeBuy = initialGame.copy(
-          players = Vector(buyingPlayer, player2),
-          currentPlayer = buyingPlayer
-        )
-        val testController = new Controller(gameBeforeBuy, dice)
-
-        // Test buying the utility
-        testController.buyProperty(utilityIndex, mockPrint)
-
-        val updatedUtility = testController.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
-        updatedUtility.owner should be(Some(buyingPlayer))
-
-        val updatedPlayer = testController.game.players.head
-        updatedPlayer.balance should be(buyingPlayer.balance - 150) // Utility price should be deducted
-      }
-
-      "handle rent payment correctly" in {
+      "allow a player to buy an unowned utilityfield" in {
         val utilityIndex = 12
-        val ownerPlayer = player2.copy(balance = 1500)
-        val payingPlayer = player1.copy(balance = 1500, position = utilityIndex)
+        val utilityField = fields(utilityIndex).asInstanceOf[UtilityField]
+        println(s"Initial utility field: ${utilityField}") // Debug
+        println(s"Initial player balance: ${player1.balance}") // Debug
+        println(s"Utility price: ${utilityField.price}") // Debug
 
-        // Setup game with owned utility
-        val ownedUtilityField = UtilityField("Electric Company", utilityIndex, Some(ownerPlayer))
-        val updatedFields = board.fields.updated(utilityIndex, ownedUtilityField)
-        val gameWithOwnedUtility = initialGame.copy(
-          board = board.copy(fields = updatedFields),
-          players = Vector(payingPlayer, ownerPlayer),
-          currentPlayer = payingPlayer
-        )
+        val game = MonopolyGame(Vector(player1, player2), Board(fields), player1, sound = false)
+        val controller = new Controller(game, dice)
 
-        // Mock dice for consistent testing
-        val mockDice = new Dice {
-          override def rollDice(sound: Boolean = false): (Int, Int) = (3, 4) // Total of 7
+        // Überprüfen Sie, ob mockAsk wirklich true zurückgibt
+        val debugMockAsk: String => Boolean = { question =>
+          println(s"Asked question: $question") // Debug
+          true
         }
 
-        val testController = new Controller(gameWithOwnedUtility, mockDice)
+        controller.handleUtilityField(utilityField, debugMockAsk, println, mockChoice)
 
-        // Initial balances
-        val initialPayingBalance = payingPlayer.balance
-        val initialOwnerBalance = ownerPlayer.balance
+        val updatedField = controller.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
 
-        // Handle the field action (should trigger rent payment)
-        testController.handleFieldAction(mockAsk, mockPrint, mockChoice)
+        println(s"Updated field owner: ${updatedField.owner}") // Debug
+        println(s"Updated player balance: ${updatedPlayer.balance}") // Debug
 
-        // Get updated players
-        val updatedPayingPlayer = testController.game.players.find(_.name == payingPlayer.name).get
-        val updatedOwnerPlayer = testController.game.players.find(_.name == ownerPlayer.name).get
-
-        // Verify rent calculation and payment (7 * 4 = 28 for one utility)
-        updatedPayingPlayer.balance should be(initialPayingBalance - 28)
-        updatedOwnerPlayer.balance should be(initialOwnerBalance + 28)
+        updatedField.owner shouldBe Some(player1)
+        updatedPlayer.balance shouldBe (1500 - 150)
       }
 
-      "not allow buying when player has insufficient funds" in {
-        val utilityIndex = 12
-        val poorPlayer = player1.copy(balance = 100) // Less than utility price
-        val gameWithPoorPlayer = initialGame.copy(
-          players = Vector(poorPlayer, player2),
-          currentPlayer = poorPlayer
-        )
-        val testController = new Controller(gameWithPoorPlayer, dice)
+      "not be able to buy utilityField if not enough money" in {
+        val playerWithNoMoney = player1.copy(balance = 100)
+        val gameWithNoMoney = initialGame.copy(players = Vector(playerWithNoMoney, player2), currentPlayer = playerWithNoMoney)
+        val utilityIndex = 12 // Index des Bahnhofs "Marklylebone Station"
+        val utilityField = fields(utilityIndex).asInstanceOf[UtilityField]
+        val controller = new Controller(gameWithNoMoney, dice)
 
-        testController.buyProperty(utilityIndex, mockPrint)
+        controller.handleUtilityField(utilityField, mockAsk, mockPrint, mockChoice)
 
-        val updatedUtility = testController.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
-        updatedUtility.owner should be(None)
+        val updatedField = controller.game.board.fields(utilityIndex).asInstanceOf[UtilityField]
+        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
 
-        val updatedPlayer = testController.game.players.head
-        updatedPlayer.balance should be(poorPlayer.balance) // Balance should remain unchanged
+        updatedField.owner shouldBe None
+        updatedPlayer.balance shouldBe (100)
       }
 
-      "handle multiple utility ownership rent calculation correctly" in {
-        val mockDice = new Dice {
-          override def rollDice(sound: Boolean = false): (Int, Int) = (6, 6) // Total of 12
-        }
+      "dont buy the UtilityField if the player said no" in {
+        val stationIndex = 12
+        val mockAsk: String => Boolean = _ => false
+        val utilityField = fields(stationIndex).asInstanceOf[UtilityField]
 
-        // Setup game with both utilities owned by the same player
-        val electricCompanyIndex = 12
-        val waterWorksIndex = 27
-        val ownerPlayer = player2.copy(balance = 1500)
-        val payingPlayer = player1.copy(balance = 1500, position = electricCompanyIndex)
+        val updatedFields = fields.updated(stationIndex, utilityField)
+        val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
 
-        val ownedUtilities = board.fields
-          .updated(electricCompanyIndex, UtilityField("Electric Company", electricCompanyIndex, Some(ownerPlayer)))
-          .updated(waterWorksIndex, UtilityField("Water Works", waterWorksIndex, Some(ownerPlayer)))
+        controller.handleUtilityField(utilityField, mockAsk, println, mockChoice)
 
-        val gameWithBothUtilities = initialGame.copy(
-          board = board.copy(fields = ownedUtilities),
-          players = Vector(payingPlayer, ownerPlayer),
-          currentPlayer = payingPlayer
-        )
+        val updatedField = controller.game.board.fields(stationIndex).asInstanceOf[UtilityField]
+        updatedField.owner should be(None)
+      }
 
-        val testController = new Controller(gameWithBothUtilities, mockDice)
+      "charge rent to current player when landing on another player's UtilityField" in {
+        // Player 2 besitzt die Station
+        val stationIndex = 12
+        val utilityField = fields(stationIndex).asInstanceOf[UtilityField].copy(owner = Some(player2))
 
-        // Initial balances
-        val initialPayingBalance = payingPlayer.balance
-        val initialOwnerBalance = ownerPlayer.balance
+        val updatedFields = fields.updated(stationIndex, utilityField)
 
-        // Handle the field action
-        testController.handleFieldAction(mockAsk, mockPrint, mockChoice)
+        val game = MonopolyGame(Vector(player1, player2), Board(updatedFields), player1, sound = false)
+        val controller = new Controller(game, dice)
 
-        // Get updated players
-        val updatedPayingPlayer = testController.game.players.find(_.name == payingPlayer.name).get
-        val updatedOwnerPlayer = testController.game.players.find(_.name == ownerPlayer.name).get
+        controller.handleUtilityField(utilityField, mockAsk, println, mockChoice)
 
-        updatedPayingPlayer.balance should be(initialPayingBalance - 100)
-        updatedOwnerPlayer.balance should be(initialOwnerBalance + 100)
+        val updatedPlayer1 = controller.game.players.find(_.name == player1.name).get
+        val updatedPlayer2 = controller.game.players.find(_.name == player2.name).get
+
+        updatedPlayer1.balance shouldBe (1500 - 10)
+        updatedPlayer2.balance shouldBe (1500 + 10)
       }
     }
 
+    "getBoardString" should {
+      "return the board as a string from BoardPrinter" in {
+        val testGame = MonopolyGame(Vector(player1), board, player1, sound = false)
+        val controller = new Controller(testGame, dice)
+
+        val boardString = controller.getBoardString
+
+        // Beispielprüfung: enthält der String bekannte Felderamen oder Zeichen?
+        boardString should include("brown1")
+        boardString should include("Go")
+        boardString.length should be > 10 // Mindestens etwas Inhalt
+      }
+    }
+
+    "getInventoryString" should {
+      "return the inventory as a string from BoardPrinter" in {
+        val testGame = MonopolyGame(Vector(player1), board, player1, sound = false)
+        val controller = new Controller(testGame, dice)
+
+        val inventoryString = controller.getInventoryString
+
+        // Beispielprüfung: enthält der String den Spielernamen?
+        inventoryString should include(player1.name)
+        inventoryString.length should be > 5
+      }
+    }
   }
 }

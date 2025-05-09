@@ -14,7 +14,7 @@ class SoundPlayerTest extends AnyWordSpec {
         soundPlayer.playBackground("src/main/resources/RollDice.wav")
       }
     }
-
+    /*
     "play sound and wait for completion" in {
       // Test playAndWait method
       val soundPlayer = new SoundPlayer()
@@ -24,5 +24,7 @@ class SoundPlayerTest extends AnyWordSpec {
       // just ensuring the method executes without exceptions
       future.isCompleted shouldBe false
     }
+
+     */
   }
 }

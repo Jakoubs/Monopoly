@@ -232,7 +232,7 @@ class BoardFieldSpec extends AnyWordSpec {
 
   "A TrainStationField" should {
     "be correctly initialized with index and no owner" in {
-      val trainStation = TrainStationField("kp", 5, None)
+      val trainStation = TrainStationField("kp", 5,200, None)
       trainStation.index shouldBe 5
       trainStation.name shouldBe "kp"
       trainStation.owner shouldBe None
@@ -240,7 +240,7 @@ class BoardFieldSpec extends AnyWordSpec {
 
     "be able to have an owner" in {
       val player = Player("Alice", 1500)
-      val trainStation = TrainStationField("kp", 15, Some(player))
+      val trainStation = TrainStationField("kp", 15,200,Some(player))
       trainStation.owner shouldBe defined
       trainStation.owner.get shouldBe player
     }
