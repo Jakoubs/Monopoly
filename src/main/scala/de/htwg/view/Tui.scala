@@ -2,7 +2,6 @@ package de.htwg.view
 
 import de.htwg.controller.Controller
 import de.htwg.util.util.Observer
-
 import scala.io.StdIn.readLine
 
 class Tui(controller: Controller) extends Observer {
@@ -15,7 +14,6 @@ class Tui(controller: Controller) extends Observer {
     while (!controller.isGameOver) {
       val current = controller.currentPlayer
       showPlayerStatus()
-
       controller.handlePlayerTurn(
         ask = msg => readLine(msg + " (j/N): ").trim.toLowerCase == "j",
         print = msg => println(msg),
