@@ -54,7 +54,7 @@ cd Monopoly
 sbt compile
 
 # Run tests
-sbt test
+sbt clean coverage test
 ```
 
 ## 🎮 Usage
@@ -90,6 +90,7 @@ quit    - Exit game
 de.htwg/
 ├── 📁 controller/      # Game logic and event handling
 ├── 📁 model/          # Data structures and game state
+├── 📁 util/          # Observer logic
 └── 📁 view/           # User interface components
 ```
 
@@ -129,8 +130,8 @@ We welcome contributions! Here's how you can help:
 - [x] Property management
 - [x] Player turns
 - [x] Dice rolling system
+- [ ] Code patterns
 - [ ] GUI implementation
-- [ ] Network multiplayer
 - [ ] AI opponents
 
 ## 🧪 Testing
@@ -154,8 +155,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - HTWG Konstanz Software Engineering Course
-- All contributors who participated in this project
-- The Scala community for their excellent resources
+- The Scala community for their resources
 
 ## 👨‍💻 Contributors
 
