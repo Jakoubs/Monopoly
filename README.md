@@ -4,6 +4,7 @@
 
 # Monopoly
 
+![Preview](src/main/resources/git6.svg)
 Welcome to the Monopoly project! This is a Scala implementation of the game Monopoly
 ## Contents
 

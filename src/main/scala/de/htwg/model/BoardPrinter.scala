@@ -9,12 +9,12 @@ object BoardPrinter {
   }
 
   private def printTop(game: MonopolyGame): String = {
-    val fieldNames = game.board.fields.slice(0, 4)
-    val fieldData = (0 to 3).map(i => formatField(fieldNames.lift(i)))
+    val fieldNames = game.board.fields.slice(0, 5)
+    val fieldData = (0 to 4).map(i => formatField(fieldNames.lift(i)))
 
     val (stats1, stats2, stats3, stats4) = getStats(game)
 
-    val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
+    val line1 = "\n+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
 
     val baseLines = List(
       "|  ______  _____  |",
@@ -34,11 +34,11 @@ object BoardPrinter {
       line + fillSpace(playersOnIndex(game,field.index, false), 8) + '|') + "  JAIL    |      |" + " " * 18 + "ALL FIELDS:"
 
     val additionalLines = List(
-      s"|          Ss.    |${"-" * 72}+          |      |${" " * 20}Index: 2, GoField",
-      s"|  ssssssssSSSS   |  ${fillSpace(stats1, 76)}  |          |      |${" " * 20}${fieldData(0)}",
-      s"|          ;:`    |  ${fillSpace(stats2, 76)}  |          |      |${" " * 20}${fieldData(1)}",
-      s"|${fillSpace(playersOnIndex(game,1, false), 17)}|  ${fillSpace(stats3, 76)}  |${fillSpace(playersOnIndex(game,11, true), 10)}|${fillSpace(playersOnIndex(game,11, false), 6)}|${" " * 20}${fieldData(2)}",
-      s"+--------+--------+  ${fillSpace(stats4, 76)}  +--------+-+------+${" " * 20}${fieldData(3)}\n"
+      s"|          Ss.    |${"-" * 80}+          |      |${" " * 20}Index: 1, GoField",
+      s"|  ssssssssSSSS   |  ${fillSpace(stats1, 76)}  |          |      |${" " * 20}${fieldData(1)}",
+      s"|          ;:`    |  ${fillSpace(stats2, 76)}  |          |      |${" " * 20}${fieldData(2)}",
+      s"|${fillSpace(playersOnIndex(game,1, false), 17)}|  ${fillSpace(stats3, 76)}  |${fillSpace(playersOnIndex(game,11, true), 10)}|${fillSpace(playersOnIndex(game,11, false), 6)}|${" " * 20}${fieldData(3)}",
+      s"+--------+--------+  ${fillSpace(stats4, 76)}  +--------+-+------+${" " * 20}${fieldData(4)}\n"
     )
 
     (List(line1, line2, line3, line4) ++ additionalLines).mkString("\n")

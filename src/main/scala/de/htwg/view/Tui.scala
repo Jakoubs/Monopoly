@@ -1,6 +1,6 @@
 package de.htwg.view
 
-import de.htwg.controller.{AdditionalActionsState, Controller, GameState, JailState, PropertyDecisionState}
+import de.htwg.controller.Controller
 import de.htwg.util.util.Observer
 
 import scala.io.StdIn.readLine
@@ -16,7 +16,7 @@ class Tui(controller: Controller) extends Observer {
       println(controller.getCurrentPlayerStatus)
 
       controller.state match {
-        case _: JailState => 
+        case _: JailState =>
           println("You're in jail! Options:")
           println("1. Pay €50 to get out")
           println("3. Try to roll doubles")
@@ -174,4 +174,3 @@ class Tui(controller: Controller) extends Observer {
 
   override def update(): Unit = println(controller.getBoardString)
 }
-*/
