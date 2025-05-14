@@ -1,6 +1,6 @@
 package de.htwg.view
 
-import de.htwg.controller.Controller
+import de.htwg.controller.{AdditionalActionsState, Controller, GameState, JailState, PropertyDecisionState}
 import de.htwg.util.util.Observer
 
 import scala.io.StdIn.readLine
@@ -10,6 +10,43 @@ class Tui(controller: Controller) extends Observer {
   controller.add(this)
 
   def run(): Unit = {
+    println(controller.getBoardString)
+
+    while (!controller.isGameOver) {
+      println(controller.getCurrentPlayerStatus)
+
+      controller.state match {
+        case _: JailState => 
+          println("You're in jail! Options:")
+          println("1. Pay €50 to get out")
+          println("3. Try to roll doubles")
+          controller.handleInput(readLine())
+
+        case _: PropertyDecisionState =>
+          println(s"Would you like to buy ${controller.board.fields(controller.currentPlayer.position).name}? (y/n)")
+          controller.handleInput(readLine())
+
+        case _: AdditionalActionsState =>
+          println("Additional actions:")
+          println("1. Buy house")
+          println("2. End turn")
+          controller.handleInput(readLine())
+
+        case _ =>
+          println("Press enter to continue...")
+          controller.handleInput(readLine())
+      }
+    }
+
+    val winner = controller.game.players.find(_.balance > 0).getOrElse(controller.game.players.head)
+    println(s"\n${winner.name} wins the game!")
+  }
+
+  override def update(): Unit = println(controller.getBoardString)
+}
+  /*
+  def run(): Unit = {
+
     println(controller.getBoardString)
 
     while (!controller.isGameOver) {
@@ -137,3 +174,4 @@ class Tui(controller: Controller) extends Observer {
 
   override def update(): Unit = println(controller.getBoardString)
 }
+*/
