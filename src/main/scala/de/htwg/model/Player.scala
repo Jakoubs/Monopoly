@@ -23,7 +23,11 @@ case class Player(name: String,
   }
 
   def releaseFromJail(): Player = {
-    val newPlayer = this.copy(isInJail = false)
+    val newPlayer = this.copy(isInJail = false, jailTurns = 0)
+    newPlayer
+  }
+  def changeBalance(amount: Int): Player = {
+    val newPlayer = this.copy(balance = balance + amount)
     newPlayer
   }
 

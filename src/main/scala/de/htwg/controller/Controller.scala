@@ -4,12 +4,12 @@ import de.htwg.model.{BoardPrinter, Player, SoundPlayer, *}
 import de.htwg.model.PropertyField.calculateRent
 import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
-
+import de.htwg.controller.GameState
 import java.awt.Choice
 import scala.io.StdIn.readLine
 
 class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
-
+  var state: GameState = StartTurnState()
   def currentPlayer: Player = game.currentPlayer
   def board: Board = game.board
   def players: Vector[Player] = game.players

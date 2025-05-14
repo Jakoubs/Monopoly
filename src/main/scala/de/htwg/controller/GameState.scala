@@ -24,11 +24,8 @@ case class JailState() extends GameState {
     input match {
       case "1" => // Pay to get out
         if (controller.currentPlayer.balance >= 50) {
-          val updatedPlayer = controller.currentPlayer.copy(
-            isInJail = false,
-            balance = controller.currentPlayer.balance - 50,
-            jailTurns = 0
-          )
+          val updatedPlayerJailFree = controller.currentPlayer.releaseFromJail()
+          val updatedPlayer = updatedPlayerJailFree.changeBalance(-50)
           controller.updatePlayer(updatedPlayer)
           RollingState()
         } else {
@@ -37,21 +34,15 @@ case class JailState() extends GameState {
       case "3" => // Try to roll doubles
         val (d1, d2) = controller.dice.rollDice(controller.sound)
         if (d1 == d2) {
-          val updatedPlayer = controller.currentPlayer.copy(
-            isInJail = false,
-            jailTurns = 0
-          )
+          val updatedPlayer = controller.currentPlayer.releaseFromJail()
           controller.updatePlayer(updatedPlayer)
           MovingState(d1 + d2)
         } else {
           val jailTurns = controller.currentPlayer.jailTurns + 1
           if (jailTurns >= 3) {
             if (controller.currentPlayer.balance >= 50) {
-              val updatedPlayer = controller.currentPlayer.copy(
-                isInJail = false,
-                balance = controller.currentPlayer.balance - 50,
-                jailTurns = 0
-              )
+              val updatedPlayerJailFree = controller.currentPlayer.releaseFromJail()
+              val updatedPlayer = updatedPlayerJailFree.changeBalance(-50)
               controller.updatePlayer(updatedPlayer)
               RollingState()
             } else {

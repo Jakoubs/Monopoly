@@ -2,7 +2,7 @@ package de.htwg.view
 
 import de.htwg.controller.Controller
 import de.htwg.util.util.Observer
-
+import de.htwg.controller.{JailState, PropertyDecisionState, AdditionalActionsState}
 import scala.io.StdIn.readLine
 
 class Tui(controller: Controller) extends Observer {
@@ -72,7 +72,7 @@ class Tui(controller: Controller) extends Observer {
 
     val winner = controller.game.players.find(_.balance > 0).getOrElse(controller.game.players.head)
     println(s"\n${winner.name} wins the game!")
-  }
+  }*/
   /*
   def handleRegularTurn(): Unit = {
     readLine("Press ENTER to roll a dice")
@@ -92,10 +92,10 @@ class Tui(controller: Controller) extends Observer {
     controller.handleJailTurn()
     getJailChoice()
   }
- */
+
   def showPlayerStatus(): Unit = {
     println(controller.getCurrentPlayerStatus+ " || " + controller.getInventoryString)
-  }
+  }*/
 
   /*
   def printNewPosition(): Unit = {
@@ -140,7 +140,7 @@ class Tui(controller: Controller) extends Observer {
     if (input != -1) handleOptionalActions()
   }
 
-   */
+
 
 
   def handleGoToJailField(): Unit = {
@@ -155,7 +155,7 @@ class Tui(controller: Controller) extends Observer {
     println("1. Pay €50 to get out")
     println("2. Use a 'Get Out of Jail Free' card (if available) - Not Implemented")
     println("3. Try to roll doubles")
-  }
+  }*/
 /*
   def getJailChoice(): Unit = {
     val choice = readLine("Enter your choice (1-3): ").trim
@@ -169,8 +169,9 @@ class Tui(controller: Controller) extends Observer {
     }
   }
 
- */
+
 
 
   override def update(): Unit = println(controller.getBoardString)
 }
+*/
