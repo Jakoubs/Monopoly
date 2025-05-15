@@ -13,7 +13,6 @@ class Tui(controller: Controller) extends Observer {
     println(controller.getBoardString)
 
     while (!controller.isGameOver) {
-      println(controller.getCurrentPlayerStatus)
       controller.state match {
         case _: JailState =>
           println("You're in jail! Options:")
