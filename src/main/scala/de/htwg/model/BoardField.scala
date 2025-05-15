@@ -11,7 +11,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
                          house:PropertyField.House = PropertyField.House()) extends BoardField{ }
   object PropertyField {
     case class House(amount: Int = 0) {
-      private val maxHouses = 5
+      val maxHouses = 5
       def calculateHousePrice(purchasePrice: Int): Int = {
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
@@ -50,7 +50,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 
     def calculateRent(property: PropertyField): Int = {
       val rent = property.rent
-      val finalRent =  property.rent + property.house.amount * (rent / 2)
+      val finalRent = rent + property.house.amount * Math.ceil(rent.toDouble / 2).toInt
       finalRent
     }
 

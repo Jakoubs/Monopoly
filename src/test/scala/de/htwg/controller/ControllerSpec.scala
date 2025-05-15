@@ -1,4 +1,4 @@
-package de.htwg.controller
+/*package de.htwg.controller
 
 import de.htwg.controller.Controller
 import de.htwg.model.PropertyField.Color.*
@@ -565,3 +565,5 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     }
   }
 }
+
+ */

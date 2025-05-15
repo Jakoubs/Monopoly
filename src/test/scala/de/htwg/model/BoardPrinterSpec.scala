@@ -15,9 +15,9 @@ class BoardPrinterSpec extends AnyWordSpec {
   val brownProperty1WithHouse = brownProperty1Owned.copy(house = PropertyField.House(1))
   val darkBlueProperty1 = PropertyField("DarkBlue1", 38, 200, 20, None, DarkBlue)
   val darkBlueProperty1Owned = darkBlueProperty1.copy(owner = Some(player1))
-  val trainStation = TrainStationField("Station1", 6, None)
+  val trainStation = TrainStationField("Station1", 6,200, None)
   val trainStationOwned = trainStation.copy(owner = Some(player1))
-  val utility = UtilityField("Utility1", 13, None)
+  val utility = UtilityField("Utility1", 13, 150, UtilityField.UtilityCheck.utility, None)
   val utilityOwned = utility.copy(owner = Some(player1))
   val goToJail = GoToJailField()
   val taxField = TaxField(100, 5)
@@ -29,17 +29,17 @@ class BoardPrinterSpec extends AnyWordSpec {
       CommunityChestField(3),
       PropertyField("brown2", 4, 60, 4, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
       TaxField(100, 5),
-      TrainStationField("Marklylebone Station", 6, None),
+      TrainStationField("Marklylebone Station", 6,200, None),
       PropertyField("lightBlue1", 7, 100, 6, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(50, false), PropertyField.House(0)),
       ChanceField(8),
       PropertyField("lightBlue2", 9, 100, 6, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(50, false), PropertyField.House(0)),
       PropertyField("lightBlue3", 10, 120, 8, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(60, false), PropertyField.House(0)),
       JailField,
       PropertyField("Pink1", 12, 140, 10, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(70, false), PropertyField.House(0)),
-      UtilityField("Electric Company", 13, None),
+      UtilityField("Electric Company", 13,150, UtilityField.UtilityCheck.utility, None),
       PropertyField("Pink2", 14, 140, 10, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(70, false), PropertyField.House(0)),
       PropertyField("Pink3", 15, 160, 12, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(80, false), PropertyField.House(0)),
-      TrainStationField("Fenchurch ST Station", 16, None),
+      TrainStationField("Fenchurch ST Station", 16,200, None),
       PropertyField("Orange1", 17, 180, 14, None, color = PropertyField.Color.Orange, PropertyField.Mortgage(90, false), PropertyField.House(0)),
       CommunityChestField(18),
       PropertyField("Orange2", 19, 180, 14, None, color = PropertyField.Color.Orange, PropertyField.Mortgage(90, false), PropertyField.House(0)),
@@ -49,9 +49,9 @@ class BoardPrinterSpec extends AnyWordSpec {
       ChanceField(23),
       PropertyField("Red2", 24, 220, 18, None, color = PropertyField.Color.Red, PropertyField.Mortgage(110, false), PropertyField.House(0)),
       PropertyField("Red3", 25, 240, 20, None, color = PropertyField.Color.Red, PropertyField.Mortgage(120, false), PropertyField.House(0)),
-      TrainStationField("King's Cross Station", 26, None),
+      TrainStationField("King's Cross Station", 26,200, None),
       PropertyField("Yellow1", 27, 260, 22, None, color = PropertyField.Color.Yellow, PropertyField.Mortgage(130, false), PropertyField.House(0)),
-      UtilityField("Water Works", 28, None),
+      UtilityField("Water Works", 28,150, UtilityField.UtilityCheck.utility, None),
       PropertyField("Yellow2", 29, 260, 22, None, color = PropertyField.Color.Yellow, PropertyField.Mortgage(130, false), PropertyField.House(0)),
       PropertyField("Yellow3", 30, 280, 24, None, color = PropertyField.Color.Yellow, PropertyField.Mortgage(140, false), PropertyField.House(0)),
       GoToJailField(),
@@ -59,7 +59,7 @@ class BoardPrinterSpec extends AnyWordSpec {
       PropertyField("Green2", 33, 300, 26, None, color = PropertyField.Color.Green, PropertyField.Mortgage(150, false), PropertyField.House(0)),
       CommunityChestField(34),
       PropertyField("Green3", 35, 320, 28, None, color = PropertyField.Color.Green, PropertyField.Mortgage(160, false), PropertyField.House(0)),
-      TrainStationField("Liverpool ST Station", 36, None),
+      TrainStationField("Liverpool ST Station", 36,200, None),
       ChanceField(37),
       PropertyField("DarkBlue1", 38, 350, 35, None, color = PropertyField.Color.DarkBlue, PropertyField.Mortgage(175, false), PropertyField.House(0)),
       TaxField(200, 39),

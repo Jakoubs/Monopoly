@@ -1,11 +1,64 @@
 package de.htwg.model
+import de.htwg.controller.Controller
+import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.BoardField
 import de.htwg.model.PropertyField.*
-import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Red}
+import de.htwg.model.PropertyField.Color.*
 import de.htwg.model.PropertyField.{House, Mortgage}
+
 class BoardFieldSpec extends AnyWordSpec {
+  val dice = new Dice()
+  val player1 = Player("Player 1", 1500, 1, isInJail = false, 0)
+  val player2 = Player("Player 2", 1500, 1, isInJail = false, 0)
+  val fields = Vector(
+    GoField,
+    PropertyField("brown1", 2, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    CommunityChestField(3),
+    PropertyField("brown2", 4, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    TaxField(100, 5),
+    TrainStationField("Marklylebone Station", 6, 200, None),
+    PropertyField("lightBlue1", 7, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    ChanceField(8),
+    PropertyField("lightBlue2", 9, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("lightBlue3", 10, 100, 10, None, color = LightBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    JailField,
+    PropertyField("Pink1", 12, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    UtilityField("Electric Company", 13, 150, UtilityField.UtilityCheck.utility, None),
+    PropertyField("Pink2", 14, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Pink3", 15, 100, 10, None, color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    TrainStationField("Fenchurch ST Station", 16, 200, None),
+    PropertyField("Orange1", 17, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    CommunityChestField(18),
+    PropertyField("Orange2", 19, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Orange3", 20, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    FreeParkingField(0),
+    PropertyField("Red1", 22, 100, 10, Some(player1), color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    ChanceField(23),
+    PropertyField("Red2", 24, 100, 10, Some(player1), color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Red3", 25, 100, 10, Some(player1), color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    TrainStationField("King's Cross Station", 26, 200, None),
+    PropertyField("Yellow1", 27, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    UtilityField("Water Works", 28, 150, UtilityField.UtilityCheck.utility, None),
+    PropertyField("Yellow2", 29, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Yellow3", 30, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    GoToJailField(),
+    PropertyField("Green1", 32, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Green2", 33, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    CommunityChestField(34),
+    PropertyField("Green3", 35, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    TrainStationField("Liverpool ST Station", 36, 200, None),
+    ChanceField(37),
+    PropertyField("DarkBlue1", 38, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    TaxField(200, 39),
+    PropertyField("DarkBlue2", 40, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0))
+  )
+
+  val board = Board(fields)
+  val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
+  val controller = new Controller(initialGame, dice)
+
   "PropertyField" should {
     "build a property field" in {
       val player = Player("Tim", 500, 0)
@@ -33,25 +86,36 @@ class BoardFieldSpec extends AnyWordSpec {
       f1.mortgage.active should be(false)
     }
     "buildHomes" in {
-      val p1 = Player("TestPlayer", 1000, 5)
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000))
-      val (newf1, newp1) = f1.house.buyHouse(p1, f1)
-      newf1.house.amount should be(1)
-      newp1.balance should be(950)
+      val (newp,newf) = PropertyField.House().buyHouse(player1, fields(21).asInstanceOf[PropertyField], initialGame)
+      controller.updateBoardAndPlayer(newp,newf)
+      val updatedField = controller.game.board.fields(21).asInstanceOf[PropertyField]
+      updatedField.house.amount should be(1)
+      val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+      updatedPlayer.balance should be(1450)
     }
+
+
     "not buildHomes if balance is to low" in {
       val p1 = Player("TestPlayer", 0, 5)
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000))
-      val (newf1, newp1) = f1.house.buyHouse(p1, f1)
-      newf1.house.amount should be(0)
-      newp1.balance should be(0)
+      val (newf1, newp1) = PropertyField.House().buyHouse(p1,f1,initialGame)
+
+      controller.updateBoardAndPlayer(newf1, newp1)
+      val updatedField = controller.game.board.fields(newf1.index-1).asInstanceOf[PropertyField]
+      updatedField.house.amount should be(0)
+      val updatedPlayer = controller.game.players.find(_.name == p1.name).get
+      updatedPlayer.balance should be(0)
     }
+
     "not buildHomes if max Hotel" in {
       val p1 = Player("TestPlayer", 1000, 5)
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000), House(5))
-      val (newf1, newp1) = f1.house.buyHouse(p1, f1)
-      newf1.house.amount should be(5)
-      newp1.balance should be(1000)
+      val (newf1, newp1) = PropertyField.House().buyHouse(p1,f1,initialGame)
+      controller.updateBoardAndPlayer(newf1, newp1)
+      val updatedField = controller.game.board.fields(newf1.index - 1).asInstanceOf[PropertyField]
+      updatedField.house.amount should be(5)
+      val updatedPlayer = controller.game.players.find(_.name == p1.name).get
+      updatedPlayer.balance should be(1000)
     }
 
     "calculate house price based on rent correctly" in {
@@ -213,14 +277,23 @@ class BoardFieldSpec extends AnyWordSpec {
     }
   }
 
-  "ChanceField" should {
-    "pick a card" in {
-      val chanceField = ChanceField(4)
+  "A ChanceField" should {
+    "have a correct name and index" in {
+      val chance = ChanceField(7)
+      chance.name shouldBe "ChanceField"
+      chance.index shouldBe 7
+      chance.CardList should not be empty
     }
   }
-  "CommunityChestField" should {
-    val player = Player("TestPlayer", 100, 21)
+
+  "A CommunityChestField" should {
+    "be correctly initialized" in {
+      val community = CommunityChestField(2)
+      community.name shouldBe "communityCard"
+      community.index shouldBe 2
+    }
   }
+
   "A TaxField" should {
     "be correctly initialized with amount and index" in {
       val taxField = TaxField(200, 4)
@@ -243,6 +316,35 @@ class BoardFieldSpec extends AnyWordSpec {
       val trainStation = TrainStationField("kp", 15,200,Some(player))
       trainStation.owner shouldBe defined
       trainStation.owner.get shouldBe player
+    }
+  }
+
+  "A UtilityField" should {
+    "be correctly initialized" in {
+      val utility = UtilityField("Water Works", 12, 150, UtilityField.UtilityCheck.utility, None)
+      utility.name shouldBe "Water Works"
+      utility.index shouldBe 12
+      utility.price shouldBe 150
+      utility.utility shouldBe UtilityField.UtilityCheck.utility
+      utility.owner shouldBe None
+    }
+
+    "be bought by a player if affordable and not owned" in {
+      val player = Player("Bob", 200, 10)
+      val utility = UtilityField("Electric Company", 12, 150, UtilityField.UtilityCheck.utility, None)
+      val (updatedUtility, updatedPlayer) = UtilityField.buyUtilityField(utility, player)
+      updatedUtility.owner shouldBe Some(player)
+      updatedPlayer.balance shouldBe 50
+      updatedPlayer.position shouldBe 12
+    }
+
+    "not be bought if already owned" in {
+      val owner = Player("Owner", 200, 10)
+      val buyer = Player("Buyer", 500, 8)
+      val utility = UtilityField("Electric Company", 12, 150, UtilityField.UtilityCheck.utility, Some(owner))
+      val (updatedUtility, updatedPlayer) = UtilityField.buyUtilityField(utility, buyer)
+      updatedUtility.owner shouldBe Some(owner)
+      updatedPlayer shouldBe buyer
     }
   }
 
