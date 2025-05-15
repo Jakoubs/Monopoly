@@ -7,8 +7,24 @@ import de.htwg.util.util.Observable
 import de.htwg.controller.GameState
 import java.awt.Choice
 import scala.io.StdIn.readLine
+case class TurnInfo(
+                     diceRoll1: Int = 0,
+                     diceRoll2: Int = 0,
+                     landedField: Option[BoardField] = None,
+                     boughtProperty: Option[BoardField] = None,
+                     builtHouse: Option[PropertyField] = None,
+                     paidRent: Option[Int] = None,
+                     rentPaidTo: Option[Player] = None
+                   )
 
 class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
+  var currentTurnInfo: TurnInfo = TurnInfo()
+  def getTurnInfo: TurnInfo = currentTurnInfo
+  def updateTurnInfo(newInfo: TurnInfo): Unit = { // Setter-Methode
+    currentTurnInfo = newInfo
+  }
+
+
   var state: GameState = StartTurnState()
   def currentPlayer: Player = game.currentPlayer
   def board: Board = game.board
@@ -483,3 +499,4 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
 
 }
+

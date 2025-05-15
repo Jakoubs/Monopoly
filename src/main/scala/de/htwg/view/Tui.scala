@@ -1,6 +1,6 @@
 package de.htwg.view
 
-import de.htwg.controller.{AdditionalActionsState, BuyPropertyState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState}
+import de.htwg.controller.{AdditionalActionsState, BuyPropertyState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState, TurnInfo}
 import de.htwg.util.util.Observer
 
 import scala.io.StdIn.readLine
@@ -14,7 +14,6 @@ class Tui(controller: Controller) extends Observer {
 
     while (!controller.isGameOver) {
       println(controller.getCurrentPlayerStatus)
-
       controller.state match {
         case _: JailState =>
           println("You're in jail! Options:")
@@ -32,7 +31,6 @@ class Tui(controller: Controller) extends Observer {
           println("1. Buy house")
           println("2. End turn")
           controller.handleInput(readLine())
-
         case _: RollingState =>
           println("Press enter to roll a dice")
           controller.handleInput(readLine())
@@ -59,7 +57,39 @@ class Tui(controller: Controller) extends Observer {
     println(s"\n${winner.name} wins the game!")
   }
 
-  override def update(): Unit = println(controller.getBoardString)
+  def displayTurnInfo(): Unit = {
+    val turnInfo = controller.getTurnInfo // Verwende die getTurnInfo-Methode des Controllers
+
+    turnInfo.diceRoll1 match {
+      case 0 => // Keine Würfel geworfen
+      case _ => println(s"Würfelergebnis: ${turnInfo.diceRoll1} und ${turnInfo.diceRoll2} (Summe: ${turnInfo.diceRoll1 + turnInfo.diceRoll2})")
+    }
+
+    turnInfo.landedField.foreach(field =>
+      println(s"Gelandet auf: ${field.name}")
+    )
+
+    turnInfo.boughtProperty.foreach(property =>
+      println(s"Gekaufte Immobilie: ${property.name}")
+    )
+
+    turnInfo.builtHouse.foreach(property =>
+      println(s"Haus gebaut auf: ${property.name}")
+    )
+
+    (turnInfo.paidRent, turnInfo.rentPaidTo) match {
+      case (Some(rent), Some(owner)) =>
+        println(s"Miete bezahlt: ${rent}€ an ${owner.name}")
+      case _ => // Keine Miete bezahlt
+    }
+  }
+
+
+  override def update(): Unit = {
+    println(controller.getBoardString)
+    println(controller.getCurrentPlayerStatus)
+    displayTurnInfo() // Jetzt ohne Parameter
+  }
 }
   /*
   def run(): Unit = {

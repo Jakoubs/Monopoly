@@ -1,8 +1,8 @@
 package de.htwg.controller
 
 import de.htwg.model._
+import de.htwg.controller.TurnInfo
 import de.htwg.util.util.Observable
-
 sealed trait GameState {
   def handle(input: String, controller: Controller): GameState
 }
@@ -59,11 +59,19 @@ case class JailState() extends GameState {
   }
 }
 
-// State when player is rolling dice
 case class RollingState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     val (d1, d2) = controller.dice.rollDice(controller.sound)
-    MovingState(() => (d1 , d2))
+
+    controller.updateTurnInfo(
+      TurnInfo(
+        diceRoll1 = d1,
+        diceRoll2 = d2
+      )
+    )
+    controller.notifyObservers()
+
+    MovingState(() => (d1, d2))
   }
 }
 
