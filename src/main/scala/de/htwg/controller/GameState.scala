@@ -88,9 +88,9 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
       case _: GoToJailField =>
         val jailedPlayer = updatedPlayer.goToJail()
         controller.updatePlayer(jailedPlayer)
-        EndTurnState()
+        AdditionalActionsState()
       case _ =>
-        EndTurnState()
+        AdditionalActionsState()
     }
   }
 }
@@ -102,7 +102,7 @@ case class PropertyDecisionState() extends GameState {
       case "y" | "j" => // Yes/ja
         BuyPropertyState()
       case _ => // No
-        EndTurnState()
+        AdditionalActionsState()
     }
   }
 }
@@ -115,17 +115,17 @@ case class BuyPropertyState() extends GameState {
       case pf: PropertyField =>
         val (updatedField, updatedPlayer) = PropertyField.buyProperty(pf,controller.currentPlayer)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-        EndTurnState()
+        AdditionalActionsState()
       case tf: TrainStationField =>
         val (updatedField, updatedPlayer) = tf.buyTrainstation(tf,controller.currentPlayer)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-        EndTurnState()
+        AdditionalActionsState()
       case uf: UtilityField =>
         val (updatedField, updatedPlayer) = UtilityField.buyUtilityField(uf,controller.currentPlayer)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-        EndTurnState()
+        AdditionalActionsState()
       case _ =>
-        EndTurnState()
+        AdditionalActionsState()
     }
   }
 }
@@ -145,17 +145,17 @@ case class AdditionalActionsState() extends GameState {
 // State when buying a house
 case class BuyHouseState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    controller.game.board.fields(input.toInt-1) match {
+    controller.game.board.fields(input.toInt - 1) match {
       case field: PropertyField =>
-        val (updatedField, updatedPlayer) = PropertyField.House().buyHouse(controller.currentPlayer,field)
+        val (updatedField, updatedPlayer) = PropertyField.House().buyHouse(controller.currentPlayer, field, controller.game)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
         AdditionalActionsState()
       case _ =>
         EndTurnState()
+    }
   }
 }
-
-// State when turn ends
+  // State when turn ends
 case class EndTurnState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     controller.switchToNextPlayer()

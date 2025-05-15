@@ -16,18 +16,30 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
       }
-      def buyHouse(player: Player, field: PropertyField): (PropertyField, Player) = {
+      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): (PropertyField, Player) = {
         if (player.balance < calculateHousePrice(field.price) || amount >= maxHouses) {
           (field, player)
         } else {
-          val updatedHouse = this.copy(amount = amount + 1)
-          (
-            field.copy(house = updatedHouse),
-            player.copy(balance = player.balance - calculateHousePrice(field.price))
-          )
+          if (field.owner.exists(_.name == player.name)) {
+            val colorGroup = game.board.fields.collect {
+              case pf: PropertyField if pf.color == field.color => pf
+            }
+            val ownsAll = colorGroup.forall(_.owner.exists(_.name == player.name))
+
+              if (ownsAll && field.house.amount < maxHouses) {
+                val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
+                val updatedPlayer = player.copy(balance = player.balance - calculateHousePrice(field.price))
+                (updatedField,updatedPlayer)
+              } else {
+              (field, player)
+              }
+          }else {
+            (field, player)
+          }
         }
       }
     }
+
 
     case class Mortgage(price: Int = 0, active: Boolean = false) {
       def toggle(): Mortgage = copy(active = !active)

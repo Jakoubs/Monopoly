@@ -22,7 +22,7 @@ class Tui(controller: Controller) extends Observer {
 
         case _: PropertyDecisionState =>
           println(s"You moved to position ${controller.currentPlayer.position} and are now on the field ${controller.board.fields(controller.currentPlayer.position-1).name}.")
-          println(s"Would you like to buy ${controller.board.fields(controller.currentPlayer.position).name}? (y/n)")
+          println(s"Would you like to buy ${controller.board.fields(controller.currentPlayer.position-1).name}? (y/n)")
           controller.handleInput(readLine())
 
         case _: AdditionalActionsState =>

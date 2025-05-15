@@ -49,7 +49,7 @@ case class Player(name: String,
 
       val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
-        return newPlayer.playerMove(Dice().rollDice(game),rollcount + 1)
+        return newPlayer.playerMove(rollDice,rollcount + 1)
       }
       newPlayer
     } else {
