@@ -1,8 +1,9 @@
 package de.htwg.controller
 
-import de.htwg.model._
+import de.htwg.model.*
 import de.htwg.controller.TurnInfo
 import de.htwg.util.util.Observable
+import de.htwg.controller._
 
 sealed trait GameState {
   def handle(input: String, controller: Controller): GameState
@@ -25,9 +26,8 @@ case class JailState() extends GameState {
     input match {
       case "1" => // Pay to get out
         if (controller.currentPlayer.balance >= 50) {
-          val strategy = JailTurnStrategy()
-          val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
-          controller.updatePlayer(updatedPlayer)
+          val command = PayJailFeeCommand(controller, controller.currentPlayer)
+          command.execute()
           RollingState()
         } else {
           this // Stay in jail if can't pay
@@ -49,7 +49,9 @@ case class JailState() extends GameState {
 // State when player is rolling dice
 case class RollingState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    val (d1, d2) = controller.dice.rollDice(controller.sound)
+    val command = RollDiceCommand(controller)
+    command.execute()
+    val (d1, d2) = command.getResult
 
     controller.updateTurnInfo(
       TurnInfo(
@@ -82,7 +84,7 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
         controller.updatePlayer(jailedPlayer)
         EndTurnState()
       case _ =>
-        EndTurnState()
+        AdditionalActionsState()
     }
   }
 }
@@ -106,16 +108,16 @@ case class BuyPropertyState() extends GameState {
     val field = controller.board.fields(controller.currentPlayer.position-1)/*Hallo*/
     field match {
       case pf: PropertyField =>
-        val (updatedField, updatedPlayer) = PropertyField.buyProperty(pf,controller.currentPlayer)
-        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-        EndTurnState()
+        val command = BuyPropertyCommand(controller, pf, controller.currentPlayer)
+        command.execute()
+        AdditionalActionsState()
       case tf: TrainStationField =>
-        val (updatedField, updatedPlayer) = tf.buyTrainstation(tf,controller.currentPlayer)
-        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        val command = BuyTrainStationCommand(controller,tf, controller.currentPlayer)
+        command.execute()
         AdditionalActionsState()
       case uf: UtilityField =>
-        val (updatedField, updatedPlayer) = UtilityField.buyUtilityField(uf,controller.currentPlayer)
-        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        val command = BuyUtilityCommand(controller, uf, controller.currentPlayer)
+        command.execute()
         AdditionalActionsState()
       case _ =>
         AdditionalActionsState()
@@ -140,8 +142,8 @@ case class BuyHouseState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     controller.game.board.fields(input.toInt - 1) match {
       case field: PropertyField =>
-        val (updatedField, updatedPlayer) = PropertyField.House().buyHouse(controller.currentPlayer, field, controller.game)
-        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        val command = BuyHouseCommand(controller, field, controller.currentPlayer)
+        command.execute()
         AdditionalActionsState()
       case _ =>
         EndTurnState()
