@@ -1,8 +1,8 @@
 package de.htwg.view
 
-import de.htwg.controller.Controller
+import de.htwg.controller.{AdditionalActionsState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState}
 import de.htwg.util.util.Observer
-import de.htwg.controller.{JailState, PropertyDecisionState, AdditionalActionsState}
+
 import scala.io.StdIn.readLine
 
 class Tui(controller: Controller) extends Observer {
@@ -23,6 +23,7 @@ class Tui(controller: Controller) extends Observer {
           controller.handleInput(readLine())
 
         case _: PropertyDecisionState =>
+          println(s"You moved to position ${controller.currentPlayer.position} and are now on the field ${controller.board.fields(controller.currentPlayer.position).name}.")
           println(s"Would you like to buy ${controller.board.fields(controller.currentPlayer.position).name}? (y/n)")
           controller.handleInput(readLine())
 
@@ -30,6 +31,18 @@ class Tui(controller: Controller) extends Observer {
           println("Additional actions:")
           println("1. Buy house")
           println("2. End turn")
+          controller.handleInput(readLine())
+
+        case _: RollingState =>
+          println("Press enter to roll a dice")
+          controller.handleInput(readLine())
+
+        case _: MovingState =>
+          println("Your now moving. Press enter to continue...")
+          controller.handleInput(readLine())
+
+        case _: EndTurnState =>
+          println("Turn ended. Switch to next player.")
           controller.handleInput(readLine())
 
         case _ =>
