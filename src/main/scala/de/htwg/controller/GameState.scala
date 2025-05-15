@@ -36,7 +36,7 @@ case class JailState() extends GameState {
         if (d1 == d2) {
           val updatedPlayer = controller.currentPlayer.releaseFromJail()
           controller.updatePlayer(updatedPlayer)
-          MovingState(d1 + d2)
+          MovingState(() => (d1 , d2))
         } else {
           val jailTurns = controller.currentPlayer.jailTurns + 1
           if (jailTurns >= 3) {
@@ -63,19 +63,17 @@ case class JailState() extends GameState {
 case class RollingState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     val (d1, d2) = controller.dice.rollDice(controller.sound)
-    MovingState(d1 + d2)
+    MovingState(() => (d1 , d2))
   }
 }
 
 // State when player is moving
-case class MovingState(steps: Int) extends GameState {
+case class MovingState(dice: () => (Int, Int)) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    val player = controller.currentPlayer
-    val newPosition = (player.position + steps) % controller.board.fields.size
-    val updatedPlayer = player.copy(position = newPosition)
+    val updatedPlayer = controller.currentPlayer.playerMove(dice)
     controller.updatePlayer(updatedPlayer)
-
-    controller.board.fields(newPosition) match {
+    controller.board.fields(updatedPlayer.position-1)
+    match {
       case _: PropertyField | _: TrainStationField | _: UtilityField =>
         PropertyDecisionState()
       case _: GoToJailField =>
@@ -103,7 +101,7 @@ case class PropertyDecisionState() extends GameState {
 // State when buying a property
 case class BuyPropertyState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    val field = controller.board.fields(controller.currentPlayer.position)
+    val field = controller.board.fields(controller.currentPlayer.position-1)
     field match {
       case pf: PropertyField if controller.currentPlayer.balance >= pf.price =>
         val updatedField = pf.copy(owner = Some(controller.currentPlayer))

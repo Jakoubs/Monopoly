@@ -41,22 +41,16 @@ case class Player(name: String,
     if (rollcount == 3) {
       this.goToJail()
     } else if(!isInJail) {
-      println("press enter to roll dice")
-      readLine("Rolling dice...")
       val (diceA, diceB) = rollDice()
       val updatedPlayer = if ((position + diceA + diceB) > 40)
         this.copy(balance = balance + 200) else this
-      println(s"You rolled $diceA and $diceB! That's ${diceA + diceB} moves.")
-      println(s"Your new position is ${(position + diceA + diceB) % 40}")
 
       val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
-        println("You rolled doubles -> Roll again")
         return newPlayer.playerMove(rollDice,rollcount + 1)
       }
       newPlayer
     } else {
-      println("You rolled doubles 3 times -> Jail :(")
       this
     }
   }
