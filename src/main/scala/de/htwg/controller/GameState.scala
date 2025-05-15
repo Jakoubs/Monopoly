@@ -1,6 +1,7 @@
 package de.htwg.controller
 
-import de.htwg.model._
+import de.htwg.model.*
+import de.htwg.model.PropertyField.buyProperty
 import de.htwg.util.util.Observable
 
 sealed trait GameState {
@@ -104,8 +105,9 @@ case class BuyPropertyState() extends GameState {
     val field = controller.board.fields(controller.currentPlayer.position-1)/*Hallo*/
     field match {
       case pf: PropertyField if controller.currentPlayer.balance >= pf.price =>
-        val updatedField = pf.copy(owner = Some(controller.currentPlayer))
-        val updatedPlayer = controller.currentPlayer.copy(balance = controller.currentPlayer.balance - pf.price)
+        val(updatedField, updatedPlayer) = PropertyField.buyProperty(pf,controller.currentPlayer)
+        //val updatedField = pf.copy(owner = Some(controller.currentPlayer))
+        //val updatedPlayer = controller.currentPlayer.copy(balance = controller.currentPlayer.balance - pf.price)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
         EndTurnState()
       case _ =>

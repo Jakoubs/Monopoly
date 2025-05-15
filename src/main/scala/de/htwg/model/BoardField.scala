@@ -1,4 +1,5 @@
 package de.htwg.model
+import de.htwg.MonopolyGame
 import de.htwg.model.PropertyField.*
 
 sealed trait BoardField {
@@ -39,6 +40,19 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
       val rent = property.rent
       val finalRent =  property.rent + property.house.amount * (rent / 2)
       finalRent
+    }
+
+    def buyProperty(propertyField: PropertyField,player: Player): (PropertyField, Player) = {
+      propertyField.owner match {
+        case None =>
+          val updatedField = propertyField.copy(
+            owner = Some(player)
+          )
+          val updatedPlayer = player.copy(balance = player.balance - propertyField.price, position = propertyField.index)
+          (updatedField, updatedPlayer)
+        case Some(owner) =>
+          (propertyField, player)
+      }
     }
   }
 
