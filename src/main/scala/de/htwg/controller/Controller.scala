@@ -26,7 +26,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   }
 
   def updateBoardAndPlayer(field: BoardField, player: Player): Unit = {
-    val updatedFields = game.board.fields.updated(field.index, field)
+    val updatedFields = game.board.fields.updated(field.index-1, field)
     val updatedBoard = game.board.copy(fields = updatedFields)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
     game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = player)

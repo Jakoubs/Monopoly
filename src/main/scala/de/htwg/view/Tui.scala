@@ -1,6 +1,6 @@
 package de.htwg.view
 
-import de.htwg.controller.{AdditionalActionsState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState}
+import de.htwg.controller.{AdditionalActionsState, BuyPropertyState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState}
 import de.htwg.util.util.Observer
 
 import scala.io.StdIn.readLine
@@ -39,6 +39,10 @@ class Tui(controller: Controller) extends Observer {
 
         case _: MovingState =>
           println("Your now moving. Press enter to continue...")
+          controller.handleInput(readLine())
+
+        case _: BuyPropertyState =>
+          println("You bought a property. Press enter to continue...")
           controller.handleInput(readLine())
 
         case _: EndTurnState =>
