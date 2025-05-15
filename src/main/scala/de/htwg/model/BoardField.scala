@@ -45,11 +45,15 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
     def buyProperty(propertyField: PropertyField,player: Player): (PropertyField, Player) = {
       propertyField.owner match {
         case None =>
+          if (player.balance > propertyField.price) {
           val updatedField = propertyField.copy(
             owner = Some(player)
           )
           val updatedPlayer = player.copy(balance = player.balance - propertyField.price, position = propertyField.index)
           (updatedField, updatedPlayer)
+          } else {
+            (propertyField, player)
+          }
         case Some(owner) =>
           (propertyField, player)
       }
@@ -104,12 +108,44 @@ case class TaxField(amount: Int, index: Int) extends BoardField {
   override val name: String = "TaxField"
 }
 case class TrainStationField(name: String ,index: Int, price: Int, owner: Option[Player]) extends BoardField {
-}
 
+  def buyTrainstation(trainStationField: TrainStationField, player: Player): (TrainStationField, Player) = {
+    trainStationField.owner match {
+      case None =>
+        if (player.balance > trainStationField.price) {
+          val updatedField = trainStationField.copy(
+            owner = Some(player)
+          )
+          val updatedPlayer = player.copy(balance = player.balance - trainStationField.price, position = trainStationField.index)
+          (updatedField, updatedPlayer)
+        } else {
+          (trainStationField, player)
+        }
+      case Some(owner) =>
+        (trainStationField, player)
+    }
+  }
+}
 
 case class UtilityField(name: String, index: Int, price: Int, utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField{ }
   object UtilityField {
 
+    def buyUtilityField(utilityField: UtilityField, player: Player): (UtilityField, Player) = {
+      utilityField.owner match {
+        case None =>
+          if (player.balance > utilityField.price) {
+            val updatedField = utilityField.copy(
+              owner = Some(player)
+            )
+            val updatedPlayer = player.copy(balance = player.balance - utilityField.price, position = utilityField.index)
+            (updatedField, updatedPlayer)
+          } else {
+            (utilityField, player)
+          }
+        case Some(owner) =>
+          (utilityField, player)
+      }
+    }
     enum UtilityCheck:
       case utility
     

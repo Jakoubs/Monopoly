@@ -112,9 +112,16 @@ case class BuyPropertyState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     val field = controller.board.fields(controller.currentPlayer.position-1)/*Hallo*/
     field match {
-      case pf: PropertyField if controller.currentPlayer.balance >= pf.price =>
-        val updatedField = pf.copy(owner = Some(controller.currentPlayer))
-        val updatedPlayer = controller.currentPlayer.copy(balance = controller.currentPlayer.balance - pf.price)
+      case pf: PropertyField =>
+        val (updatedField, updatedPlayer) = PropertyField.buyProperty(pf,controller.currentPlayer)
+        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        EndTurnState()
+      case tf: TrainStationField =>
+        val (updatedField, updatedPlayer) = tf.buyTrainstation(tf,controller.currentPlayer)
+        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        EndTurnState()
+      case uf: UtilityField =>
+        val (updatedField, updatedPlayer) = UtilityField.buyUtilityField(uf,controller.currentPlayer)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
         EndTurnState()
       case _ =>
