@@ -58,3 +58,7 @@ case class Player(name: String,
   }
 
 }
+
+trait TurnStrategy {
+  def executeTurn(player: Player, dice: () => (Int, Int)): Player
+}
