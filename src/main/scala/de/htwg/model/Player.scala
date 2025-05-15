@@ -1,5 +1,7 @@
 package de.htwg.model
 import scala.io.StdIn.readLine
+import de.htwg.model.Dice
+import de.htwg.MonopolyGame
 
 case class Player(name: String,
                   balance: Int,
@@ -47,7 +49,7 @@ case class Player(name: String,
 
       val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
-        return newPlayer.playerMove(rollDice,rollcount + 1)
+        return newPlayer.playerMove(Dice().rollDice(game),rollcount + 1)
       }
       newPlayer
     } else {

@@ -145,8 +145,13 @@ case class AdditionalActionsState() extends GameState {
 // State when buying a house
 case class BuyHouseState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    // Implementation for buying a house
-    EndTurnState()
+    controller.game.board.fields(input.toInt-1) match {
+      case field: PropertyField =>
+        val (updatedField, updatedPlayer) = PropertyField.House().buyHouse(controller.currentPlayer,field)
+        controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        AdditionalActionsState()
+      case _ =>
+        EndTurnState()
   }
 }
 
