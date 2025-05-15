@@ -25,35 +25,21 @@ case class JailState() extends GameState {
     input match {
       case "1" => // Pay to get out
         if (controller.currentPlayer.balance >= 50) {
-          val updatedPlayerJailFree = controller.currentPlayer.releaseFromJail()
-          val updatedPlayer = updatedPlayerJailFree.changeBalance(-50)
+          val strategy = JailTurnStrategy()
+          val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
           controller.updatePlayer(updatedPlayer)
           RollingState()
         } else {
           this // Stay in jail if can't pay
         }
       case "3" => // Try to roll doubles
-        val (d1, d2) = controller.dice.rollDice(controller.sound)
-        if (d1 == d2) {
-          val updatedPlayer = controller.currentPlayer.releaseFromJail()
-          controller.updatePlayer(updatedPlayer)
-          MovingState(() => (d1 , d2))
+        val strategy = JailTurnStrategy()
+        val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
+        controller.updatePlayer(updatedPlayer)
+        if (!updatedPlayer.isInJail) {
+          MovingState(() => controller.dice.rollDice(controller.sound))
         } else {
-          val jailTurns = controller.currentPlayer.jailTurns + 1
-          if (jailTurns >= 3) {
-            if (controller.currentPlayer.balance >= 50) {
-              val updatedPlayerJailFree = controller.currentPlayer.releaseFromJail()
-              val updatedPlayer = updatedPlayerJailFree.changeBalance(-50)
-              controller.updatePlayer(updatedPlayer)
-              RollingState()
-            } else {
-              this // Stay in jail
-            }
-          } else {
-            val updatedPlayer = controller.currentPlayer.copy(jailTurns = jailTurns)
-            controller.updatePlayer(updatedPlayer)
-            this
-          }
+          this
         }
       case _ => this
     }
@@ -79,21 +65,28 @@ case class RollingState() extends GameState {
 // State when player is moving
 case class MovingState(dice: () => (Int, Int)) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    val updatedPlayer = controller.currentPlayer.playerMove(dice)
+    val strategy = if (controller.currentPlayer.isInJail) {
+      JailTurnStrategy()
+    } else {
+      RegularTurnStrategy()
+    }
+
+    val updatedPlayer = strategy.executeTurn(controller.currentPlayer, dice)
     controller.updatePlayer(updatedPlayer)
-    controller.board.fields(updatedPlayer.position-1)
-    match {
+
+    controller.board.fields(updatedPlayer.position-1) match {
       case _: PropertyField | _: TrainStationField | _: UtilityField =>
         PropertyDecisionState()
       case _: GoToJailField =>
         val jailedPlayer = updatedPlayer.goToJail()
         controller.updatePlayer(jailedPlayer)
-        AdditionalActionsState()
+        EndTurnState()
       case _ =>
-        AdditionalActionsState()
+        EndTurnState()
     }
   }
 }
+
 
 // State when player needs to decide whether to buy a property
 case class PropertyDecisionState() extends GameState {
@@ -115,7 +108,7 @@ case class BuyPropertyState() extends GameState {
       case pf: PropertyField =>
         val (updatedField, updatedPlayer) = PropertyField.buyProperty(pf,controller.currentPlayer)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-        AdditionalActionsState()
+        EndTurnState()
       case tf: TrainStationField =>
         val (updatedField, updatedPlayer) = tf.buyTrainstation(tf,controller.currentPlayer)
         controller.updateBoardAndPlayer(updatedField, updatedPlayer)
