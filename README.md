@@ -1,49 +1,184 @@
+<div align="center">
+
+# 🎲 Monopoly Game
+
+*A modern Scala implementation of the classic board game*
+
 [![Coverage Status](https://coveralls.io/repos/github/Jakoubs/Monopoly/badge.svg)](https://coveralls.io/github/Jakoubs/Monopoly)
 [![Build Status](https://github.com/Jakoubs/Monopoly/actions/workflows/scala.yml/badge.svg)](https://github.com/Jakoubs/Monopoly/actions/workflows/scala.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/Jakoubs/Monopoly.svg?color=blue)](https://github.com/Jakoubs/Monopoly/commits/main)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Scala Version](https://img.shields.io/badge/scala-3.3-red.svg)](https://www.scala-lang.org/download/)
 
-# Monopoly
+[Features](#-features) •
+[Installation](#-installation) •
+[Usage](#-usage) •
+[Contributing](#-contributing) •
+[License](#-license)
 
-![Preview](src/main/resources/git6.svg)
-Welcome to the Monopoly project! This is a Scala implementation of the game Monopoly
-## Contents
+<div align="center">
+    <img src="src/main/resources/git6.svg" alt="Monopoly Game Terminal Demo" width="800"/>
+</div>
 
-- [About the Project](#about-the-project)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+</div>
 
-## About the Project
+- 🎮 Full implementation of classic Monopoly rules
+- 👥 Multiplayer support
+- 🏠 Property management system
+- 💰 Trading and auction mechanics
+- 🎲 Interactive dice rolling
+- 📊 Player statistics tracking
+- 🎯 State-based game progression
+- 🖥️ Text-based user interface (TUI)
 
-This is an implementation of the Monopoly board game in Scala. The project was created as part of the Software Engineering course at HTWG.
+## 🚀 Installation
 
-## Installation
+### Prerequisites
 
-To use this project, you need to have Scala installed. If you don't have Scala installed yet, you can do so from the [official Scala website](https://www.scala-lang.org/download/).
+- Java SDK 23
+- Scala 3.3
+- sbt (Scala Build Tool)
 
-Then, follow these steps:
+### Quick Start
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/Jakoubs/Monopoly.git
-    ```
+```bash
+# Clone the repository
+git clone https://github.com/Jakoubs/Monopoly.git
 
-2. Navigate to the project directory:
-    ```sh
-    cd Monopoly
-    ```
+# Navigate to project directory
+cd Monopoly
 
-3. Build the project:
-    ```sh
-    sbt compile
-    ```
+# Build the project
+sbt compile
 
-## Usage
+# Run tests
+sbt clean coverage test
+```
 
-To start the game, simply run the main class:
+## 🎮 Usage
 
-```sh
+### Starting the Game
+
+```bash
 sbt run
 ```
 
+### Basic Commands
+
+```
+start   - Start a new game
+roll    - Roll the dice
+buy     - Purchase property
+pay     - Pay rent
+end     - End turn
+quit    - Exit game
+```
+
+### Game Flow
+
+1. 🎲 Roll dice to move
+2. 🏠 Land on property
+3. 💰 Buy property or pay rent
+4. 🔄 End turn
+5. 👥 Next player's turn
+
+## 🛠️ Project Structure
+
+```
+de.htwg/
+├── 📁 controller/      # Game logic and event handling
+├── 📁 model/          # Data structures and game state
+├── 📁 util/          # Observer logic
+└── 📁 view/           # User interface components
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. 🍴 Fork the repository
+2. 🔧 Create your feature branch
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+3. 💾 Commit your changes
+   ```bash
+   git commit -m '✨ Add some AmazingFeature'
+   ```
+4. 📤 Push to the branch
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+5. 🔄 Open a Pull Request
+
+### Commit Message Guidelines
+
+```
+✨ feat: Add new feature
+🐛 fix: Fix a bug
+📚 docs: Update documentation
+🎨 style: Format code
+♻️ refactor: Refactor code
+🧪 test: Add tests
+```
+
+## 📋 Development Status
+
+- [x] Basic game mechanics
+- [x] Property management
+- [x] Player turns
+- [x] Dice rolling system
+- [ ] Code patterns
+- [ ] GUI implementation
+- [ ] AI opponents
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+sbt test
+
+# Run specific test suite
+sbt "testOnly de.htwg.model.PlayerTest"
+
+# Check coverage
+sbt coverage test
+sbt coverageReport
+```
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- HTWG Konstanz Software Engineering Course
+- The Scala community for their resources
+
+## 👨‍💻 Contributors
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Jakoubs">
+        <img src="https://github.com/Jakoubs.png" width="100px;" alt="Jakoubs"/><br />
+        <sub><b>Jakob Strohmaier</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/BrutTim">
+        <img src="https://github.com/BrutTim.png" width="100px;" alt="BrutTim"/><br />
+        <sub><b>BrutTim</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+---
+
+<div align="center">
+
+Made with ❤️ by [Jakoubs](https://github.com/Jakoubs) & [BrutTim](https://github.com/BrutTim)
+
+</div>
+```
