@@ -1,5 +1,7 @@
 package de.htwg.model
 import scala.io.StdIn.readLine
+import de.htwg.model.Dice
+import de.htwg.MonopolyGame
 
 case class Player(name: String,
                   balance: Int,
@@ -23,7 +25,11 @@ case class Player(name: String,
   }
 
   def releaseFromJail(): Player = {
-    val newPlayer = this.copy(isInJail = false)
+    val newPlayer = this.copy(isInJail = false, jailTurns = 0)
+    newPlayer
+  }
+  def changeBalance(amount: Int): Player = {
+    val newPlayer = this.copy(balance = balance + amount)
     newPlayer
   }
 
@@ -37,24 +43,22 @@ case class Player(name: String,
     if (rollcount == 3) {
       this.goToJail()
     } else if(!isInJail) {
-      println("press enter to roll dice")
-      readLine("Rolling dice...")
       val (diceA, diceB) = rollDice()
       val updatedPlayer = if ((position + diceA + diceB) > 40)
         this.copy(balance = balance + 200) else this
-      println(s"You rolled $diceA and $diceB! That's ${diceA + diceB} moves.")
-      println(s"Your new position is ${(position + diceA + diceB) % 40}")
 
       val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
       if (diceA == diceB) {
-        println("You rolled doubles -> Roll again")
         return newPlayer.playerMove(rollDice,rollcount + 1)
       }
       newPlayer
     } else {
-      println("You rolled doubles 3 times -> Jail :(")
       this
     }
   }
 
+}
+
+trait TurnStrategy {
+  def executeTurn(player: Player, dice: () => (Int, Int)): Player
 }

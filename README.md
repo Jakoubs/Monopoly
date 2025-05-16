@@ -22,8 +22,6 @@
 
 </div>
 
-## ✨ Features
-
 - 🎮 Full implementation of classic Monopoly rules
 - 👥 Multiplayer support
 - 🏠 Property management system

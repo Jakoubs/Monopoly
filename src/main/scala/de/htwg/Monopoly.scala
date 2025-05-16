@@ -30,6 +30,7 @@ object Monopoly:
     if (soundBool) {
       SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     }
+    //if(!isTestBoard) {
 
     var playerVector = Vector[Player]()
 
@@ -62,7 +63,7 @@ object Monopoly:
     val board = Board(
       Vector(
         GoField,
-        PropertyField("brown1", 2, 60, 2, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
+        PropertyField("brown1", 2, 60, 2, Some(playerVector.head), color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
         CommunityChestField(3),
         PropertyField("brown2", 4, 60, 4, Some(playerVector.head), color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
         TaxField(100, 5),

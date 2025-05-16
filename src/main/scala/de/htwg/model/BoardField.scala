@@ -1,4 +1,5 @@
 package de.htwg.model
+import de.htwg.MonopolyGame
 import de.htwg.model.PropertyField.*
 
 sealed trait BoardField {
@@ -10,23 +11,35 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
                          house:PropertyField.House = PropertyField.House()) extends BoardField{ }
   object PropertyField {
     case class House(amount: Int = 0) {
-      private val maxHouses = 5
+      val maxHouses = 5
       def calculateHousePrice(purchasePrice: Int): Int = {
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
       }
-      def buyHouse(player: Player, field: PropertyField): (PropertyField, Player) = {
+      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): (PropertyField, Player) = {
         if (player.balance < calculateHousePrice(field.price) || amount >= maxHouses) {
           (field, player)
         } else {
-          val updatedHouse = this.copy(amount = amount + 1)
-          (
-            field.copy(house = updatedHouse),
-            player.copy(balance = player.balance - calculateHousePrice(field.price))
-          )
+          if (field.owner.exists(_.name == player.name)) {
+            val colorGroup = game.board.fields.collect {
+              case pf: PropertyField if pf.color == field.color => pf
+            }
+            val ownsAll = colorGroup.forall(_.owner.exists(_.name == player.name))
+
+              if (ownsAll && field.house.amount < maxHouses) {
+                val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
+                val updatedPlayer = player.copy(balance = player.balance - calculateHousePrice(field.price))
+                (updatedField,updatedPlayer)
+              } else {
+              (field, player)
+              }
+          }else {
+            (field, player)
+          }
         }
       }
     }
+
 
     case class Mortgage(price: Int = 0, active: Boolean = false) {
       def toggle(): Mortgage = copy(active = !active)
@@ -37,8 +50,25 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 
     def calculateRent(property: PropertyField): Int = {
       val rent = property.rent
-      val finalRent =  property.rent + property.house.amount * (rent / 2)
+      val finalRent = rent + property.house.amount * Math.ceil(rent.toDouble / 2).toInt
       finalRent
+    }
+
+    def buyProperty(propertyField: PropertyField,player: Player): (PropertyField, Player) = {
+      propertyField.owner match {
+        case None =>
+          if (player.balance > propertyField.price) {
+          val updatedField = propertyField.copy(
+            owner = Some(player)
+          )
+          val updatedPlayer = player.copy(balance = player.balance - propertyField.price, position = propertyField.index)
+          (updatedField, updatedPlayer)
+          } else {
+            (propertyField, player)
+          }
+        case Some(owner) =>
+          (propertyField, player)
+      }
     }
   }
 
@@ -90,12 +120,44 @@ case class TaxField(amount: Int, index: Int) extends BoardField {
   override val name: String = "TaxField"
 }
 case class TrainStationField(name: String ,index: Int, price: Int, owner: Option[Player]) extends BoardField {
-}
 
+  def buyTrainstation(trainStationField: TrainStationField, player: Player): (TrainStationField, Player) = {
+    trainStationField.owner match {
+      case None =>
+        if (player.balance > trainStationField.price) {
+          val updatedField = trainStationField.copy(
+            owner = Some(player)
+          )
+          val updatedPlayer = player.copy(balance = player.balance - trainStationField.price, position = trainStationField.index)
+          (updatedField, updatedPlayer)
+        } else {
+          (trainStationField, player)
+        }
+      case Some(owner) =>
+        (trainStationField, player)
+    }
+  }
+}
 
 case class UtilityField(name: String, index: Int, price: Int, utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField{ }
   object UtilityField {
 
+    def buyUtilityField(utilityField: UtilityField, player: Player): (UtilityField, Player) = {
+      utilityField.owner match {
+        case None =>
+          if (player.balance > utilityField.price) {
+            val updatedField = utilityField.copy(
+              owner = Some(player)
+            )
+            val updatedPlayer = player.copy(balance = player.balance - utilityField.price, position = utilityField.index)
+            (updatedField, updatedPlayer)
+          } else {
+            (utilityField, player)
+          }
+        case Some(owner) =>
+          (utilityField, player)
+      }
+    }
     enum UtilityCheck:
       case utility
     

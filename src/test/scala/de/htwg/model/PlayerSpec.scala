@@ -79,6 +79,11 @@ class PlayerSpec extends AnyWordSpec {
       updatedPlayer.position shouldEqual 2
     }
 
+    "change balance when collecting money" in {
+      val player = Player("TestPlayer", 1000, position = 35)
+      val updatedPlayer = player.changeBalance(50)
+      updatedPlayer.balance shouldEqual 1050
+    }
 
     "earn 200 Money when go over Go" in {
       val player = Player("TestPlayer", 1000, position = 35)
