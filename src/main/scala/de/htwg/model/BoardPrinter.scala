@@ -182,7 +182,7 @@ object BoardPrinter {
     }
   }
 
-  private def playersOnIndex(game: MonopolyGame,idx: Int, inJail: Boolean): String = {
+  def playersOnIndex(game: MonopolyGame,idx: Int, inJail: Boolean): String = {
     game.players
       .filter(p => p.position == idx && p.isInJail == inJail)
       .map(_.name + " ")
@@ -190,7 +190,7 @@ object BoardPrinter {
   }
 
 
-  private def getStats(game: MonopolyGame): (String, String, String, String) = {
+  def getStats(game: MonopolyGame): (String, String, String, String) = {
     val playerInfos = game.players.map(p =>
       s"${p.name} pos[${p.position}], balance[${p.balance}], isInJail[${p.isInJail}]    "
     )
