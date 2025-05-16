@@ -21,14 +21,16 @@ trait BuyableField extends BoardField {
 }
 
 trait BoardField {
-val name: String
-val index: Int
+  def accept[T](visitor: FieldVisitor[T]): T
+  val name: String
+  val index: Int
 }
 case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner: Option[Player] = None,
                          color: PropertyField.Color, mortgage: PropertyField.Mortgage = PropertyField.Mortgage(),
                          house:PropertyField.House = PropertyField.House()) extends BoardField with BuyableField
                          {
                            override def withNewOwner(player: Player): PropertyField = this.copy(owner = Some(player))
+                           override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
                          }
   object PropertyField {
     case class House(amount: Int = 0) {
@@ -82,10 +84,14 @@ case object GoField extends BoardField {
   def addMoney(player: Player): Player = {
     player.copy(balance = player.balance + 200)
   }
+
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
+
 }
 case object JailField extends BoardField{
   override val index: Int = 11
   override val name: String = "Jail"
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
 case class GoToJailField() extends BoardField{
   override val index: Int = 31
@@ -93,6 +99,7 @@ case class GoToJailField() extends BoardField{
   def goToJail(player: Player): Player = {
     player.goToJail()
   }
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
 case class FreeParkingField(amount: Int) extends BoardField{
   override val index: Int = 21
@@ -105,6 +112,9 @@ case class FreeParkingField(amount: Int) extends BoardField{
   def resetAmount(): FreeParkingField = {
     this.copy(amount = 0)
   }
+
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
+
 }
 
 case class ChanceField(idx: Int) extends BoardField {
@@ -115,22 +125,30 @@ case class ChanceField(idx: Int) extends BoardField {
     MoveCard("Advance to Go", "(Collect $200)",1, true),
     MoveCard("Advance to Illinois Avenue", "If you pass Go, collect $200", 4, true) // Welcher Index?
   )
-
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
 case class CommunityChestField(index: Int) extends BoardField{
   override val name: String = "communityCard"
+
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
+
 }
 case class TaxField(amount: Int, index: Int) extends BoardField {
   override val name: String = "TaxField"
+
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
+
 }
 case class TrainStationField(name: String ,index: Int, price: Int, owner: Option[Player]) extends BoardField with BuyableField
 {
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
   override def withNewOwner(player: Player): TrainStationField = this.copy(owner = Some(player))
 }
 
 case class UtilityField(name: String, index: Int, price: Int, utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField with BuyableField
 {
   override def withNewOwner(player: Player): UtilityField = this.copy(owner = Some(player))
+  override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
   object UtilityField {
 

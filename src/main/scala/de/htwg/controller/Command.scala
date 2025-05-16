@@ -51,8 +51,6 @@ trait Command {
     def execute(): Unit = {
       previousPlayerState = Some(controller.currentPlayer)
       rollResult = controller.dice.rollDice(controller.sound)
-      //val updatedPlayer = RegularTurnStrategy().executeTurn(controller.currentPlayer, () => rollResult)
-      //controller.updatePlayer(updatedPlayer)
     }
 
     def undo(): Unit = {

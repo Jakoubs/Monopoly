@@ -23,7 +23,7 @@ case class Player(name: String,
     }
     this
   }
-
+  
   def releaseFromJail(): Player = {
     val newPlayer = this.copy(isInJail = false, jailTurns = 0)
     newPlayer

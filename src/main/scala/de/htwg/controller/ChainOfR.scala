@@ -5,16 +5,15 @@ import de.htwg.controller.PayJailFeeCommand
 import de.htwg.controller.JailTurnStrategy
 import de.htwg.model.Player
 
-// Abstrakte Basisklasse für die Handler in der Kette
-abstract class JailActionHandler {
+abstract class ActionHandler {
   val controller: Controller
-  var nextHandler: Option[JailActionHandler] // nextHandler ist jetzt var
+  var nextHandler: Option[ActionHandler] // nextHandler ist jetzt var
 
   def handle(input: String): Option[GameState]
 
-  def setNext(handler: JailActionHandler): JailActionHandler = {
+  def setNext(handler: ActionHandler): ActionHandler = {
     this match {
-      case h: JailActionHandler =>
+      case h: ActionHandler =>
         h.nextHandler match {
           case Some(next) => next.setNext(handler)
           case None => h.nextHandler = Some(handler); handler
@@ -24,8 +23,7 @@ abstract class JailActionHandler {
   }
 }
 
-// Handler für die Option "Bezahlen, um freizukommen"
-case class PayJailHandler(override val controller: Controller, var nextHandler: Option[JailActionHandler] = None) extends JailActionHandler {
+case class PayJailHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
   override def handle(input: String): Option[GameState] = {
     if (input == "1") {
       if (controller.currentPlayer.balance >= 50) {
@@ -33,7 +31,7 @@ case class PayJailHandler(override val controller: Controller, var nextHandler: 
         command.execute()
         Some(RollingState())
       } else {
-        Some(JailState()) // Bleibe im Gefängnis, wenn nicht bezahlt werden kann
+        Some(JailState()) 
       }
     } else {
       nextHandler.flatMap(_.handle(input))
@@ -41,8 +39,7 @@ case class PayJailHandler(override val controller: Controller, var nextHandler: 
   }
 }
 
-// Handler für die Option "Versuchen, Pasch zu würfeln"
-case class RollDoublesJailHandler(override val controller: Controller, var nextHandler: Option[JailActionHandler] = None) extends JailActionHandler {
+case class RollDoublesJailHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
   override def handle(input: String): Option[GameState] = {
     if (input == "3") {
       val strategy = JailTurnStrategy()
@@ -59,9 +56,8 @@ case class RollDoublesJailHandler(override val controller: Controller, var nextH
   }
 }
 
-// Default-Handler, wenn keine der spezifischen Optionen zutrifft
-case class InvalidJailInputHandler(override val controller: Controller, var nextHandler: Option[JailActionHandler] = None) extends JailActionHandler {
+case class InvalidJailInputHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
   override def handle(input: String): Option[GameState] = {
-    Some(JailState()) // Bleibe im JailState bei ungültiger Eingabe
+    Some(JailState()) 
   }
 }
