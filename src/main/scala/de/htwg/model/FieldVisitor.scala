@@ -23,7 +23,7 @@ class RentVisitor(currentPlayer: Player, allPlayers: Vector[Player], board: Boar
       val houseRent = field.house.amount * (baseRent / 2)
       val colorGroup = board.fields.collect { case pf: PropertyField if pf.color == field.color => pf }
       val ownsAll = colorGroup.forall(_.owner.exists(_.name == field.owner.get.name))
-      val monopolyMultiplier = if (ownsAll && field.house.amount == 0) 2 else 1
+      val monopolyMultiplier = if (ownsAll) 2 else 1
       (baseRent + houseRent) * monopolyMultiplier
     }
   }
@@ -35,7 +35,6 @@ class RentVisitor(currentPlayer: Player, allPlayers: Vector[Player], board: Boar
         case 2 => 50
         case 3 => 100
         case 4 => 200
-        case _ => 0
       }
     }.getOrElse(0)
   }
@@ -54,6 +53,5 @@ class RentVisitor(currentPlayer: Player, allPlayers: Vector[Player], board: Boar
   override def visit(field: BoardField): Int = field match {
     case GoField => 0
     case JailField => 0
-    case _ => 0
   }
 }

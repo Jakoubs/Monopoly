@@ -9,6 +9,10 @@ import de.htwg.model.PropertyField.Color.*
 import de.htwg.model.PropertyField.{House, Mortgage}
 
 class BoardFieldSpec extends AnyWordSpec {
+
+  val dummyPlayer = Player("dummy", 1500, 0, isInJail = false, 0)
+  val otherPlayer = Player("other", 1500, 0, isInJail = false, 0)
+
   val dice = new Dice()
   val player1 = Player("Player 1", 1500, 1, isInJail = false, 0)
   val player2 = Player("Player 2", 1500, 1, isInJail = false, 0)
@@ -58,6 +62,22 @@ class BoardFieldSpec extends AnyWordSpec {
   val board = Board(fields)
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
   val controller = new Controller(initialGame, dice)
+
+  val ownedProperties: Map[Player, List[PropertyField]] =
+    board.fields.collect { case p: PropertyField if p.owner.isDefined => (p.owner.get, p) }
+      .groupBy(_._1).view.mapValues(_.map(_._2).toList).toMap
+
+  val ownedTrainStations: Map[Player, Int] =
+    board.fields.collect { case t: TrainStationField if t.owner.isDefined => (t.owner.get, 1) }
+      .groupBy(_._1).view.mapValues(_.size).toMap
+
+  val ownedUtilities: Map[Player, Int] =
+    board.fields.collect { case u: UtilityField if u.owner.isDefined => (u.owner.get, 1) }
+      .groupBy(_._1).view.mapValues(_.size).toMap
+
+  val diceResult = 7
+
+  val rentVisitor = new RentVisitor(dummyPlayer, Vector(dummyPlayer, otherPlayer), board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
 
   "PropertyField" should {
     "build a property field" in {
@@ -338,6 +358,54 @@ class BoardFieldSpec extends AnyWordSpec {
       utility.utility shouldBe UtilityField.UtilityCheck.utility
       utility.owner shouldBe None
     }
+  }
+
+  "visit PropertyField and calculate rent correctly" in {
+    val property = PropertyField("brown1", 1, 100, 10, Some(otherPlayer), PropertyField.Color.Brown)
+    property.accept(rentVisitor) shouldBe 10
+  }
+
+  "visit TrainStationField and calculate rent correctly" in {
+    val station = TrainStationField("Station1", 5, 200, Some(otherPlayer))
+    station.accept(rentVisitor) shouldBe 25 // Since owned 1 station
+  }
+
+  "visit UtilityField and calculate rent correctly" in {
+    val utility = UtilityField("Utility1", 12, 150, UtilityField.UtilityCheck.utility, Some(otherPlayer))
+    utility.accept(rentVisitor) shouldBe diceResult * 4 // Since owned 1 utility
+  }
+
+  "visit GoToJailField and return 0" in {
+    val goToJail = GoToJailField()
+    goToJail.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit FreeParkingField and return 0" in {
+    val freeParking = FreeParkingField(100)
+    freeParking.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit ChanceField and return 0" in {
+    val chance = ChanceField(7)
+    chance.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit CommunityChestField and return 0" in {
+    val cc = CommunityChestField(8)
+    cc.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit TaxField and return amount" in {
+    val tax = TaxField(75, 4)
+    tax.accept(rentVisitor) shouldBe 75
+  }
+
+  "visit GoField and return 0" in {
+    GoField.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit JailField and return 0" in {
+    JailField.accept(rentVisitor) shouldBe 0
   }
 
   "A BuyableField" should {
