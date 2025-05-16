@@ -105,18 +105,10 @@ case class PropertyDecisionState() extends GameState {
 // State when buying a property
 case class BuyPropertyState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    val field = controller.board.fields(controller.currentPlayer.position-1)/*Hallo*/
+    val field = controller.board.fields(controller.currentPlayer.position-1)
     field match {
-      case pf: PropertyField =>
-        val command = BuyPropertyCommand(controller, pf, controller.currentPlayer)
-        command.execute()
-        AdditionalActionsState()
-      case tf: TrainStationField =>
-        val command = BuyTrainStationCommand(controller,tf, controller.currentPlayer)
-        command.execute()
-        AdditionalActionsState()
-      case uf: UtilityField =>
-        val command = BuyUtilityCommand(controller, uf, controller.currentPlayer)
+      case buyableField: BuyableField =>
+        val command = BuyCommand(controller, buyableField, controller.currentPlayer)
         command.execute()
         AdditionalActionsState()
       case _ =>
