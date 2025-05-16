@@ -37,10 +37,10 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     PropertyField("Orange2", 19, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     PropertyField("Orange3", 20, 100, 10, None, color = Orange, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     FreeParkingField(0),
-    PropertyField("Red1", 22, 100, 10, None, color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Red1", 22, 100, 10, Some(player1), color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     ChanceField(23),
-    PropertyField("Red2", 24, 100, 10, None, color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-    PropertyField("Red3", 25, 100, 10, None, color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Red2", 24, 100, 10, Some(player1), color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Red3", 25, 100, 10, Some(player1), color = Red, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     TrainStationField("King's Cross Station", 26, 200, None),
     PropertyField("Yellow1", 27, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     UtilityField("Water Works", 28, 150, UtilityField.UtilityCheck.utility, None),
@@ -103,11 +103,166 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       state shouldBe a[AdditionalActionsState]
     }
 
-    "go to AdditionalActionsState after GoToJailField" in {
+    "go to EndTurnState after GoToJailField" in {
       controller.updatePlayer(player1.copy(position = 30)) // GoToJail
       val state = MovingState(() => (1, 0)).handle("", controller)
-      state shouldBe a[AdditionalActionsState]
+      state shouldBe a[EndTurnState]
       controller.currentPlayer.isInJail shouldBe true
+    }
+
+    "use JailTurnStrategy when player is in jail" in {
+      val jailedPlayer = player1.copy(isInJail = true)
+      controller.updatePlayer(jailedPlayer)
+
+      val state = MovingState(() => (3, 3)).handle("", controller)
+
+      controller.currentPlayer.isInJail shouldBe false
+      state should not be a[JailState]
+    }
+  }
+
+  "BuyHouseState" should {
+
+    "buy a house on a property field and return AdditionalActionsState" in {
+
+      val state = BuyHouseState().handle("22", controller) // input.toInt - 1 = 1 → "brown1"
+      state shouldBe a[AdditionalActionsState]
+
+      val updatedField = controller.board.fields(21).asInstanceOf[PropertyField]
+      updatedField.house.amount should be > 0
+    }
+
+    "return EndTurnState if field is not a property field" in {
+      val jailFieldIndex = 11 // JailField bei Index 10 → input = 11
+      val state = BuyHouseState().handle(jailFieldIndex.toString, controller)
+      state shouldBe a[EndTurnState]
+    }
+  }
+
+  "AdditionalActionsState" should {
+
+    "return BuyHouseState when input is '1'" in {
+      val state = AdditionalActionsState().handle("1", controller)
+      state shouldBe a[BuyHouseState]
+    }
+
+    "return EndTurnState when input is not '1'" in {
+      val state1 = AdditionalActionsState().handle("0", controller)
+      val state2 = AdditionalActionsState().handle("abc", controller)
+      val state3 = AdditionalActionsState().handle("", controller)
+
+      state1 shouldBe a[EndTurnState]
+      state2 shouldBe a[EndTurnState]
+      state3 shouldBe a[EndTurnState]
+    }
+  }
+
+  "BuyPropertyState" should {
+
+    "execute BuyPropertyCommand and return AdditionalActionsState for PropertyField" in {
+      controller.updatePlayer(player1.copy(position = 2))
+      val state = BuyPropertyState().handle("", controller)
+      state shouldBe a[AdditionalActionsState]
+    }
+
+    "execute BuyTrainStationCommand and return AdditionalActionsState for TrainStationField" in {
+      controller.updatePlayer(player1.copy(position = 6))
+      val state = BuyPropertyState().handle("", controller)
+      state shouldBe a[AdditionalActionsState]
+    }
+
+    "execute BuyUtilityCommand and return AdditionalActionsState for UtilityField" in {
+      controller.updatePlayer(player1.copy(position = 13))
+      val state = BuyPropertyState().handle("", controller)
+      state shouldBe a[AdditionalActionsState]
+    }
+
+    "return AdditionalActionsState for non-buyable field" in {
+      controller.updatePlayer(player1.copy(position = 1))
+      val state = BuyPropertyState().handle("", controller)
+      state shouldBe a[AdditionalActionsState]
+    }
+  }
+
+  "PropertyDecisionState" should {
+
+    "return BuyPropertyState when input is 'y' or 'j'" in {
+      val stateY = PropertyDecisionState().handle("y", controller)
+      val stateJ = PropertyDecisionState().handle("j", controller)
+
+      stateY shouldBe a[BuyPropertyState]
+      stateJ shouldBe a[BuyPropertyState]
+    }
+
+    "return AdditionalActionsState for any other input" in {
+      val state1 = PropertyDecisionState().handle("n", controller)
+      val state2 = PropertyDecisionState().handle("no", controller)
+      val state3 = PropertyDecisionState().handle("", controller)
+
+      state1 shouldBe a[AdditionalActionsState]
+      state2 shouldBe a[AdditionalActionsState]
+      state3 shouldBe a[AdditionalActionsState]
+    }
+  }
+
+  "JailState" should {
+
+    "return RollingState if player pays to leave jail and has enough money" in {
+      val richPlayer = player1.copy(balance = 100, isInJail = true)
+      controller.updatePlayer(richPlayer)
+      val state = JailState().handle("1", controller)
+      state shouldBe a[RollingState]
+    }
+
+    "stay in JailState if player tries to pay with insufficient balance" in {
+      val poorPlayer = player1.copy(balance = 10, isInJail = true)
+      controller.updatePlayer(poorPlayer)
+      val state = JailState().handle("1", controller)
+      state shouldBe a[JailState]
+    }
+
+    "return MovingState if player rolls doubles" in {
+      val doubler = () => (3, 3)
+      controller.updatePlayer(player1.copy(isInJail = true))
+      val strategy = JailTurnStrategy()
+      val updated = strategy.executeTurn(controller.currentPlayer, doubler)
+      controller.updatePlayer(updated)
+
+      val state = JailState().handle("3", controller)
+      if (!controller.currentPlayer.isInJail)
+        state shouldBe a[MovingState]
+      else
+        fail("Expected player to leave jail after rolling doubles")
+    }
+
+    "stay in JailState if player rolls and does not roll doubles" in {
+      val nonDoubler = () => (2, 3)
+      controller.updatePlayer(player1.copy(isInJail = true))
+
+      val state = JailState().handle("3", controller)
+      if (controller.currentPlayer.isInJail)
+        state shouldBe a[JailState]
+      else
+        fail("Expected player to stay in jail after not rolling doubles")
+    }
+
+    "stay in JailState on unrecognized input" in {
+      controller.updatePlayer(player1.copy(isInJail = true))
+      val state = JailState().handle("invalid", controller)
+      state shouldBe a[JailState]
+    }
+
+    "handle if controller is not right initilized" in {
+      val fakeDice = new Dice() {
+        override def rollDice(withSound: Boolean): (Int, Int) = (6, 6)
+      }
+
+      val controller = new Controller(initialGame, fakeDice)
+      controller.updatePlayer(player1.copy(isInJail = true))
+
+      val state = JailState().handle("3", controller)
+
+      state shouldBe a[MovingState]
     }
   }
 }

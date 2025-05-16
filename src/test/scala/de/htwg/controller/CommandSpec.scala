@@ -99,7 +99,6 @@ class CommandSpec extends AnyWordSpec {
     }
 
     "when BuyHouseCommand is executed" should {
-      // Zuerst müssen wir ein Grundstück kaufen, um dann ein Haus darauf bauen zu können
       val propertyField = fields(11).asInstanceOf[PropertyField]
       val buyHouseCommand = BuyHouseCommand(controller, propertyField, player1)
 
@@ -107,11 +106,9 @@ class CommandSpec extends AnyWordSpec {
         val initialMoney = findPlayer(player1.name).balance
         buyHouseCommand.execute()
 
-        // Überprüfe, dass ein Haus auf dem Grundstück steht
         val updatedField = getFieldAt(propertyField.index).asInstanceOf[PropertyField]
         updatedField.house.amount should be > 0
 
-        // Überprüfe, dass das Geld für das Haus abgezogen wurde
         findPlayer(player1.name).balance should be < initialMoney
       }
 
@@ -119,11 +116,9 @@ class CommandSpec extends AnyWordSpec {
         val moneyBeforeUndo = findPlayer(player1.name).balance
         buyHouseCommand.undo()
 
-        // Überprüfe, dass kein Haus mehr auf dem Grundstück steht
         val restoredField = getFieldAt(propertyField.index).asInstanceOf[PropertyField]
         restoredField.house.amount shouldBe 0
 
-        // Überprüfe, dass das Geld wiederhergestellt wurde
         findPlayer(player1.name).balance shouldBe (moneyBeforeUndo + propertyField.house.calculateHousePrice(propertyField.price))
       }
     }
