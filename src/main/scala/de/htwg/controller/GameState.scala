@@ -3,7 +3,15 @@ package de.htwg.controller
 import de.htwg.model.*
 import de.htwg.controller.TurnInfo
 import de.htwg.util.util.Observable
-import de.htwg.controller._
+import de.htwg.controller.*
+import de.htwg.controller.StartTurnState // Import des GameState-Traits
+import de.htwg.controller.RollingState // Import des RollingState (falls verwendet)
+import de.htwg.controller.JailState // Import des JailState (falls verwendet)
+import de.htwg.controller.MovingState // Import des MovingState (falls verwendet)
+import de.htwg.controller.PayJailHandler
+import de.htwg.controller.RollDoublesJailHandler
+import de.htwg.controller.InvalidJailInputHandler
+
 
 sealed trait GameState {
   def handle(input: String, controller: Controller): GameState
@@ -20,29 +28,18 @@ case class StartTurnState() extends GameState {
   }
 }
 
-// State when player is in jail
+// Der GameState für den Jail-Zustand, der die Kette verwendet
 case class JailState() extends GameState {
-  def handle(input: String, controller: Controller): GameState = {
-    input match {
-      case "1" => // Pay to get out
-        if (controller.currentPlayer.balance >= 50) {
-          val command = PayJailFeeCommand(controller, controller.currentPlayer)
-          command.execute()
-          RollingState()
-        } else {
-          this // Stay in jail if can't pay
-        }
-      case "3" => // Try to roll doubles
-        val strategy = JailTurnStrategy()
-        val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
-        controller.updatePlayer(updatedPlayer)
-        if (!updatedPlayer.isInJail) {
-          MovingState(() => controller.dice.rollDice(controller.sound))
-        } else {
-          this
-        }
-      case _ => this
-    }
+  override def handle(input: String, controller: Controller): GameState = {
+    val payHandler = PayJailHandler(controller)
+    val rollHandler = RollDoublesJailHandler(controller)
+    val invalidHandler = InvalidJailInputHandler(controller)
+
+    // Aufbau der Kette
+    payHandler.setNext(rollHandler).setNext(invalidHandler)
+
+    // Start der Kette und Behandlung der Eingabe
+    payHandler.handle(input).getOrElse(this) // Fallback auf den aktuellen Zustand, falls die Kette None zurückgibt (was im obigen Aufbau nicht passieren sollte)
   }
 }
 
