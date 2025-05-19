@@ -1,23 +1,22 @@
 package de.htwg.controller
-import de.htwg.model.{Player}
+import de.htwg.model.{Dice, Player}
 
 trait TurnStrategy {
   def executeTurn(player: Player, dice: () => (Int, Int)): Player
 }
 case class RegularTurnStrategy() extends TurnStrategy {
   override def executeTurn(player: Player, dice: () => (Int, Int)): Player = {
-    if (!player.isInJail) {
-      val (diceA, diceB) = dice()
-      val updatedPlayer = if ((player.position + diceA + diceB) > 40)
-        player.copy(balance = player.balance + 200)
-      else player
+    if (player.isInJail) return player
 
-      val newPlayer = updatedPlayer.moveToIndex((player.position + diceA + diceB) % 40)
-      if (diceA == diceB) {
-        return newPlayer.playerMove(dice, 1)
-      }
-      newPlayer
-    } else player
+    val (diceA, diceB) = dice()
+
+    val newPosition = (player.position + diceA + diceB) % 40
+    val updatedPlayer = if ((player.position + diceA + diceB) > 40) {
+      player.copy(balance = player.balance + 200)
+    } else {
+      player
+    }
+    updatedPlayer.moveToIndex(newPosition)
   }
 }
 
