@@ -96,7 +96,6 @@ trait Command {
       val updatedPlayer = player.copy(
         isInJail = false,
         balance = player.balance - 50,
-        jailTurns = 0
       )
         controller.updatePlayer(updatedPlayer)
     }

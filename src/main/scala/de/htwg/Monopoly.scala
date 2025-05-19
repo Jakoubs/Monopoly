@@ -56,7 +56,7 @@ object Monopoly:
 
     for (i <- 1 to playerAnz) {
       val playerName = randomEmoji(playerVector)
-      playerVector = playerVector.appended(Player(playerName, 1500, 1,false,0,0))
+      playerVector = playerVector.appended(Player(playerName, 1500, 1,false,0))
       println(s"Spieler $playerName hinzugefügt.")
     }
 

@@ -118,12 +118,13 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
 // State when player needs to decide whether to buy a property
 case class PropertyDecisionState(isDouble: Boolean = false) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    input.toLowerCase match {
-      case "y" | "j" => // Yes/ja
-        BuyPropertyState(isDouble)
-      case _ => // No
-        AdditionalActionsState(isDouble)
-    }
+    
+      input.toLowerCase match {
+        case "y" | "j" => // Yes/ja
+          BuyPropertyState(isDouble)
+        case _ => // No
+          AdditionalActionsState(isDouble)
+      }
   }
 }
 

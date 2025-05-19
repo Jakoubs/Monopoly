@@ -7,7 +7,6 @@ case class Player(name: String,
                   balance: Int,
                   position: Int = 1,
                   isInJail: Boolean = false,
-                  jailTurns: Int = 0 ,
                   consecutiveDoubles: Int
                  ) {
 
@@ -28,7 +27,7 @@ case class Player(name: String,
   def resetDoubles(): Player = copy(consecutiveDoubles = 0)
 
   def releaseFromJail(): Player = {
-    val newPlayer = this.copy(isInJail = false, jailTurns = 0)
+    val newPlayer = this.copy(isInJail = false)
     newPlayer
   }
   def changeBalance(amount: Int): Player = {

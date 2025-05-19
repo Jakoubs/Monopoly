@@ -28,13 +28,13 @@ case class JailTurnStrategy() extends TurnStrategy {
         player.releaseFromJail()
           .moveToIndex((player.position + diceA + diceB) % 40)
       } else {
-        val jailTurns = player.jailTurns + 1
+        val jailTurns = player.consecutiveDoubles + 1
         if (jailTurns >= 3) {
-          player.copy(jailTurns = 0)
+          player.copy(consecutiveDoubles = 0)
             .changeBalance(-50)
             .releaseFromJail()
         } else {
-          player.copy(jailTurns = jailTurns)
+          player.copy(consecutiveDoubles = jailTurns)
         }
       }
     } else player

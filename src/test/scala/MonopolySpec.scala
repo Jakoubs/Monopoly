@@ -61,9 +61,9 @@ class MonopolySpec extends AnyWordSpec {
   "Monopoly" should{
     "initialize a game with correct number of players" in {
       val game = MonopolyGame(
-        Vector(Player("🐶", 1500, 1), Player("🐱", 1500, 1)),
+        Vector(Player("🐶", 1500, 1,false,0), Player("🐱", 1500, 1,false,0)),
         Board(Vector(GoField)),
-        Player("🐶", 1500, 1),
+        Player("🐶", 1500, 1,false,0),
         false
       )
       game.players.size should be(2)
