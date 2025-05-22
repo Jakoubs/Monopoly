@@ -110,6 +110,48 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       boardString shouldBe a[String]
       boardString should not be empty
     }
+    "correctly return owned properties grouped by player" in {
+      val prop1 = PropertyField("brown1", 2, 100, 10, Some(player1), color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
+      val prop2 = PropertyField("brown2", 4, 100, 10, Some(player2), color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
+      val prop3 = PropertyField("brown3", 5, 100, 10, Some(player1), color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
 
+      val testFields = Vector(GoField, prop1, prop2, prop3, JailField)
+      val testBoard = Board(testFields)
+      val testGame = MonopolyGame(Vector(player1, player2), testBoard, player1, sound = false)
+      val testController = new Controller(testGame, dice)
+
+      val ownedProps = testController.getOwnedProperties()
+      ownedProps(player1) should contain allOf(prop1, prop3)
+      ownedProps(player2) should contain(prop2)
+    }
+
+    "correctly count owned train stations per player" in {
+      val ts1 = TrainStationField("Station 1", 6, 200, Some(player1))
+      val ts2 = TrainStationField("Station 2", 7, 200, Some(player1))
+      val ts3 = TrainStationField("Station 3", 8, 200, Some(player2))
+
+      val testFields = Vector(GoField, ts1, ts2, ts3, JailField)
+      val testBoard = Board(testFields)
+      val testGame = MonopolyGame(Vector(player1, player2), testBoard, player1, sound = false)
+      val testController = new Controller(testGame, dice)
+
+      val ownedStations = testController.getOwnedTrainStations()
+      ownedStations(player1) shouldBe 2
+      ownedStations(player2) shouldBe 1
+    }
+
+    "correctly count owned utilities per player" in {
+      val util1 = UtilityField("Utility 1", 10, 150, UtilityField.UtilityCheck.utility, Some(player1))
+      val util2 = UtilityField("Utility 2", 11, 150, UtilityField.UtilityCheck.utility, Some(player2))
+
+      val testFields = Vector(GoField, util1, util2, JailField)
+      val testBoard = Board(testFields)
+      val testGame = MonopolyGame(Vector(player1, player2), testBoard, player1, sound = false)
+      val testController = new Controller(testGame, dice)
+
+      val ownedUtils = testController.getOwnedUtilities()
+      ownedUtils(player1) shouldBe 1
+      ownedUtils(player2) shouldBe 1
+    }
   }
 }

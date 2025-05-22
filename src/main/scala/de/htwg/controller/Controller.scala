@@ -72,6 +72,31 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
         s"In Jail: ${if (p.isInJail) "Yes" else "No"}"
   }
 
+  def getOwnedProperties(): Map[Player, List[PropertyField]] = {
+    board.fields.collect {
+        case p: PropertyField if p.owner.isDefined => (p.owner.get, p)
+      }.groupBy(_._1)
+      .map { case (player, tuples) => player -> tuples.map(_._2).toList }
+  }
+
+  def getOwnedTrainStations(): Map[Player, Int] = {
+    board.fields.collect {
+        case t: TrainStationField if t.owner.isDefined => (t.owner.get, 1)
+      }.groupBy(_._1)
+      .view
+      .mapValues(_.size)
+      .toMap
+  }
+
+  def getOwnedUtilities(): Map[Player, Int] = {
+    board.fields.collect {
+        case u: UtilityField if u.owner.isDefined => (u.owner.get, 1)
+      }.groupBy(_._1)
+      .view
+      .mapValues(_.size)
+      .toMap
+  }
+
 
 }
 
