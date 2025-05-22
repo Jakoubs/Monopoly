@@ -56,7 +56,6 @@ case class RollingState() extends GameState {
         diceRoll2 = d2
       )
     )
-    controller.notifyObservers()
 
     if (isDouble) {
       val player = controller.currentPlayer
@@ -111,14 +110,13 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
             if (updatedPlayer.balance >= rent) {
               val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
               val receivingPlayer = owner.copy(balance = owner.balance + rent)
-              controller.updatePlayer(payingPlayer)
               controller.updatePlayer(receivingPlayer)
+              controller.updatePlayer(payingPlayer)
               controller.updateTurnInfo(controller.getTurnInfo.copy(paidRent = Some(rent), rentPaidTo = Some(owner)))
-              controller.notifyObservers()
             } else {
               controller.isGameOver
             }
-            EndTurnState()
+          AdditionalActionsState(isDouble)
           case None => PropertyDecisionState()
           case _ => AdditionalActionsState()
         }
@@ -207,6 +205,7 @@ case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) ext
           EndTurnState()
         }
     }
+
   }
 }
 
