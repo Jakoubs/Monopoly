@@ -3,13 +3,14 @@ package de.htwg.controller
 import de.htwg.controller.Controller
 import de.htwg.controller.PayJailFeeCommand
 import de.htwg.controller.JailTurnStrategy
+import de.htwg.controller.OpEnum.roll
 import de.htwg.model.Player
 
 abstract class ActionHandler {
   val controller: Controller
   var nextHandler: Option[ActionHandler] // nextHandler ist jetzt var
 
-  def handle(input: String): Option[GameState]
+  def handle(input: OpEnum): Option[GameState]
 
   def setNext(handler: ActionHandler): ActionHandler = {
     this match {
@@ -24,8 +25,8 @@ abstract class ActionHandler {
 }
 
 case class PayJailHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
-  override def handle(input: String): Option[GameState] = {
-    if (input == "1") {
+  override def handle(input: OpEnum): Option[GameState] = {
+    if (input == OpEnum.pay) {
       if (controller.currentPlayer.balance >= 50) {
         val command = PayJailFeeCommand(controller, controller.currentPlayer)
         command.execute()
@@ -40,8 +41,8 @@ case class PayJailHandler(override val controller: Controller, var nextHandler: 
 }
 
 case class RollDoublesJailHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
-  override def handle(input: String): Option[GameState] = {
-    if (input == "3") {
+  override def handle(input: OpEnum): Option[GameState] = {
+    if (input == OpEnum.roll) {
       val strategy = JailTurnStrategy()
       val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
       controller.updatePlayer(updatedPlayer)
@@ -57,7 +58,7 @@ case class RollDoublesJailHandler(override val controller: Controller, var nextH
 }
 
 case class InvalidJailInputHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
-  override def handle(input: String): Option[GameState] = {
+  override def handle(input: OpEnum): Option[GameState] = {
     Some(JailState()) 
   }
 }

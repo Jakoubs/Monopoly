@@ -2,6 +2,7 @@ package de.htwg.view
 
 import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState, TurnInfo}
 import de.htwg.util.util.Observer
+import de.htwg.controller.OpEnum
 
 import scala.io.StdIn.readLine
 
@@ -18,48 +19,88 @@ class Tui(controller: Controller) extends Observer {
           println("You're in jail! Options:")
           println("1. Pay €50 to get out")
           println("3. Try to roll doubles")
-          controller.handleInput(readLine())
+          val input = readLine()
+          input match {
+            case "1" => controller.handleInput(OpEnum.pay)
+            case "3" => controller.handleInput(OpEnum.roll)
+            case _ => controller.handleInput(OpEnum.pay)
+          }
 
         case _: PropertyDecisionState =>
           println(s"You moved to position ${controller.currentPlayer.position} and are now on the field ${controller.board.fields(controller.currentPlayer.position-1).name}.")
           println(s"Would you like to buy ${controller.board.fields(controller.currentPlayer.position-1).name}? (y/n)")
-          controller.handleInput(readLine())
-
+          val input = readLine()
+          input match {
+            case "y" => controller.handleInput(OpEnum.y)
+            case "n" => controller.handleInput(OpEnum.n)
+            case _ => controller.handleInput(OpEnum.n)
+          }
         case _: AdditionalActionsState =>
           println("Additional actions:")
           println("1. Buy house")
           println("2. End turn")
-          controller.handleInput(readLine())
-          
+          val input = readLine()
+          input match {
+            case "1" => controller.handleInput(OpEnum.buy)
+            case "2" => controller.handleInput(OpEnum.end)
+            case _ => controller.handleInput(OpEnum.end)
+          }
         case _: RollingState =>
           println("Press enter to roll a dice")
-          controller.handleInput(readLine())
-
+          val input = readLine()
+          input match {
+            case "" => controller.handleInput(OpEnum.enter)
+            case _ => controller.handleInput(OpEnum.enter)
+          }
         case _: MovingState =>
           displayTurnInfo()
           println("Your now moving. Press enter to continue...")
-          controller.handleInput(readLine())
-
+          val input = readLine()
+          input match {
+            case "" => controller.handleInput(OpEnum.enter)
+            case _ => controller.handleInput(OpEnum.enter)
+          }
         case _: BuyPropertyState =>
           println("You bought a property. Press enter to continue...")
-          controller.handleInput(readLine())
-
+          val input = readLine()
+          input match {
+            case "" => controller.handleInput(OpEnum.enter)
+            case _ => controller.handleInput(OpEnum.enter)
+          }
         case _: EndTurnState =>
           println("Turn ended. Switch to next player.")
-          controller.handleInput(readLine())
-
+          val input = readLine()
+          input match {
+            case "" => controller.handleInput(OpEnum.enter)
+            case _ => controller.handleInput(OpEnum.enter)
+          }
         case _: BuyHouseState =>
           println("Which House do you want to buy? (1-40)")
-          controller.handleInput(readLine())
+          val input = readLine()
+
+          val houseNumber: Int = input.toIntOption match {
+            case Some(num) if num >= 1 && num <= 40 => num
+            case _ =>
+              println("Invalid input. Defaulting to house 1.")
+              1
+          }
+          controller.handleInput(OpEnum.fieldSelected(houseNumber))
 
         case _: ConfirmBuyHouseState =>
           println("Do you want to Undo the House purchase? (y/n)")
-          controller.handleInput(readLine())
-
+          val input = readLine()
+          input match {
+            case "" => controller.handleInput(OpEnum.y)
+            case "n" => controller.handleInput(OpEnum.n)
+            case _ => controller.handleInput(OpEnum.n)
+          }
         case _ =>
           println("Press enter to continue...")
-          controller.handleInput(readLine())
-      }
+          val input = readLine()
+          input match {
+            case "" => controller.handleInput(OpEnum.enter)
+            case _ => controller.handleInput(OpEnum.enter)
+          }      }
     }
 
     val winner = controller.game.players.find(_.balance > 0).getOrElse(controller.game.players.head)

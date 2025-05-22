@@ -7,6 +7,17 @@ import de.htwg.util.util.Observable
 import de.htwg.controller.GameState
 import java.awt.Choice
 import scala.io.StdIn.readLine
+
+enum OpEnum:
+  case roll
+  case pay
+  case buy
+  case end
+  case y
+  case n
+  case enter
+  case fieldSelected(id: Int)
+  
 case class TurnInfo(
                      diceRoll1: Int = 0,
                      diceRoll2: Int = 0,
@@ -30,9 +41,8 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def board: Board = game.board
   def players: Vector[Player] = game.players
   def sound: Boolean = game.sound
-
-  def handleInput(input: String): Unit = {
-    state = state.handle(input, this)
+  def handleInput(input: OpEnum): Unit = {
+    state = state.handle(input, this)  // Jetzt funktioniert das!
     notifyObservers()
   }
 
