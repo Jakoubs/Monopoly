@@ -1,6 +1,8 @@
 package de.htwg.controller
 
 import de.htwg.model.{BuyableField, Player, PropertyField, TrainStationField, UtilityField}
+import scala.util.{Try, Success, Failure}
+
 
 trait Command {
   def execute(): Unit
@@ -33,8 +35,12 @@ trait Command {
 
     def execute(): Unit = {
       previousState = Some((field, player))
-      val (updatedField, updatedPlayer) = PropertyField.House().buyHouse(player, field, controller.game)
-      controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+
+      PropertyField.House().buyHouse(player, field, controller.game) match {
+        case Success((updatedField: PropertyField, updatedPlayer: Player)) =>
+          controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        case Failure(exception) =>
+      }
     }
 
     def undo(): Unit = {

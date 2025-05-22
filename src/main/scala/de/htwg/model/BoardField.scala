@@ -1,6 +1,7 @@
 package de.htwg.model
 import de.htwg.MonopolyGame
 import de.htwg.model.PropertyField.*
+import scala.util.{Try, Success, Failure}
 
 trait BuyableField extends BoardField {
   val price: Int
@@ -39,27 +40,39 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
       }
-      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): (PropertyField, Player) = {
-        if (player.balance < calculateHousePrice(field.price) || amount >= maxHouses) {
-          (field, player)
-        } else {
-          if (field.owner.exists(_.name == player.name)) {
-            val colorGroup = game.board.fields.collect {
-              case pf: PropertyField if pf.color == field.color => pf
-            }
-            val ownsAll = colorGroup.forall(_.owner.exists(_.name == player.name))
-
-              if (ownsAll && field.house.amount < maxHouses) {
-                val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
-                val updatedPlayer = player.copy(balance = player.balance - calculateHousePrice(field.price))
-                (updatedField,updatedPlayer)
-              } else {
-              (field, player)
-              }
-          }else {
-            (field, player)
-          }
+      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): Try[(PropertyField, Player)] = Try {
+        // Check 1: Does the player own the property?
+        val ownsProperty = field.owner.exists(_.name == player.name)
+        if (!ownsProperty) {
+          throw new IllegalArgumentException(s"${player.name} does not own ${field.name}.")
         }
+
+        val housePrice = calculateHousePrice(field.price)
+
+        // Check 2: Does the player have enough money?
+        if (player.balance < housePrice) {
+          throw new IllegalArgumentException(s"${player.name} does not have enough money to buy a house on ${field.name}. Needed: $housePrice, Has: ${player.balance}.")
+        }
+
+        // Check 3: Can a house be built (maxHouses)?
+        if (field.house.amount >= maxHouses) {
+          throw new IllegalArgumentException(s"${field.name} already has the maximum number of houses ($maxHouses).")
+        }
+
+        // Check 4: Does the player own all properties in the color group?
+        val colorGroupProperties = game.board.fields.collect {
+          case pf: PropertyField if pf.color == field.color => pf
+        }
+        val ownsEntireColorGroup = colorGroupProperties.forall(_.owner.exists(_.name == player.name))
+
+        if (!ownsEntireColorGroup) {
+          throw new IllegalArgumentException(s"${player.name} must own all properties in the ${field.color} group to build houses on ${field.name}.")
+        }
+
+        // If all checks pass, proceed with the purchase
+        val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
+        val updatedPlayer = player.copy(balance = player.balance - housePrice)
+        (updatedField, updatedPlayer)
       }
     }
 

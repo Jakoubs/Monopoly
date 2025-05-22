@@ -111,8 +111,8 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
             if (updatedPlayer.balance >= rent) {
               val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
               val receivingPlayer = owner.copy(balance = owner.balance + rent)
-              controller.updatePlayer(payingPlayer)
               controller.updatePlayer(receivingPlayer)
+              controller.updatePlayer(payingPlayer)
               controller.updateTurnInfo(controller.getTurnInfo.copy(paidRent = Some(rent), rentPaidTo = Some(owner)))
               controller.notifyObservers()
             } else {
@@ -216,3 +216,5 @@ case class EndTurnState() extends GameState {
     StartTurnState()
   }
 }
+
+
