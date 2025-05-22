@@ -8,6 +8,8 @@ import de.htwg.model.PropertyField.*
 import de.htwg.model.PropertyField.Color.*
 import de.htwg.model.PropertyField.{House, Mortgage}
 
+import scala.util.{Try,Success, Failure}
+
 class BoardFieldSpec extends AnyWordSpec {
 
   val dummyPlayer = Player("dummy", 1500, 0, isInJail = false, 0)
@@ -16,6 +18,7 @@ class BoardFieldSpec extends AnyWordSpec {
   val dice = new Dice()
   val player1 = Player("Player 1", 1500, 1, isInJail = false, 0)
   val player2 = Player("Player 2", 1500, 1, isInJail = false, 0)
+  val player3 = Player("Player 3", 5, 1, isInJail = false, 0)
   val fields = Vector(
     GoField,
     PropertyField("brown1", 2, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0)),
@@ -48,19 +51,19 @@ class BoardFieldSpec extends AnyWordSpec {
     PropertyField("Yellow2", 29, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     PropertyField("Yellow3", 30, 100, 10, None, color = Yellow, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     GoToJailField(),
-    PropertyField("Green1", 32, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Green1", 32, 100, 10, Some(player2), color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     PropertyField("Green2", 33, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     CommunityChestField(34),
     PropertyField("Green3", 35, 100, 10, None, color = Green, PropertyField.Mortgage(10, false), PropertyField.House(0)),
-    TrainStationField("Liverpool ST Station", 36, 200, None),
+    TrainStationField("Liverpool ST Station", 36, 200, Some(otherPlayer)),
     ChanceField(37),
-    PropertyField("DarkBlue1", 38, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("DarkBlue1", 38, 100, 10, Some(player3), color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0)),
     TaxField(200, 39),
-    PropertyField("DarkBlue2", 40, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0))
+    PropertyField("DarkBlue2", 40, 100, 10, Some(player3), color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0))
   )
 
   val board = Board(fields)
-  val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
+  val initialGame = MonopolyGame(Vector(player1, player2,player3), board, player1, sound = false)
   val controller = new Controller(initialGame, dice)
 
   val ownedProperties: Map[Player, List[PropertyField]] =
@@ -105,46 +108,73 @@ class BoardFieldSpec extends AnyWordSpec {
       f1.house.amount should be(0)
       f1.mortgage.active should be(false)
     }
-    "buildHomes" in {
-      val (newp,newf) = PropertyField.House().buyHouse(player1, fields(21).asInstanceOf[PropertyField], initialGame)
-      controller.updateBoardAndPlayer(newp,newf)
-      val updatedField = controller.game.board.fields(21).asInstanceOf[PropertyField]
-      updatedField.house.amount should be(1)
-      val updatedPlayer = controller.game.players.find(_.name == player1.name).get
-      updatedPlayer.balance should be(1450)
-    }
 
     "not build house if player is not the owner" in {
-      val (newp, newf) = PropertyField.House().buyHouse(player1, fields(16).asInstanceOf[PropertyField], initialGame)
-      controller.updateBoardAndPlayer(newp, newf)
-      val updatedField = controller.game.board.fields(16).asInstanceOf[PropertyField]
-      updatedField.house.amount should be(0)
-      val updatedPlayer = controller.game.players.find(_.name == player1.name).get
-      updatedPlayer.balance should be(1500)
+      val initialField = fields(31).asInstanceOf[PropertyField]
+
+      val result: Try[(PropertyField, Player)] = PropertyField.House().buyHouse(player1, initialField, initialGame)
+
+      result match {
+        case Success((newf, newp)) =>
+          fail("Should not have succeeded in buying a house on a property the player doesn't own.")
+        case Failure(exception) =>
+          exception.getMessage should include(s"${player1.name} does not own ${initialField.name}.")
+          val updatedField = controller.game.board.fields(31).asInstanceOf[PropertyField]
+          updatedField.house.amount should be(0)
+          val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+          updatedPlayer.balance should be(1500)
+      }
     }
 
-    "not buildHomes if balance is to low" in {
-      val p1 = Player("TestPlayer", 0, 5)
-      val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000))
-      val (newf1, newp1) = PropertyField.House().buyHouse(p1,f1,initialGame)
+    "not buildHomes if balance is too low" in {
+      val result: Try[(PropertyField, Player)] = PropertyField.House().buyHouse(player3,controller.game.board.fields(39).asInstanceOf[PropertyField], initialGame)
 
-      controller.updateBoardAndPlayer(newf1, newp1)
-      val updatedField = controller.game.board.fields(newf1.index-1).asInstanceOf[PropertyField]
-      updatedField.house.amount should be(0)
-      val updatedPlayer = controller.game.players.find(_.name == p1.name).get
-      updatedPlayer.balance should be(0)
+      result match {
+        case Success((newf1, newp1)) =>
+          fail("Should not have succeeded in buying a house with insufficient balance.")
+
+        case Failure(exception) =>
+          val updatedField = controller.game.board.fields(39).asInstanceOf[PropertyField]
+          updatedField.house.amount should be(0)
+          val updatedPlayer = controller.game.players.find(_.name == player3.name).get
+          updatedPlayer.balance should be(5)
+      }
     }
+
 
     "not buildHomes if max Hotel" in {
       val p1 = Player("TestPlayer", 1000, 5)
       val f1 = PropertyField("kpAlee", 4, 100, 20, Some(p1), Red, Mortgage(1000), House(5))
-      val (newf1, newp1) = PropertyField.House().buyHouse(p1,f1,initialGame)
-      controller.updateBoardAndPlayer(newf1, newp1)
-      val updatedField = controller.game.board.fields(newf1.index - 1).asInstanceOf[PropertyField]
-      updatedField.house.amount should be(5)
-      val updatedPlayer = controller.game.players.find(_.name == p1.name).get
-      updatedPlayer.balance should be(1000)
+      val result: Try[(PropertyField, Player)] = PropertyField.House().buyHouse(p1, f1, initialGame)
+
+      result match {
+        case Success(_) =>
+          fail("Expected failure due to max houses, but succeeded")
+
+        case Failure(exception) =>
+          exception.getMessage should include("maximum number of houses")
+
+          // Original state remains unchanged
+          f1.house.amount should be(5)
+          p1.balance should be(1000)
+      }
     }
+
+    "buildHomes" in {
+      val result: Try[(PropertyField, Player)] = PropertyField.House().buyHouse(player1, fields(21).asInstanceOf[PropertyField], initialGame)
+      result match {
+        case Success((newf, newp)) =>
+          controller.updateBoardAndPlayer(newf, newp)
+          val updatedField = controller.game.board.fields(21).asInstanceOf[PropertyField]
+          updatedField.house.amount should be(1)
+          val updatedPlayer = controller.game.players.find(_.name == player1.name).get
+          updatedPlayer.balance should be(1450)
+
+        case Failure(exception) =>
+          fail(s"Buying a house should have succeeded but failed with: ${exception.getMessage}")
+      }
+    }
+
 
     "calculate house price based on rent correctly" in {
       val f1 = PropertyField("kpAlee", 4, 100, 20, None, Red, Mortgage(1000))

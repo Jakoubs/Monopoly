@@ -90,10 +90,11 @@ class Tui(controller: Controller) extends Observer {
           println("Do you want to Undo the House purchase? (y/n)")
           val input = readLine()
           input match {
-            case "" => controller.handleInput(OpEnum.y)
+            case "y" => controller.handleInput(OpEnum.y)
             case "n" => controller.handleInput(OpEnum.n)
             case _ => controller.handleInput(OpEnum.n)
           }
+
         case _ =>
           println("Press enter to continue...")
           val input = readLine()

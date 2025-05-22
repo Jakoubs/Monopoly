@@ -12,6 +12,7 @@ class PlayerSpec extends AnyWordSpec {
       player.balance should be(1000)
       player.position should be(5)
       player.isInJail should be(false)
+      player.consecutiveDoubles should be(0)
     }
 
     "be able to change position index when not in jail" in {
@@ -19,6 +20,12 @@ class PlayerSpec extends AnyWordSpec {
       val updatedPlayer = player.moveToIndex(4)
       updatedPlayer.position shouldEqual 4
       updatedPlayer.isInJail should be(false)
+    }
+
+    "increase consecutiveDoubles when incrementDoubles" in {
+      val player = Player("TestPlayer", 100, 5)
+      val updatedPlayer = player.incrementDoubles()
+      updatedPlayer.consecutiveDoubles shouldEqual 1
     }
 
     "not be able to change index when in jail" in {
@@ -40,56 +47,10 @@ class PlayerSpec extends AnyWordSpec {
       updatedPlayer.position shouldEqual 11
       updatedPlayer.isInJail should be(true)
     }
-
-    "roll the dice and move position" in {
-      val player = Player("TestPlayer", 100)
-      val mockRollDice = () => (3, 4)
-      val updatedPlayer = player.playerMove(mockRollDice)
-      updatedPlayer.position shouldEqual 8
-    }
-
-    "remain in jail when trying to move while jailed" in {
-      val player = Player("TestPlayer", 2000, position = 10, isInJail = true)
-      val mockRollDice = () => (5, 6)
-      val updatedPlayer = player.playerMove(mockRollDice)
-      updatedPlayer.position shouldEqual 10
-      updatedPlayer.isInJail shouldEqual true
-    }
-
-    "move to jail after rolling doubles three times" in {
-      val player = Player("TestPlayer", 1500)
-      val mockRollDice = () => (6, 6)
-
-      val jailedPlayer = player.playerMove(mockRollDice)
-      jailedPlayer.position shouldEqual 11
-      jailedPlayer.isInJail shouldEqual true
-    }
-
-    "never be on index 0" in {
-      val player = Player("TestPlayer", 2000, position = 35)
-      val mockRollDice = () => (2, 3)
-      val updatedPlayer = player.playerMove(mockRollDice)
-      updatedPlayer.position shouldEqual 40
-    }
-
-    "never be on index over 40" in {
-      val player = Player("TestPlayer", 2000, position = 35)
-      val mockRollDice = () => (2, 5)
-      val updatedPlayer = player.playerMove(mockRollDice)
-      updatedPlayer.position shouldEqual 2
-    }
-
     "change balance when collecting money" in {
       val player = Player("TestPlayer", 1000, position = 35)
       val updatedPlayer = player.changeBalance(50)
       updatedPlayer.balance shouldEqual 1050
-    }
-
-    "earn 200 Money when go over Go" in {
-      val player = Player("TestPlayer", 1000, position = 35)
-      val mockRollDice = () => (4, 3)
-      val updatedPlayer = player.playerMove(mockRollDice)
-      updatedPlayer.balance shouldEqual 1200
     }
 
   }
