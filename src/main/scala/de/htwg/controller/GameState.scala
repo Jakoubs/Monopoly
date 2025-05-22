@@ -19,6 +19,9 @@ sealed trait GameState {
 
 case class StartTurnState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
+    val player = controller.currentPlayer.resetDoubles()
+    controller.updatePlayer(player)
+    
     if (controller.currentPlayer.isInJail) {
       JailState()
     } else {
@@ -44,7 +47,9 @@ case class RollingState() extends GameState {
     val command = RollDiceCommand(controller)
     command.execute()
     val (d1, d2) = command.getResult
+    val isDouble = d1 == d2
 
+    // Update turn info
     controller.updateTurnInfo(
       TurnInfo(
         diceRoll1 = d1,
@@ -52,7 +57,24 @@ case class RollingState() extends GameState {
       )
     )
     controller.notifyObservers()
-    MovingState(() => (d1 , d2))
+
+    if (isDouble) {
+      val player = controller.currentPlayer
+      val updatedPlayer = player.incrementDoubles()
+      controller.updatePlayer(updatedPlayer)
+
+      if (updatedPlayer.consecutiveDoubles >= 3) {
+        val jailedPlayer = updatedPlayer.goToJail()
+        controller.updatePlayer(jailedPlayer)
+        return EndTurnState()
+      }
+    } else {
+
+      val updatedPlayer = controller.currentPlayer.resetDoubles()
+      controller.updatePlayer(updatedPlayer)
+    }
+
+    MovingState(() => (d1, d2))
   }
 }
 
@@ -64,8 +86,12 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
       RegularTurnStrategy()
     }
 
-    val updatedPlayer = strategy.executeTurn(controller.currentPlayer, dice)
+    val (d1, d2) = dice()
+    val isDouble = d1 == d2
+
+    val updatedPlayer = strategy.executeTurn(controller.currentPlayer,() => (d1, d2))
     controller.updatePlayer(updatedPlayer)
+
 
     val currentField = controller.board.fields(updatedPlayer.position - 1)
     controller.updateTurnInfo(controller.getTurnInfo.copy(landedField = Some(currentField)))
@@ -101,56 +127,85 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
         controller.updatePlayer(jailedPlayer)
         EndTurnState()
       case _ =>
-        AdditionalActionsState()
+        AdditionalActionsState(isDouble)
     }
   }
 }
 
-case class PropertyDecisionState() extends GameState {
+
+case class PropertyDecisionState(isDouble: Boolean = false) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
-    input.toLowerCase match {
-      case "y" | "j" => // Yes/ja
-        BuyPropertyState()
-      case _ => // No
-        AdditionalActionsState()
-    }
+    
+      input.toLowerCase match {
+        case "y" | "j" => // Yes/ja
+          BuyPropertyState(isDouble)
+        case _ => // No
+          AdditionalActionsState(isDouble)
+      }
   }
 }
 
-case class BuyPropertyState() extends GameState {
+
+case class BuyPropertyState(isDouble: Boolean = false) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     val field = controller.board.fields(controller.currentPlayer.position-1)
     field match {
       case buyableField: BuyableField =>
         val command = BuyCommand(controller, buyableField, controller.currentPlayer)
         command.execute()
-        AdditionalActionsState()
+        AdditionalActionsState(isDouble)
       case _ =>
-        AdditionalActionsState()
+        AdditionalActionsState(isDouble)
     }
   }
 }
 
-case class AdditionalActionsState() extends GameState {
+
+case class AdditionalActionsState(isDouble: Boolean = false) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     input match {
       case "1" => // Buy house
-        BuyHouseState()
+        BuyHouseState(isDouble)
       case _ =>
-        EndTurnState()
+        if (isDouble) {
+          RollingState()
+        } else {
+          EndTurnState()
+        }
     }
   }
 }
 
-case class BuyHouseState() extends GameState {
+// State when buying a house
+case class BuyHouseState(isDouble: Boolean = false) extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     controller.game.board.fields(input.toInt - 1) match {
       case field: PropertyField =>
         val command = BuyHouseCommand(controller, field, controller.currentPlayer)
         command.execute()
-        AdditionalActionsState()
+        ConfirmBuyHouseState(isDouble, command)
       case _ =>
-        EndTurnState()
+        if (isDouble) {
+          RollingState()
+        } else {
+          EndTurnState()
+        }
+    }
+  }
+}
+
+case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) extends GameState {
+  def handle(input: String, controller: Controller): GameState = {
+    input match {
+      case  "y" =>
+        command.undo()
+        AdditionalActionsState(isDouble)
+      case _ =>
+        if (isDouble) {
+          RollingState()
+        } else {
+          EndTurnState()
+        }
     }
   }
 }

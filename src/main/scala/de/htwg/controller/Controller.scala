@@ -62,6 +62,10 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       BoardPrinter.getBoardAsString(game)
   }
 
+  def getInventory: String = {
+    BoardPrinter.getInventoryString(game)
+  }
+
   def getCurrentPlayerStatus: String = {
       val p = currentPlayer
       s"${p.name} | Balance: ${p.balance}€ | Position: ${p.position} | " +
