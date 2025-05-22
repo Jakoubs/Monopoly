@@ -174,6 +174,22 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
       case field: PropertyField =>
         val command = BuyHouseCommand(controller, field, controller.currentPlayer)
         command.execute()
+        ConfirmBuyHouseState(isDouble, command)
+      case _ =>
+        if (isDouble) {
+          RollingState()
+        } else {
+          EndTurnState()
+        }
+    }
+  }
+}
+
+case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) extends GameState {
+  def handle(input: String, controller: Controller): GameState = {
+    input match {
+      case  "y" =>
+        command.undo()
         AdditionalActionsState(isDouble)
       case _ =>
         if (isDouble) {
@@ -184,7 +200,8 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
     }
   }
 }
-  // State when turn ends
+
+// State when turn ends
 case class EndTurnState() extends GameState {
   def handle(input: String, controller: Controller): GameState = {
     controller.switchToNextPlayer()

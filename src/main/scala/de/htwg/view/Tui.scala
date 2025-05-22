@@ -1,6 +1,6 @@
 package de.htwg.view
 
-import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState, TurnInfo}
+import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState, TurnInfo}
 import de.htwg.util.util.Observer
 
 import scala.io.StdIn.readLine
@@ -50,6 +50,10 @@ class Tui(controller: Controller) extends Observer {
 
         case _: BuyHouseState =>
           println("Which House do you want to buy? (1-40)")
+          controller.handleInput(readLine())
+
+        case _: ConfirmBuyHouseState =>
+          println("Do you want to Undo the House purchase? (y/n)")
           controller.handleInput(readLine())
 
         case _ =>
