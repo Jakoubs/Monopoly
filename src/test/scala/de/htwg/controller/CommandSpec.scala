@@ -42,61 +42,78 @@ class CommandSpec extends AnyWordSpec {
     def findPlayer(name: String): Player = controller.game.players.find(_.name == name).get
     def getFieldAt(position: Int): BoardField = controller.game.board.fields(position - 1)
 
-    "when BuyPropertyCommand is executed" should {
-      val propertyField = fields(1).asInstanceOf[PropertyField]
-      val buyPropertyCommand = BuyPropertyCommand(controller, propertyField, player1)
+    "when BuyCommand is executed for a PropertyField" should {
+      val propertyField = fields(1).asInstanceOf[BuyableField]
+      val buyCommand = BuyCommand(controller, propertyField, player1)
 
       "buy the property and update player's money" in {
         val initialMoney = player1.balance
-        buyPropertyCommand.execute()
+        buyCommand.execute()
 
-        // Überprüfe, dass das Feld dem Spieler gehört
-        val updatedField = getFieldAt(propertyField.index).asInstanceOf[PropertyField]
+        val updatedField = getFieldAt(propertyField.index).asInstanceOf[BuyableField]
         updatedField.owner shouldBe Some(player1)
 
-        // Überprüfe, dass das Geld abgezogen wurde
         findPlayer(player1.name).balance shouldBe (initialMoney - propertyField.price)
       }
 
       "restore previous state when undone" in {
-        buyPropertyCommand.undo()
+        buyCommand.undo()
 
-        // Überprüfe, dass das Feld keinen Besitzer hat
-        val restoredField = getFieldAt(propertyField.index).asInstanceOf[PropertyField]
+        val restoredField = getFieldAt(propertyField.index).asInstanceOf[BuyableField]
         restoredField.owner shouldBe None
 
-        // Überprüfe, dass das Geld wiederhergestellt wurde
         findPlayer(player1.name).balance shouldBe 1500
       }
     }
 
-    "when BuyTrainStationCommand is executed" should {
-      val trainStationField = fields(5).asInstanceOf[TrainStationField]
-      val buyTrainStationCommand = BuyTrainStationCommand(controller, trainStationField, player1)
+    "when BuyCommand is executed for a TrainStationField" should {
+      val trainStationField = fields(5).asInstanceOf[BuyableField]
+      val buyCommand = BuyCommand(controller, trainStationField, player1)
 
       "buy the train station and update player's money" in {
         val initialMoney = player1.balance
-        buyTrainStationCommand.execute()
+        buyCommand.execute()
 
-        // Überprüfe, dass die Bahnstation dem Spieler gehört
-        val updatedField = getFieldAt(trainStationField.index).asInstanceOf[TrainStationField]
+        val updatedField = getFieldAt(trainStationField.index).asInstanceOf[BuyableField]
         updatedField.owner shouldBe Some(player1)
 
-        // Überprüfe, dass das Geld abgezogen wurde
         findPlayer(player1.name).balance shouldBe (initialMoney - trainStationField.price)
       }
 
       "restore previous state when undone" in {
-        buyTrainStationCommand.undo()
+        buyCommand.undo()
 
-        // Überprüfe, dass die Bahnstation keinen Besitzer hat
-        val restoredField = getFieldAt(trainStationField.index).asInstanceOf[TrainStationField]
+        val restoredField = getFieldAt(trainStationField.index).asInstanceOf[BuyableField]
         restoredField.owner shouldBe None
 
-        // Überprüfe, dass das Geld wiederhergestellt wurde
         findPlayer(player1.name).balance shouldBe 1500
       }
     }
+
+    "when BuyCommand is executed for a UtilityField" should {
+      val utilityField = fields(12).asInstanceOf[BuyableField]
+      val buyCommand = BuyCommand(controller, utilityField, player1)
+
+      "buy the utility and update player's money" in {
+        val initialMoney = player1.balance
+        buyCommand.execute()
+
+        val updatedField = getFieldAt(utilityField.index).asInstanceOf[BuyableField]
+        updatedField.owner shouldBe Some(player1)
+
+        findPlayer(player1.name).balance shouldBe (initialMoney - utilityField.price)
+      }
+
+      "restore previous state when undone" in {
+        buyCommand.undo()
+
+        val restoredField = getFieldAt(utilityField.index).asInstanceOf[BuyableField]
+        restoredField.owner shouldBe None
+
+        findPlayer(player1.name).balance shouldBe 1500
+      }
+    }
+    
 
     "when BuyHouseCommand is executed" should {
       val propertyField = fields(11).asInstanceOf[PropertyField]
@@ -176,41 +193,6 @@ class CommandSpec extends AnyWordSpec {
       }
     }
 
-    "when BuyUtilityCommand is executed" should {
-      // Annahme: Ein Versorgungswerk ist an Position 12 im Testboard
-      val utilityField = UtilityField("Electric Company", 13, 150, UtilityField.UtilityCheck.utility, None)
-      val buyUtilityCommand = BuyUtilityCommand(controller, utilityField, player1)
-
-      "buy the utility and update player's money" in {
-        val initialMoney = player1.balance
-        buyUtilityCommand.execute()
-
-        // Da das Versorgunswerk nicht Teil des ursprünglichen Spielfelds ist,
-        // müssen wir den aktuellen Zustand des Feldes aus dem Command selbst überprüfen
-        val fieldAfterBuy = controller.game.board.fields.find(f =>
-          f.isInstanceOf[UtilityField] && f.asInstanceOf[UtilityField].name == utilityField.name
-        ).getOrElse(utilityField)
-
-        fieldAfterBuy.asInstanceOf[UtilityField].owner shouldBe Some(player1)
-
-        // Überprüfe, dass das Geld abgezogen wurde
-        findPlayer(player1.name).balance shouldBe (initialMoney - utilityField.price)
-      }
-
-      "restore previous state when undone" in {
-        buyUtilityCommand.undo()
-
-        // Da das Versorgunswerk nicht Teil des ursprünglichen Spielfelds ist,
-        // müssen wir den aktuellen Zustand des Feldes aus dem Command selbst überprüfen
-        val fieldAfterUndo = controller.game.board.fields.find(f =>
-          f.isInstanceOf[UtilityField] && f.asInstanceOf[UtilityField].name == utilityField.name
-        ).getOrElse(utilityField)
-
-        fieldAfterUndo.asInstanceOf[UtilityField].owner shouldBe None
-
-        // Überprüfe, dass das Geld wiederhergestellt wurde
-        findPlayer(player1.name).balance shouldBe 1500
-      }
-    }
+    
   }
 }

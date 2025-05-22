@@ -56,16 +56,16 @@ object Monopoly:
 
     for (i <- 1 to playerAnz) {
       val playerName = randomEmoji(playerVector)
-      playerVector = playerVector.appended(Player(playerName, 1500, 1))
+      playerVector = playerVector.appended(Player(playerName, 1500, 1,false,0))
       println(s"Spieler $playerName hinzugefügt.")
     }
 
     val board = Board(
       Vector(
         GoField,
-        PropertyField("brown1", 2, 60, 2, Some(playerVector.head), color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
+        PropertyField("brown1", 2, 60, 2, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
         CommunityChestField(3),
-        PropertyField("brown2", 4, 60, 4, Some(playerVector.head), color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
+        PropertyField("brown2", 4, 60, 4, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
         TaxField(100, 5),
         TrainStationField("Marklylebone Station", 6,200, None),
         PropertyField("lightBlue1", 7, 100, 6, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(50, false), PropertyField.House(0)),
@@ -74,7 +74,7 @@ object Monopoly:
         PropertyField("lightBlue3", 10, 120, 8, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(60, false), PropertyField.House(0)),
         JailField,
         PropertyField("Pink1", 12, 140, 10, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(70, false), PropertyField.House(0)),
-        UtilityField("Electric Company", 13,150,UtilityField.UtilityCheck.utility, None),
+        UtilityField("Electric Company", 13,150,UtilityField.UtilityCheck.utility,None),
         PropertyField("Pink2", 14, 140, 10, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(70, false), PropertyField.House(0)),
         PropertyField("Pink3", 15, 160, 12, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(80, false), PropertyField.House(0)),
         TrainStationField("Fenchurch ST Station", 16,200, None),

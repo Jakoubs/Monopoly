@@ -9,6 +9,10 @@ import de.htwg.model.PropertyField.Color.*
 import de.htwg.model.PropertyField.{House, Mortgage}
 
 class BoardFieldSpec extends AnyWordSpec {
+
+  val dummyPlayer = Player("dummy", 1500, 0, isInJail = false, 0)
+  val otherPlayer = Player("other", 1500, 0, isInJail = false, 0)
+
   val dice = new Dice()
   val player1 = Player("Player 1", 1500, 1, isInJail = false, 0)
   val player2 = Player("Player 2", 1500, 1, isInJail = false, 0)
@@ -59,6 +63,22 @@ class BoardFieldSpec extends AnyWordSpec {
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
   val controller = new Controller(initialGame, dice)
 
+  val ownedProperties: Map[Player, List[PropertyField]] =
+    board.fields.collect { case p: PropertyField if p.owner.isDefined => (p.owner.get, p) }
+      .groupBy(_._1).view.mapValues(_.map(_._2).toList).toMap
+
+  val ownedTrainStations: Map[Player, Int] =
+    board.fields.collect { case t: TrainStationField if t.owner.isDefined => (t.owner.get, 1) }
+      .groupBy(_._1).view.mapValues(_.size).toMap
+
+  val ownedUtilities: Map[Player, Int] =
+    board.fields.collect { case u: UtilityField if u.owner.isDefined => (u.owner.get, 1) }
+      .groupBy(_._1).view.mapValues(_.size).toMap
+
+  val diceResult = 7
+
+  val rentVisitor = new RentVisitor(dummyPlayer, Vector(dummyPlayer, otherPlayer), board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
+
   "PropertyField" should {
     "build a property field" in {
       val player = Player("Tim", 500, 0)
@@ -71,42 +91,6 @@ class BoardFieldSpec extends AnyWordSpec {
       f1.color should be(Red)
       f1.mortgage.price should be(1000)
       f1.house.amount should be(0)
-
-    }
-
-    "buyProperty" should {
-
-      "allow player to buy property if unowned and has enough balance" in {
-        val (newField, newPlayer) = PropertyField.buyProperty(fields(16).asInstanceOf[PropertyField],controller.currentPlayer)
-        controller.updateBoardAndPlayer(newField, newPlayer)
-        val updatedField = controller.game.board.fields(16).asInstanceOf[PropertyField]
-        updatedField.owner should be(Some(player1))
-        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
-        updatedPlayer.balance should be(1400)
-      }
-
-      "not allow player to buy property if unowned but insufficient balance" in {
-        val player = Player("TestPlayer", 10, 0)
-        val gameInJail = initialGame.copy(players = Vector(player, player2), currentPlayer = player)
-        val testController = new Controller(gameInJail, dice)
-        val (newField, newPlayer) = PropertyField.buyProperty(fields(16).asInstanceOf[PropertyField], testController.currentPlayer)
-        testController.updateBoardAndPlayer(newField, newPlayer)
-        val updatedField = testController.game.board.fields(16).asInstanceOf[PropertyField]
-        updatedField.owner should be(None)
-        val updatedPlayer = testController.game.players.find(_.name == player.name).get
-        updatedPlayer.balance should be(10)
-      }
-
-      "not allow player to buy property if already owned" in {
-        val gameInJail = initialGame.copy(players = Vector(player1, player2), currentPlayer = player2)
-        val testController = new Controller(gameInJail, dice)
-        val (newField, newPlayer) = PropertyField.buyProperty(fields(21).asInstanceOf[PropertyField], testController.currentPlayer)
-        testController.updateBoardAndPlayer(newField, newPlayer)
-        val updatedField = testController.game.board.fields(21).asInstanceOf[PropertyField]
-        updatedField.owner should be(Some(player1))
-        val updatedPlayer = testController.game.players.find(_.name == player2.name).get
-        updatedPlayer.balance should be(1500)
-      }
 
     }
 
@@ -362,42 +346,8 @@ class BoardFieldSpec extends AnyWordSpec {
       trainStation.owner.get shouldBe player
     }
 
-    "buyTrainstation" should {
-
-      "allow player to buy trainstation if unowned and has enough balance" in {
-        val (newField, newPlayer) = fields(35).asInstanceOf[TrainStationField].buyTrainstation(fields(35).asInstanceOf[TrainStationField], player1)
-        controller.updateBoardAndPlayer(newField, newPlayer)
-        val updatedField = controller.game.board.fields(35).asInstanceOf[TrainStationField]
-        updatedField.owner should be(Some(player1))
-        val updatedPlayer = controller.game.players.find(_.name == player1.name).get
-        updatedPlayer.balance should be(1300)
-      }
-
-      "not allow player to buy trainstation if unowned but insufficient balance" in {
-        val player = Player("TestPlayer", 10, 0)
-        val gameInJail = initialGame.copy(players = Vector(player, player2), currentPlayer = player)
-        val testController = new Controller(gameInJail, dice)
-        val (newField, newPlayer) = fields(35).asInstanceOf[TrainStationField].buyTrainstation(fields(35).asInstanceOf[TrainStationField], testController.currentPlayer)
-        testController.updateBoardAndPlayer(newField, newPlayer)
-        val updatedField = testController.game.board.fields(35).asInstanceOf[TrainStationField]
-        updatedField.owner should be(None)
-        val updatedPlayer = testController.game.players.find(_.name == player.name).get
-        updatedPlayer.balance should be(10)
-      }
-
-      "not allow player to buy trainstation if already owned" in {
-        val gameInJail = initialGame.copy(players = Vector(player1, player2), currentPlayer = player2)
-        val testController = new Controller(gameInJail, dice)
-        val (newField, newPlayer) = fields(5).asInstanceOf[TrainStationField].buyTrainstation(fields(5).asInstanceOf[TrainStationField], testController.currentPlayer)
-        testController.updateBoardAndPlayer(newField, newPlayer)
-        val updatedField = testController.game.board.fields(5).asInstanceOf[TrainStationField]
-        updatedField.owner should be(Some(player1))
-        val updatedPlayer = testController.game.players.find(_.name == player2.name).get
-        updatedPlayer.balance should be(1500)
-      }
-
-    }
   }
+
 
   "A UtilityField" should {
     "be correctly initialized" in {
@@ -408,36 +358,90 @@ class BoardFieldSpec extends AnyWordSpec {
       utility.utility shouldBe UtilityField.UtilityCheck.utility
       utility.owner shouldBe None
     }
-
-    "be bought by a player if affordable and not owned" in {
-      val player = Player("Bob", 200, 10)
-      val utility = UtilityField("Electric Company", 12, 150, UtilityField.UtilityCheck.utility, None)
-      val (updatedUtility, updatedPlayer) = UtilityField.buyUtilityField(utility, player)
-      updatedUtility.owner shouldBe Some(player)
-      updatedPlayer.balance shouldBe 50
-      updatedPlayer.position shouldBe 12
-    }
-
-    "not be bought if already owned" in {
-      val owner = Player("Owner", 200, 10)
-      val buyer = Player("Buyer", 500, 8)
-      val utility = UtilityField("Electric Company", 12, 150, UtilityField.UtilityCheck.utility, Some(owner))
-      val (updatedUtility, updatedPlayer) = UtilityField.buyUtilityField(utility, buyer)
-      updatedUtility.owner shouldBe Some(owner)
-      updatedPlayer shouldBe buyer
-    }
-
-    "not allow player to buy utilityfield if unowned but insufficient balance" in {
-      val player = Player("TestPlayer", 10, 0)
-      val gameInJail = initialGame.copy(players = Vector(player, player2), currentPlayer = player)
-      val testController = new Controller(gameInJail, dice)
-      val (newField, newPlayer) = UtilityField.buyUtilityField(fields(12).asInstanceOf[UtilityField], testController.currentPlayer)
-      testController.updateBoardAndPlayer(newField, newPlayer)
-      val updatedField = testController.game.board.fields(12).asInstanceOf[UtilityField]
-      updatedField.owner should be(None)
-      val updatedPlayer = testController.game.players.find(_.name == player.name).get
-      updatedPlayer.balance should be(10)
-    }
   }
 
+  "visit PropertyField and calculate rent correctly" in {
+    val property = PropertyField("brown1", 1, 100, 10, Some(otherPlayer), PropertyField.Color.Brown)
+    property.accept(rentVisitor) shouldBe 10
+  }
+
+  "visit TrainStationField and calculate rent correctly" in {
+    val station = TrainStationField("Station1", 5, 200, Some(otherPlayer))
+    station.accept(rentVisitor) shouldBe 25 // Since owned 1 station
+  }
+
+  "visit UtilityField and calculate rent correctly" in {
+    val utility = UtilityField("Utility1", 12, 150, UtilityField.UtilityCheck.utility, Some(otherPlayer))
+    utility.accept(rentVisitor) shouldBe diceResult * 4 // Since owned 1 utility
+  }
+
+  "visit GoToJailField and return 0" in {
+    val goToJail = GoToJailField()
+    goToJail.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit FreeParkingField and return 0" in {
+    val freeParking = FreeParkingField(100)
+    freeParking.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit ChanceField and return 0" in {
+    val chance = ChanceField(7)
+    chance.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit CommunityChestField and return 0" in {
+    val cc = CommunityChestField(8)
+    cc.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit TaxField and return amount" in {
+    val tax = TaxField(75, 4)
+    tax.accept(rentVisitor) shouldBe 75
+  }
+
+  "visit GoField and return 0" in {
+    GoField.accept(rentVisitor) shouldBe 0
+  }
+
+  "visit JailField and return 0" in {
+    JailField.accept(rentVisitor) shouldBe 0
+  }
+
+  "A BuyableField" should {
+
+    "allow buying if player has enough money and no owner yet" in {
+      val player = Player("Alice", balance = 500, position = 4)
+      val property = PropertyField("kpAlee", 4, 100, 20, None, Red, Mortgage(1000))
+
+
+      val (newField, updatedPlayer) = property.buy(player)
+
+      val propertyField = newField.asInstanceOf[PropertyField]
+      propertyField.owner should contain(player)
+      updatedPlayer.balance shouldBe 400
+    }
+
+    "not allow buying if player has insufficient funds" in {
+      val player = Player("Bob", balance = 100, position = 4)
+      val property = PropertyField("kpAlee", 4, 100, 20, None, Red, Mortgage(1000))
+
+      val (newField, updatedPlayer) = property.buy(player)
+      val propertyField = newField.asInstanceOf[PropertyField]
+      propertyField.owner shouldBe empty
+      updatedPlayer shouldBe player
+    }
+
+    "not allow buying if the property already has an owner" in {
+      val owner = Player("Charlie", balance = 300, position = 2)
+      val player = Player("Dana", balance = 500, position = 4)
+      val property = PropertyField("kpAlee", 4, 100, 20, Some(owner), Red, Mortgage(1000))
+
+      val (newField, updatedPlayer) = property.buy(player)
+
+      val propertyField = newField.asInstanceOf[PropertyField]
+      propertyField.owner should contain(owner)
+      updatedPlayer shouldBe player
+    }
+  }
 }

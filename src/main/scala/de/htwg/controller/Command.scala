@@ -1,49 +1,25 @@
 package de.htwg.controller
 
-import de.htwg.model.{Player, PropertyField, TrainStationField, UtilityField}
+import de.htwg.model.{BuyableField, Player, PropertyField, TrainStationField, UtilityField}
+import scala.util.{Try, Success, Failure}
+
 
 trait Command {
   def execute(): Unit
   def undo(): Unit
 }
-  case class BuyTrainStationCommand(controller: Controller, field: TrainStationField, player: Player) extends Command {
-    private var previousState: Option[(TrainStationField, Player)] = None
+
+  case class BuyCommand[T <: BuyableField](
+                                               controller: Controller,
+                                               field: T,
+                                               player: Player
+                                             ) {
+
+    private var previousState: Option[(T, Player)] = None
 
     def execute(): Unit = {
       previousState = Some((field, player))
-      val (updatedField, updatedPlayer) = field.buyTrainstation(field, player)
-      controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-    }
-
-    def undo(): Unit = {
-      previousState.foreach { case (f, p) =>
-        controller.updateBoardAndPlayer(f, p)
-      }
-    }
-  }
-
-  case class BuyUtilityCommand(controller: Controller, field: UtilityField, player: Player) extends Command {
-    private var previousState: Option[(UtilityField, Player)] = None
-
-    def execute(): Unit = {
-      previousState = Some((field, player))
-      val (updatedField, updatedPlayer) = UtilityField.buyUtilityField(field, player)
-      controller.updateBoardAndPlayer(updatedField, updatedPlayer)
-    }
-
-    def undo(): Unit = {
-      previousState.foreach { case (f, p) =>
-        controller.updateBoardAndPlayer(f, p)
-      }
-    }
-  }
-
-  case class BuyPropertyCommand(controller: Controller, field: PropertyField, player: Player) extends Command {
-    private var previousState: Option[(PropertyField, Player)] = None
-
-    def execute(): Unit = {
-      previousState = Some((field, player))
-      val (updatedField, updatedPlayer) = PropertyField.buyProperty(field, player)
+      val (updatedField, updatedPlayer) = field.buy(player)
       controller.updateBoardAndPlayer(updatedField, updatedPlayer)
     }
 
@@ -59,8 +35,12 @@ trait Command {
 
     def execute(): Unit = {
       previousState = Some((field, player))
-      val (updatedField, updatedPlayer) = PropertyField.House().buyHouse(player, field, controller.game)
-      controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+
+      PropertyField.House().buyHouse(player, field, controller.game) match {
+        case Success((updatedField: PropertyField, updatedPlayer: Player)) =>
+          controller.updateBoardAndPlayer(updatedField, updatedPlayer)
+        case Failure(exception) =>
+      }
     }
 
     def undo(): Unit = {
@@ -77,8 +57,6 @@ trait Command {
     def execute(): Unit = {
       previousPlayerState = Some(controller.currentPlayer)
       rollResult = controller.dice.rollDice(controller.sound)
-      //val updatedPlayer = RegularTurnStrategy().executeTurn(controller.currentPlayer, () => rollResult)
-      //controller.updatePlayer(updatedPlayer)
     }
 
     def undo(): Unit = {
@@ -96,7 +74,6 @@ trait Command {
       val updatedPlayer = player.copy(
         isInJail = false,
         balance = player.balance - 50,
-        jailTurns = 0
       )
         controller.updatePlayer(updatedPlayer)
     }

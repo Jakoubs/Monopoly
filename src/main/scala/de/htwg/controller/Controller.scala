@@ -7,6 +7,17 @@ import de.htwg.util.util.Observable
 import de.htwg.controller.GameState
 import java.awt.Choice
 import scala.io.StdIn.readLine
+
+enum OpEnum:
+  case roll
+  case pay
+  case buy
+  case end
+  case y
+  case n
+  case enter
+  case fieldSelected(id: Int)
+  
 case class TurnInfo(
                      diceRoll1: Int = 0,
                      diceRoll2: Int = 0,
@@ -30,9 +41,8 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def board: Board = game.board
   def players: Vector[Player] = game.players
   def sound: Boolean = game.sound
-
-  def handleInput(input: String): Unit = {
-    state = state.handle(input, this)
+  def handleInput(input: OpEnum): Unit = {
+    state = state.handle(input, this)  // Jetzt funktioniert das!
     notifyObservers()
   }
 
@@ -62,10 +72,39 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       BoardPrinter.getBoardAsString(game)
   }
 
+  def getInventory: String = {
+    BoardPrinter.getInventoryString(game)
+  }
+
   def getCurrentPlayerStatus: String = {
       val p = currentPlayer
       s"${p.name} | Balance: ${p.balance}€ | Position: ${p.position} | " +
         s"In Jail: ${if (p.isInJail) "Yes" else "No"}"
+  }
+
+  def getOwnedProperties(): Map[Player, List[PropertyField]] = {
+    board.fields.collect {
+        case p: PropertyField if p.owner.isDefined => (p.owner.get, p)
+      }.groupBy(_._1)
+      .map { case (player, tuples) => player -> tuples.map(_._2).toList }
+  }
+
+  def getOwnedTrainStations(): Map[Player, Int] = {
+    board.fields.collect {
+        case t: TrainStationField if t.owner.isDefined => (t.owner.get, 1)
+      }.groupBy(_._1)
+      .view
+      .mapValues(_.size)
+      .toMap
+  }
+
+  def getOwnedUtilities(): Map[Player, Int] = {
+    board.fields.collect {
+        case u: UtilityField if u.owner.isDefined => (u.owner.get, 1)
+      }.groupBy(_._1)
+      .view
+      .mapValues(_.size)
+      .toMap
   }
 
 

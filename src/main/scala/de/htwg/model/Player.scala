@@ -7,8 +7,7 @@ case class Player(name: String,
                   balance: Int,
                   position: Int = 1,
                   isInJail: Boolean = false,
-                  jailTurns: Int = 0
-                  //properties: List[PropertyField] = List()
+                  consecutiveDoubles: Int
                  ) {
 
   def moveToIndex(index: Int): Player = {
@@ -23,9 +22,12 @@ case class Player(name: String,
     }
     this
   }
+  
+  def incrementDoubles(): Player = copy(consecutiveDoubles = consecutiveDoubles + 1)
+  def resetDoubles(): Player = copy(consecutiveDoubles = 0)
 
   def releaseFromJail(): Player = {
-    val newPlayer = this.copy(isInJail = false, jailTurns = 0)
+    val newPlayer = this.copy(isInJail = false)
     newPlayer
   }
   def changeBalance(amount: Int): Player = {
@@ -34,27 +36,8 @@ case class Player(name: String,
   }
 
   def goToJail(): Player = {
-    val newPlayer = this.copy(position = 11, isInJail = true)
+    val newPlayer = this.copy(position = 11, isInJail = true,consecutiveDoubles = 0)
     newPlayer
-  }
-
-  def playerMove(rollDice: () => (Int, Int),
-                 rollcount: Int = 0): Player = {
-    if (rollcount == 3) {
-      this.goToJail()
-    } else if(!isInJail) {
-      val (diceA, diceB) = rollDice()
-      val updatedPlayer = if ((position + diceA + diceB) > 40)
-        this.copy(balance = balance + 200) else this
-
-      val newPlayer = updatedPlayer.moveToIndex((position + diceA + diceB) % 40)
-      if (diceA == diceB) {
-        return newPlayer.playerMove(rollDice,rollcount + 1)
-      }
-      newPlayer
-    } else {
-      this
-    }
   }
 
 }
