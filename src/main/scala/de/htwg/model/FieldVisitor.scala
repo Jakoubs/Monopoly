@@ -44,12 +44,12 @@ class RentVisitor(currentPlayer: Player, allPlayers: Vector[Player], board: Boar
       diceResult * (if (ownedUtilities.getOrElse(owner, 0) == 2) 10 else 4)
     }.getOrElse(0)
   }
+  override def visit(field: TaxField): Int = field.amount
 
   override def visit(field: GoToJailField): Int = 0
   override def visit(field: FreeParkingField): Int = 0
   override def visit(field: ChanceField): Int = 0
   override def visit(field: CommunityChestField): Int = 0
-  override def visit(field: TaxField): Int = field.amount
   override def visit(field: BoardField): Int = field match {
     case GoField => 0
     case JailField => 0
