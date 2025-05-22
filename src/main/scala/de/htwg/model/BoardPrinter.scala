@@ -211,11 +211,11 @@ object BoardPrinter {
 
     val inventoryItems = game.board.fields.collect {
       case pf: PropertyField if pf.owner.exists(owner => owner.name == game.currentPlayer.name) =>
-        s"idx:${pf.index+1}[${pf.house.amount}]"
+        s"idx:${pf.index}[${pf.house.amount}]"
       case ts: TrainStationField if ts.owner.exists(owner => owner.name == game.currentPlayer.name) =>
-        s"idx:${ts.index+1}"
+        s"idx:${ts.index}"
       case uf: UtilityField if uf.owner.exists(owner => owner.name == game.currentPlayer.name) =>
-        s"idx:${uf.index+1}"
+        s"idx:${uf.index}"
     }
 
     if (inventoryItems.isEmpty) {

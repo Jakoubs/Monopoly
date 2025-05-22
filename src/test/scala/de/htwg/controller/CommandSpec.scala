@@ -114,11 +114,11 @@ class CommandSpec extends AnyWordSpec {
       }
     }
     
-
+    
     "when BuyHouseCommand is executed" should {
       val propertyField = fields(11).asInstanceOf[PropertyField]
       val buyHouseCommand = BuyHouseCommand(controller, propertyField, player1)
-
+      
       "buy a house for the property and update player's money" in {
         val initialMoney = findPlayer(player1.name).balance
         buyHouseCommand.execute()

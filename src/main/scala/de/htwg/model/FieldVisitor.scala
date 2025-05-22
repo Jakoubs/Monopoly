@@ -35,6 +35,7 @@ class RentVisitor(currentPlayer: Player, allPlayers: Vector[Player], board: Boar
         case 2 => 50
         case 3 => 100
         case 4 => 200
+        case _ => 0
       }
     }.getOrElse(0)
   }

@@ -65,10 +65,6 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
         }
         val ownsEntireColorGroup = colorGroupProperties.forall(_.owner.exists(_.name == player.name))
 
-        if (!ownsEntireColorGroup) {
-          throw new IllegalArgumentException(s"${player.name} must own all properties in the ${field.color} group to build houses on ${field.name}.")
-        }
-
         // If all checks pass, proceed with the purchase
         val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
         val updatedPlayer = player.copy(balance = player.balance - housePrice)
