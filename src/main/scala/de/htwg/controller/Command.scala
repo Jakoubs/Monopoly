@@ -7,13 +7,15 @@ import scala.util.{Try, Success, Failure}
 trait Command {
   def execute(): Unit
   def undo(): Unit
+  var previousGameStates: Option[GameState] = None
+  var nextGameStates: Option[GameState] = None
 }
 
   case class BuyCommand[T <: BuyableField](
                                                controller: Controller,
                                                field: T,
                                                player: Player
-                                             ) {
+                                             ) extends Command {
 
     private var previousState: Option[(T, Player)] = None
 
