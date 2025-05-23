@@ -46,7 +46,7 @@ case class JailState() extends GameState {
 case class RollingState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
     val command = RollDiceCommand(controller)
-    command.execute()
+    controller.executeCommand(command)
     val (d1, d2) = command.getResult
     val isDouble = d1 == d2
     
@@ -168,7 +168,7 @@ case class BuyPropertyState(isDouble: Boolean = false) extends GameState {
     field match {
       case buyableField: BuyableField =>
         val command = BuyCommand(controller, buyableField, controller.currentPlayer)
-        command.execute()
+        controller.executeCommand(command)
         AdditionalActionsState(isDouble)
       case _ =>
         AdditionalActionsState(isDouble)
@@ -182,7 +182,7 @@ case class AdditionalActionsState(isDouble: Boolean = false) extends GameState {
     input match {
       case OpEnum.buy =>
         BuyHouseState(isDouble)
-      case OpEnum.end =>
+      case _ =>
         if (isDouble) {
           RollingState()
         } else {
@@ -200,7 +200,7 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
           controller.game.board.fields(fieldId - 1) match {
             case field: PropertyField =>
               val command = BuyHouseCommand(controller, field, controller.currentPlayer)
-              command.execute()
+              controller.executeCommand(command)
               ConfirmBuyHouseState(isDouble, command)
             case _ =>
               if (isDouble){

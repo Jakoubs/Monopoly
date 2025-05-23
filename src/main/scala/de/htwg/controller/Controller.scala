@@ -5,7 +5,9 @@ import de.htwg.model.PropertyField.calculateRent
 import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
 import de.htwg.controller.GameState
+
 import java.awt.Choice
+import scala.collection.mutable
 import scala.io.StdIn.readLine
 
 enum OpEnum:
@@ -17,7 +19,9 @@ enum OpEnum:
   case n
   case enter
   case fieldSelected(id: Int)
-  
+  case undo
+  case redo
+
 case class TurnInfo(
                      diceRoll1: Int = 0,
                      diceRoll2: Int = 0,
@@ -30,6 +34,9 @@ case class TurnInfo(
 
 class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   var currentTurnInfo: TurnInfo = TurnInfo()
+  private val undoStack: mutable.Stack[Command] = mutable.Stack()
+  private val redoStack: mutable.Stack[Command] = mutable.Stack()
+
   def getTurnInfo: TurnInfo = currentTurnInfo
   def updateTurnInfo(newInfo: TurnInfo): Unit = { // Setter-Methode
     currentTurnInfo = newInfo
@@ -41,9 +48,16 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
   def board: Board = game.board
   def players: Vector[Player] = game.players
   def sound: Boolean = game.sound
+
   def handleInput(input: OpEnum): Unit = {
-    state = state.handle(input, this)  // Jetzt funktioniert das!
+    input match {
+      case OpEnum.undo => undo()
+      case OpEnum.redo => redo()
+      case _ =>
+        state = state.handle(input, this)
+    }
     notifyObservers()
+
   }
 
   def updatePlayer(player: Player): Unit = {
@@ -63,6 +77,34 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     val nextIndex = (currentIndex + 1) % game.players.size
     val nextPlayer = game.players(nextIndex)
     game = game.copy(currentPlayer = nextPlayer)
+  }
+
+  def executeCommand(cmd: Command): Unit = {
+    cmd.previousGameStates = Some(state)   // Zustand vor Ausführung
+    cmd.execute()
+    cmd.nextGameStates = Some(state)       // Zustand nach Ausführung
+    undoStack.push(cmd)
+    redoStack.clear()
+  }
+
+  def undo(): Unit = {
+    if (undoStack.nonEmpty) {
+      val cmd = undoStack.pop()
+      cmd.undo()
+      cmd.previousGameStates.foreach(state = _) 
+      redoStack.push(cmd)
+    }
+  }
+
+  def redo(): Unit = {
+    if (redoStack.nonEmpty) {
+      val cmd = redoStack.pop()
+      cmd.execute()
+      cmd.nextGameStates.foreach(state = _) 
+      undoStack.push(cmd)
+      notifyObservers()
+    }
+
   }
 
   def isGameOver: Boolean = game.players.count(_.balance > 0) <= 1

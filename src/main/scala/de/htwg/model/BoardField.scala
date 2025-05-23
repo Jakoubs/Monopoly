@@ -40,38 +40,51 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
         val baseHousePrice = purchasePrice / 2
         ((baseHousePrice + 9) / 10) * 10
       }
-      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): Try[(PropertyField, Player)] = Try {
-        // Check 1: Does the player own the property?
-        val ownsProperty = field.owner.exists(_.name == player.name)
-        if (!ownsProperty) {
-          throw new IllegalArgumentException(s"${player.name} does not own ${field.name}.")
+
+      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): Try[(PropertyField, Player)] = {
+        // Step 1: Check if the player owns the property.
+        // We use flatMap on Try to chain operations. If the initial check fails, it immediately returns Failure.
+        val checkOwnership: Try[Unit] = field.owner match {
+          case Some(owner) if owner.name == player.name => Success(())
+          case _ => Failure(new IllegalArgumentException(s"${player.name} does not own ${field.name}."))
         }
 
-        val housePrice = calculateHousePrice(field.price)
+        checkOwnership.flatMap { _ =>
+          val housePrice = calculateHousePrice(field.price)
 
-        // Check 2: Does the player have enough money?
-        if (player.balance < housePrice) {
-          throw new IllegalArgumentException(s"${player.name} does not have enough money to buy a house on ${field.name}. Needed: $housePrice, Has: ${player.balance}.")
+          // Step 2: Check if the player has enough money.
+          val checkBalance: Try[Unit] =
+            if (player.balance >= housePrice) Success(())
+            else Failure(new IllegalArgumentException(s"${player.name} does not have enough money to buy a house on ${field.name}. Needed: $housePrice, Has: ${player.balance}."))
+
+          checkBalance.flatMap { _ =>
+            // Step 3: Check if a house can be built (maxHouses).
+            val checkMaxHouses: Try[Unit] =
+              if (field.house.amount < maxHouses) Success(())
+              else Failure(new IllegalArgumentException(s"${field.name} already has the maximum number of houses ($maxHouses)."))
+
+            checkMaxHouses.flatMap { _ =>
+              // Step 4: Check if the player owns all properties in the color group.
+              val colorGroupProperties = game.board.fields.collect {
+                case pf: PropertyField if pf.color == field.color => pf
+              }
+              val ownsEntireColorGroup = colorGroupProperties.forall(_.owner.exists(_.name == player.name))
+
+              val checkColorGroup: Try[Unit] =
+                if (ownsEntireColorGroup) Success(())
+                else Failure(new IllegalArgumentException(s"${player.name} must own all properties in the ${field.color} group to build a house on ${field.name}."))
+
+              checkColorGroup.map { _ =>
+                // If all checks pass, proceed with the purchase
+                val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
+                val updatedPlayer = player.copy(balance = player.balance - housePrice)
+                (updatedField, updatedPlayer)
+              }
+            }
+          }
         }
-
-        // Check 3: Can a house be built (maxHouses)?
-        if (field.house.amount >= maxHouses) {
-          throw new IllegalArgumentException(s"${field.name} already has the maximum number of houses ($maxHouses).")
-        }
-
-        // Check 4: Does the player own all properties in the color group?
-        val colorGroupProperties = game.board.fields.collect {
-          case pf: PropertyField if pf.color == field.color => pf
-        }
-        val ownsEntireColorGroup = colorGroupProperties.forall(_.owner.exists(_.name == player.name))
-
-        // If all checks pass, proceed with the purchase
-        val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
-        val updatedPlayer = player.copy(balance = player.balance - housePrice)
-        (updatedField, updatedPlayer)
       }
     }
-
 
     case class Mortgage(price: Int = 0, active: Boolean = false) {
       def toggle(): Mortgage = copy(active = !active)
