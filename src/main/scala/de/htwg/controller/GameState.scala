@@ -150,12 +150,14 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
 
 case class PropertyDecisionState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
-
     input match {
-      case y => // Yes/ja
+      case OpEnum.y => // ✅ Nur bei 'y' kaufen
         BuyPropertyState(isDouble)
-      case _ => // No
+      case OpEnum.n => // ✅ Bei 'n' nicht kaufen
         AdditionalActionsState(isDouble)
+      case _ =>
+        // Optional: Fehlerbehandlung für ungültige Eingabe
+        this // Bleibe im aktuellen State
     }
   }
 }
