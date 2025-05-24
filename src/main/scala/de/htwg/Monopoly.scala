@@ -4,21 +4,37 @@ import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Ora
 import de.htwg.model.PropertyField
 import de.htwg.model.SoundPlayer
 import de.htwg.model.PropertyField.calculateRent
+
 import scala.io.StdIn.readLine
 import scala.util.Random
 import de.htwg.controller.Controller
 import de.htwg.view.Tui
+import de.htwg.view.GUI
 import de.htwg.model.*
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future // Import Future for asynchronous execution
 
 case class Board(fields: Vector[BoardField])
 
 object Monopoly:
+  // Make the controller a global variable or pass it to GUI.main
+  // Option 1: Global var (less ideal for large apps, but simple for now)
+  var gameController: Option[Controller] = None // Option to hold the controller
+
   def main(args: Array[String]): Unit = {
     val game = defineGame()
     val dice = Dice()
     val controller = Controller(game, dice)
-    val tui = Tui(controller)
-    tui.run() // Die TUI steuert jetzt den Spielablauf
+    gameController = Some(controller) // Store the controller
+
+    // Launch the TUI in a separate Future (on a separate thread)
+    Future {
+      val tui = Tui(controller)
+      tui.run() // This will block this Future's thread, not the main thread.
+    }
+
+    // Launch the GUI. The GUI's start() method will then retrieve the controller.
+    GUI.main(args)
   }
 
   def defineGame(): MonopolyGame = {
@@ -30,7 +46,6 @@ object Monopoly:
     if (soundBool) {
       SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     }
-    //if(!isTestBoard) {
 
     var playerVector = Vector[Player]()
 
