@@ -17,14 +17,16 @@ class BoardPanel(controller: Controller) extends GridPane {
   private val numRows = 11
   private val numCols = 11
 
-  private val topw = 120
-  private val toph = 180
-  private val sidew = 180
-  private val sideh = 120
-  private val edges = 180
+  private val scaleFactor = .5
+  private val topw = 120 * scaleFactor
+  private val toph = 180 * scaleFactor
+  private val sidew = 180 * scaleFactor
+  private val sideh = 120 * scaleFactor
+  private val edges = 180 * scaleFactor
+  private val fontsize = (8 * scaleFactor*0.7).toString
 
   private val contentFieldStyle =
-    "-fx-font: normal bold 16pt sans-serif;" +
+    "-fx-font: normal bold "+fontsize+"pt sans-serif;" +
       "-fx-background-color: #4A4A4A;" +
       "-fx-text-fill: white;" +
       "-fx-border-radius: 8;" +
