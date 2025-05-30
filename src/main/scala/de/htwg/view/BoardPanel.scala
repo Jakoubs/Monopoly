@@ -9,15 +9,12 @@ import de.htwg.controller.Controller
 import de.htwg.model.{BoardField, GoField, GoToJailField, JailField, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.model.PropertyField.Color as PropertyColor
 
-// BoardPanel is a class that takes a Controller as a dependency
-// It extends GridPane because it is a GridPane that represents the board
 class BoardPanel(controller: Controller) extends GridPane {
 
-  // Constants (can be made configurable if needed)
   private val numRows = 11
   private val numCols = 11
 
-  private val scaleFactor = .5
+  private val scaleFactor = .44
   private val topw = 120 * scaleFactor
   private val toph = 180 * scaleFactor
   private val sidew = 180 * scaleFactor
@@ -33,16 +30,13 @@ class BoardPanel(controller: Controller) extends GridPane {
       "-fx-background-radius: 8;" +
       "-fx-alignment: center;"
 
-  // Initialize the GridPane properties
   padding = Insets(20)
   alignment = Pos.Center
   hgap = 10
   vgap = 10
 
-  // Immediately build the board when an instance of BoardPanel is created
   buildBoard()
 
-  // Helper functions - these now access the 'controller' instance passed to the class
   private def getFieldName(idx: Int): String = {
     if (idx >= 0 && idx < controller.game.board.fields.length) {
       controller.game.board.fields(idx).name
@@ -58,6 +52,32 @@ class BoardPanel(controller: Controller) extends GridPane {
         case pf: PropertyField =>
           pf.owner match {
             case Some(owner) => s" ${owner.name} ${pf.house.amount}🏠"
+            case None => ""
+          }
+        case ts: TrainStationField =>
+          ts.owner match {
+            case Some(owner) => s" ${owner.name}"
+            case None => ""
+          }
+        case uf: UtilityField =>
+          uf.owner match {
+            case Some(owner) => s" ${owner.name}"
+            case None => ""
+          }
+        case _ => ""
+      }
+    } else {
+      ""
+    }
+  }
+
+  private def getExtraSide(idx: Int): String = {
+    if (idx >= 0 && idx < controller.game.board.fields.length) {
+      val field = controller.game.board.fields(idx)
+      field match {
+        case pf: PropertyField =>
+          pf.owner match {
+            case Some(owner) => s" ${owner.name}\n ${pf.house.amount}\n🏠"
             case None => ""
           }
         case ts: TrainStationField =>
@@ -111,12 +131,9 @@ class BoardPanel(controller: Controller) extends GridPane {
     }
   }
 
-  // Method to build the board content
   def buildBoard(): Unit = {
-    // Clear existing children before rebuilding to avoid duplicates
     children.clear()
 
-    // Edges (Corners)
     add(new Label {
       text = s"1\n${getFieldName(0)}\n${getPlayerOnField(0)}"
       prefWidth = edges
@@ -145,12 +162,11 @@ class BoardPanel(controller: Controller) extends GridPane {
       style = contentFieldStyle
     }, 0, 10)
 
-    // TOP ROW (Fields 1-9) - Stripe at the bottom
     for {
       col <- 1 until numCols - 1
       boardIndex = col
     } add(new VBox {
-      val stripeHeight = toph / 5
+      val stripeHeight = toph / 4
       val contentHeight = toph - stripeHeight
 
       children = Seq(
@@ -174,7 +190,7 @@ class BoardPanel(controller: Controller) extends GridPane {
       row <- 1 until numRows - 1
       boardIndex = 10 + row
     } add(new HBox {
-      val stripeWidth = sidew / 5
+      val stripeWidth = sidew / 4
       val contentWidth = sidew - stripeWidth
 
       children = Seq(
@@ -182,7 +198,7 @@ class BoardPanel(controller: Controller) extends GridPane {
           prefWidth = stripeWidth
           prefHeight = sideh
           style = s"-fx-background-color: ${getColor(boardIndex)}; -fx-text-fill: white; -fx-alignment: center;"
-          text = getExtra(boardIndex)
+          text = getExtraSide(boardIndex)
         },
         new Label {
           text = s"${boardIndex + 1}\n${getFieldName(boardIndex)}\n${getPlayerOnField(boardIndex)}"
@@ -193,12 +209,11 @@ class BoardPanel(controller: Controller) extends GridPane {
       )
     }, 10, row)
 
-    // BOTTOM ROW (Fields 21-29) - Reversed order - Stripe at the top
     for {
       col <- 1 until numCols - 1
       boardIndex = 20 + (numCols - 1 - col)
     } add(new VBox {
-      val stripeHeight = toph / 5
+      val stripeHeight = toph / 4
       val contentHeight = toph - stripeHeight
 
       children = Seq(
@@ -222,7 +237,7 @@ class BoardPanel(controller: Controller) extends GridPane {
       row <- 1 until numRows - 1
       boardIndex = 30 + (numRows - 1 - row)
     } add(new HBox {
-      val stripeWidth = sidew / 5
+      val stripeWidth = sidew / 4
       val contentWidth = sidew - stripeWidth
 
       children = Seq(
@@ -236,7 +251,7 @@ class BoardPanel(controller: Controller) extends GridPane {
           prefWidth = stripeWidth
           prefHeight = sideh
           style = s"-fx-background-color: ${getColor(boardIndex)}; -fx-text-fill: white; -fx-alignment: center;"
-          text = getExtra(boardIndex)
+          text = getExtraSide(boardIndex)
         }
       )
     }, 0, row)
