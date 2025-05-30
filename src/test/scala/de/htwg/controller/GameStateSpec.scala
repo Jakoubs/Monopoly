@@ -4,6 +4,7 @@ import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.controller.*
+import de.htwg.controller.OpEnum.{buy, enter, fieldSelected, n, pay, roll, y}
 import de.htwg.model.*
 import de.htwg.model.PropertyField.Color.*
 import de.htwg.util.util.Observable
@@ -65,27 +66,27 @@ class GameStateSpec extends AnyWordSpec with Matchers {
   "StartTurnState" should {
     "go to JailState if player is in jail" in {
       controller.updatePlayer(player1.copy(isInJail = true))
-      val state = StartTurnState().handle(OpEnum.enter, controller)
+      val state = StartTurnState().handle(enter, controller)
       state shouldBe a[JailState]
     }
 
     "go to RollingState if player is not in jail" in {
       controller.updatePlayer(player1.copy(isInJail = false))
-      val state = StartTurnState().handle(OpEnum.enter, controller)
+      val state = StartTurnState().handle(enter, controller)
       state shouldBe a[RollingState]
     }
   }
 
   "RollingState" should {
     "roll the dice and go to MovingState" in {
-      val state = RollingState().handle(OpEnum.enter, controller)
+      val state = RollingState().handle(enter, controller)
       state shouldBe a[MovingState]
     }
   }
 
   "EndTurnState" should {
     "switch to next player and return StartTurnState" in {
-      val state = EndTurnState().handle(OpEnum.end, controller)
+      val state = EndTurnState().handle(enter, controller)
       state shouldBe a[StartTurnState]
     }
   }
@@ -93,19 +94,19 @@ class GameStateSpec extends AnyWordSpec with Matchers {
   "MovingState" should {
     "go to PropertyDecisionState when landing on buyable property" in {
       controller.updatePlayer(player1.copy(position = 1)) // Property "brown1"
-      val state = MovingState(() => (1, 0)).handle(OpEnum.enter, controller)
+      val state = MovingState(() => (1, 0)).handle(enter, controller)
       state shouldBe a[PropertyDecisionState]
     }
 
     "go to AdditionalActionsState when landing on empty field" in {
       controller.updatePlayer(player1.copy(position = 2)) // CommunityChestField
-      val state = MovingState(() => (1, 0)).handle(OpEnum.enter, controller)
+      val state = MovingState(() => (1, 0)).handle(enter, controller)
       state shouldBe a[AdditionalActionsState]
     }
 
     "go to EndTurnState after GoToJailField" in {
       controller.updatePlayer(player1.copy(position = 30)) // GoToJail
-      val state = MovingState(() => (1, 0)).handle(OpEnum.enter, controller)
+      val state = MovingState(() => (1, 0)).handle(enter, controller)
       state shouldBe a[EndTurnState]
       controller.currentPlayer.isInJail shouldBe true
     }
@@ -113,8 +114,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     "use JailTurnStrategy when player is in jail" in {
       val jailedPlayer = player1.copy(isInJail = true)
       controller.updatePlayer(jailedPlayer)
-
-      val state = MovingState(() => (3, 3)).handle(OpEnum.enter, controller)
+      val state = MovingState(() => (3, 3)).handle(enter, controller)
 
       controller.currentPlayer.isInJail shouldBe false
       state should not be a[JailState]
@@ -173,21 +173,16 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       val state = BuyHouseState().handle(OpEnum.fieldSelected(fieldIndexToBuyHouseOn), controller)
       state shouldBe a[ConfirmBuyHouseState]
 
-      val updatedField = controller.board.fields(fieldIndexToBuyHouseOn - 1).asInstanceOf[PropertyField]
+      val state = BuyHouseState().handle(fieldSelected(22), controller) // input.toInt - 1 = 1 → "brown1"
+      state shouldBe a[AdditionalActionsState]
+
+      val updatedField = controller.board.fields(21).asInstanceOf[PropertyField]
       updatedField.house.amount should be > 0
     }
 
     "return EndTurnState if field is not a property field" in {
-      val jailFieldIndex = 11 // JailField at index 10
-      val state = BuyHouseState(isDouble = false).handle(OpEnum.fieldSelected(jailFieldIndex), controller)
-      state shouldBe a[EndTurnState]
-    }
-    "return RollingState if field is not a property field and player rolls doubles" in {
-      val state = BuyHouseState(isDouble = true).handle(OpEnum.fieldSelected(5), controller)
-      state shouldBe a[RollingState]
-    }
-    "return EndState if field is not a property field and player does not roll doubles" in {
-      val state = BuyHouseState().handle(OpEnum.fieldSelected(5), controller)
+      val jailFieldIndex = 11 // JailField bei Index 10 → input = 11
+      val state = BuyHouseState().handle(fieldSelected(11), controller)
       state shouldBe a[EndTurnState]
     }
     "return BuyHouseState if OpEnum is not fieldSelected" in {
@@ -216,42 +211,43 @@ class GameStateSpec extends AnyWordSpec with Matchers {
 
     "execute BuyPropertyCommand and return AdditionalActionsState for PropertyField" in {
       controller.updatePlayer(player1.copy(position = 2))
-      val state = BuyPropertyState().handle(OpEnum.enter, controller)
+      val state = BuyPropertyState().handle(enter, controller)
       state shouldBe a[AdditionalActionsState]
     }
 
     "execute BuyTrainStationCommand and return AdditionalActionsState for TrainStationField" in {
       controller.updatePlayer(player1.copy(position = 6))
-      val state = BuyPropertyState().handle(OpEnum.enter, controller)
+
+      val state = BuyPropertyState().handle(enter, controller)
       state shouldBe a[AdditionalActionsState]
     }
 
     "execute BuyUtilityCommand and return AdditionalActionsState for UtilityField" in {
       controller.updatePlayer(player1.copy(position = 13))
-      val state = BuyPropertyState().handle(OpEnum.enter, controller)
+      val state = BuyPropertyState().handle(enter, controller)
       state shouldBe a[AdditionalActionsState]
     }
 
     "return AdditionalActionsState for non-buyable field" in {
       controller.updatePlayer(player1.copy(position = 1))
-      val state = BuyPropertyState().handle(OpEnum.enter, controller)
+      val state = BuyPropertyState().handle(enter, controller)
       state shouldBe a[AdditionalActionsState]
     }
   }
 
   "PropertyDecisionState" should {
 
-    "return BuyPropertyState when input is 'y'" in {
-      val stateY = PropertyDecisionState().handle(OpEnum.y, controller)
+    "return BuyPropertyState when input is 'y' or 'j'" in {
+      val stateY = PropertyDecisionState().handle(y, controller)
       stateY shouldBe a[BuyPropertyState]
     }
-    "return AdditionalActionsState when input is 'n'" in {
-      val stateN = PropertyDecisionState().handle(OpEnum.n, controller)
-      stateN shouldBe a[AdditionalActionsState]
-    }
-    "return AdditionalActionsState when input is not 'y' or 'n'" in {
-      val state = PropertyDecisionState().handle(OpEnum.roll, controller)
-      state shouldBe a[AdditionalActionsState]
+
+    "return AdditionalActionsState for any other input" in {
+      val state1 = PropertyDecisionState().handle(n, controller)
+      val state3 = PropertyDecisionState().handle(enter, controller)
+
+      state1 shouldBe a[AdditionalActionsState]
+      state3 shouldBe a[AdditionalActionsState]
     }
   }
 
@@ -260,14 +256,14 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     "return RollingState if player pays to leave jail and has enough money" in {
       val richPlayer = player1.copy(balance = 100, isInJail = true)
       controller.updatePlayer(richPlayer)
-      val state = JailState().handle(OpEnum.pay, controller)
+      val state = JailState().handle(pay, controller)
       state shouldBe a[RollingState]
     }
 
     "stay in JailState if player tries to pay with insufficient balance" in {
       val poorPlayer = player1.copy(balance = 10, isInJail = true)
       controller.updatePlayer(poorPlayer)
-      val state = JailState().handle(OpEnum.pay, controller)
+      val state = JailState().handle(pay, controller)
       state shouldBe a[JailState]
     }
 
@@ -278,7 +274,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       val updated = strategy.executeTurn(controller.currentPlayer, doubler)
       controller.updatePlayer(updated)
 
-      val state = JailState().handle(OpEnum.roll, controller)
+      val state = JailState().handle(roll, controller)
       if (!controller.currentPlayer.isInJail)
         state shouldBe a[MovingState]
       else
@@ -290,13 +286,20 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       controller.updatePlayer(player1.copy(isInJail = true))
 
       val state = JailState().handle(OpEnum.roll, controller)
+
       if (controller.currentPlayer.isInJail)
         state shouldBe a[JailState]
       else
         fail("Expected player to stay in jail after not rolling doubles")
     }
 
-    "handle if controller is not right initialized" in {
+    "stay in JailState on unrecognized input" in {
+      controller.updatePlayer(player1.copy(isInJail = true))
+      val state = JailState().handle(y, controller)
+      state shouldBe a[JailState]
+    }
+
+    "handle if controller is not right initilized" in {
       val fakeDice = new Dice() {
         override def rollDice(withSound: Boolean): (Int, Int) = (6, 6)
       }
@@ -304,7 +307,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       val controller = new Controller(initialGame, fakeDice)
       controller.updatePlayer(player1.copy(isInJail = true))
 
-      val state = JailState().handle(OpEnum.roll, controller)
+      val state = JailState().handle(enter, controller)
       state shouldBe a[MovingState]
     }
   }

@@ -8,8 +8,8 @@ import de.htwg.Board
 class RentVisitorSpec extends AnyWordSpec with Matchers {
 
   "A RentVisitor" when {
-    val player1 = Player("Player 1", 1500, 1)
-    val player2 = Player("Player 2", 1500, 1)
+    val player1 = Player("Player 1", 1500, 1, isInJail = false, 0)
+    val player2 = Player("Player 2", 1500, 1, isInJail = false, 0)
     val board = Board(Vector.empty) // You might need to create a more realistic board for some tests
 
     "visiting a PropertyField" should {

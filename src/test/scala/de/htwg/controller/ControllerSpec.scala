@@ -1,6 +1,7 @@
 package de.htwg.controller
 
 import de.htwg.controller.OpEnum.end
+import de.htwg.controller.OpEnum.enter
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import de.htwg.model.*
@@ -47,7 +48,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
     "update state when handleInput is called" in {
       val initialState = controller.state
-      controller.handleInput(OpEnum.end)
+      controller.handleInput(enter)
       controller.state should not be initialState
     }
 

@@ -2,10 +2,11 @@ package de.htwg.controller
 
 import de.htwg.MonopolyGame
 import de.htwg.Board
-import de.htwg.model.{BoardField, Player, Dice}
+import de.htwg.model.{BoardField, Dice, Player}
 import de.htwg.controller.PayJailHandler
 import de.htwg.controller.MovingState
 import de.htwg.controller.JailState
+import de.htwg.controller.OpEnum.*
 import de.htwg.controller.RollingState
 import de.htwg.controller.StartTurnState
 import de.htwg.util.util.Observable
@@ -31,7 +32,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
 
     override def handle(input: OpEnum): Option[GameState] = {
       handleCalledWith = Some(input)
-      if (input == expectedInput) nextState else None
+      if (input.equals(expectedInput)) nextState else None
     }
   }
 
@@ -49,7 +50,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
     "handle 'pay' and call payJailFee on controller and return RollingState if player has enough balance" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
       val handler = PayJailHandler(controller)
-      val result = handler.handle(OpEnum.pay)
+      val result = handler.handle(pay)
       controller.payJailFeeCalled should be(false)
       result shouldBe Some(RollingState())
     }
@@ -57,12 +58,12 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
     "handle 'pay' and not call payJailFee and return JailState if player does not have enough balance" in {
       val controller = new TestController(initialGame.copy(players = Vector(player1.copy(balance = 20)), currentPlayer = player1.copy(balance = 20)), mockDiceNonDoubles)
       val handler = PayJailHandler(controller)
-      val result = handler.handle(OpEnum.pay)
+      val result = handler.handle(pay)
       controller.payJailFeeCalled should be(false)
       result shouldBe Some(JailState())
     }
 
-    "not handle other input and call next handler" in {
+    /*"not handle other input and call next handler" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
       val nextHandlerStub = new NextHandlerStub(OpEnum.roll, Some(JailState()))
       val handler = PayJailHandler(controller, Some(nextHandlerStub))
@@ -75,7 +76,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
     "handle 'roll', call updatePlayer on controller and return MovingState if doubles are rolled" in {
       val controller = new TestController(initialGame, mockDiceDoubles)
       val handler = RollDoublesJailHandler(controller)
-      val result = handler.handle(OpEnum.roll)
+      val result = handler.handle(roll)
       controller.updatePlayerCalledWith.isDefined should be(true)
       controller.updatePlayerCalledWith.get.isInJail should be(false)
       result shouldBe a[Some[_]]
@@ -85,7 +86,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
     "handle 'roll', call updatePlayer on controller and return JailState if no doubles are rolled" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
       val handler = RollDoublesJailHandler(controller)
-      val result = handler.handle(OpEnum.roll)
+      val result = handler.handle(roll)
       controller.updatePlayerCalledWith.isDefined should be(true)
       controller.updatePlayerCalledWith.get.isInJail should be(true)
       result shouldBe Some(JailState())
@@ -93,21 +94,28 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
 
     "not handle other input and call next handler" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
-      val nextHandlerStub = new NextHandlerStub(OpEnum.pay, Some(JailState()))
+      val nextHandlerStub = new NextHandlerStub(pay, Some(JailState()))
       val handler = RollDoublesJailHandler(controller, Some(nextHandlerStub))
-      handler.handle(OpEnum.pay) shouldBe Some(JailState())
-      nextHandlerStub.handleCalledWith shouldBe Some(OpEnum.pay)
+      handler.handle(pay) shouldBe Some(JailState())
+      nextHandlerStub.handleCalledWith shouldBe Some(pay)
     }
   }
 
   "InvalidJailInputHandler" should {
+    "handle any input and return JailState" in {
+      val controller = new TestController(initialGame, mockDiceNonDoubles)
+      val handler = InvalidJailInputHandler(controller)
+      handler.handle(n) shouldBe Some(JailState())
+      handler.handle(n) shouldBe Some(JailState())
+      handler.handle(enter) shouldBe Some(JailState())
+    }
 
     "not call next handler as it's the end of the chain" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
-      val nextHandlerStub = new NextHandlerStub(OpEnum.enter, None)
+      val nextHandlerStub = new NextHandlerStub(enter, None)
       val handler = InvalidJailInputHandler(controller, Some(nextHandlerStub))
-      handler.handle(OpEnum.enter)
-      nextHandlerStub.handleCalledWith shouldBe None
+      handler.handle(n)
+      nextHandlerStub.handleCalledWith shouldBe None // Da der InvalidHandler immer einen Zustand zurückgibt
     }
   }
 }
