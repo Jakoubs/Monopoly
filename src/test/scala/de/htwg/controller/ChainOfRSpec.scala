@@ -21,6 +21,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
     var updatePlayerCalledWith: Option[Player] = None
 
     override val dice: Dice = mockDice
+
     override def updatePlayer(player: Player): Unit = updatePlayerCalledWith = Some(player)
   }
 
@@ -37,7 +38,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
   }
 
   val player1 = Player("Test Player", 100, 0, isInJail = true, 0)
-  val board =  Board(Vector.empty)
+  val board = Board(Vector.empty)
   val mockDiceNonDoubles = new Dice() {
     override def rollDice(sound: Boolean = false): (Int, Int) = (1, 2)
   }
@@ -63,7 +64,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
       result shouldBe Some(JailState())
     }
 
-    /*"not handle other input and call next handler" in {
+    "not handle other input and call next handler" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
       val nextHandlerStub = new NextHandlerStub(OpEnum.roll, Some(JailState()))
       val handler = PayJailHandler(controller, Some(nextHandlerStub))

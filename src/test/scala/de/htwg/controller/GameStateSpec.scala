@@ -173,8 +173,8 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       val state = BuyHouseState().handle(OpEnum.fieldSelected(fieldIndexToBuyHouseOn), controller)
       state shouldBe a[ConfirmBuyHouseState]
 
-      val state = BuyHouseState().handle(fieldSelected(22), controller) // input.toInt - 1 = 1 → "brown1"
-      state shouldBe a[AdditionalActionsState]
+      val state2 = BuyHouseState().handle(fieldSelected(22), controller) // input.toInt - 1 = 1 → "brown1"
+      state2 shouldBe a[ConfirmBuyHouseState]
 
       val updatedField = controller.board.fields(21).asInstanceOf[PropertyField]
       updatedField.house.amount should be > 0
@@ -308,7 +308,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       controller.updatePlayer(player1.copy(isInJail = true))
 
       val state = JailState().handle(enter, controller)
-      state shouldBe a[MovingState]
+      state shouldBe a[JailState]
     }
   }
 

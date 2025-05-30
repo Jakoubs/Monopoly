@@ -157,8 +157,7 @@ case class PropertyDecisionState(isDouble: Boolean = false) extends GameState {
       case OpEnum.n => // ✅ Bei 'n' nicht kaufen
         AdditionalActionsState(isDouble)
       case _ =>
-        // Optional: Fehlerbehandlung für ungültige Eingabe
-        this // Bleibe im aktuellen State
+        AdditionalActionsState(isDouble)
     }
   }
 }

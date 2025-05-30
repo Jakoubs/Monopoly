@@ -192,7 +192,7 @@ object GUI extends JFXApp3 with Observer {
           rollDiceButton.disable = false
           endTurnButton.disable = true
 
-        case RollingState() =>
+        case RollingState(_) =>
           rollDiceButton.disable = false
 
         case JailState() =>
