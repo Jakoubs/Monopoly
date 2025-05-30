@@ -77,16 +77,16 @@ class MonopolySpec extends AnyWordSpec {
     }
 
     "not generate duplicate emojis" in {
-      val existingPlayers = Vector(Player("🐶", 1500, 1))
+      val existingPlayers = Vector(Player("🐶", 1500, 1, false, 0))
       val emoji = Monopoly.randomEmoji(existingPlayers)
       emoji should not be "🐶"
     }
 
     "initialize board with correct fields" in {
       val game = MonopolyGame(
-        Vector(Player("🐶", 1500, 1)),
+        Vector(Player("🐶", 1500, 1, false, 0)),
         Board(Vector(GoField)),
-        Player("🐶", 1500, 1),
+        Player("🐶", 1500, 1, false, 0),
         false
       )
       game.board.fields.size should be >= 1

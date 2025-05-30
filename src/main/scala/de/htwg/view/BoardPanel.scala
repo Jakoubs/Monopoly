@@ -23,7 +23,7 @@ class BoardPanel(controller: Controller) extends GridPane {
   private val sidew = 180 * scaleFactor
   private val sideh = 120 * scaleFactor
   private val edges = 180 * scaleFactor
-  private val fontsize = (8 * scaleFactor*0.7).toString
+  private val fontsize = (24*scaleFactor).toString
 
   private val contentFieldStyle =
     "-fx-font: normal bold "+fontsize+"pt sans-serif;" +

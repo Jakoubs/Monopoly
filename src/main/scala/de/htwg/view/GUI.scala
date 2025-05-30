@@ -1,10 +1,9 @@
-// src/main/scala/de/htwg/view/GUI.scala
 package de.htwg.view
 
 import scalafx.application.JFXApp3
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Label}
+import scalafx.scene.control.{Button, ComboBox, Label, TextField}
 import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.scene.paint.Color
 import de.htwg.controller.Controller
@@ -18,19 +17,28 @@ import de.htwg.model.{Dice, GoField, GoToJailField, JailField, Player, PropertyF
 import de.htwg.controller.OpEnum
 import de.htwg.controller.OpEnum.{buy, end, enter, n, pay, y}
 import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, PropertyDecisionState, RollingState, StartTurnState}
+import scalafx.collections.ObservableBuffer
 
 object GUI extends JFXApp3 with Observer {
   private var gameController: Option[Controller] = None
   private var boardPanel: Option[BoardPanel] = None
 
-  // --- Change these to lazy val ---
   private lazy val rollDiceButton = new Button("Würfeln")
   private lazy val buyPropertyButton = new Button("Kaufen")
   private lazy val endTurnButton = new Button("Zug beenden")
   private lazy val payJailFineButton = new Button("Kaution zahlen")
   private lazy val confirmBuyHouseButton = new Button("Bestätigen")
   private lazy val declineBuyHouseButton = new Button("Abbrechen")
-  // ---------------------------------
+  private lazy val turnInfoLabel = new Label {
+    style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
+    wrapText = true
+    maxWidth = Double.MaxValue
+  }
+  private lazy val playersInfoLabel = new Label {
+    style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
+    wrapText = true
+    maxWidth = Double.MaxValue
+  }
 
   override def start(): Unit = {
     Monopoly.gameController match {
@@ -43,10 +51,12 @@ object GUI extends JFXApp3 with Observer {
         Platform.exit()
         return
     }
-
-    val rootLayout = new VBox {
-      alignment = Pos.Center
+    val mainLayout = new HBox {
+      spacing = 20
       padding = Insets(10)
+
+    val leftColumn = new VBox {
+      alignment = Pos.Center
       spacing = 20
 
       boardPanel.foreach(panel => {
@@ -54,21 +64,63 @@ object GUI extends JFXApp3 with Observer {
         VBox.setVgrow(panel, Priority.Always)
       })
 
+      children += turnInfoLabel
       children += createButtonPanel()
     }
 
+      val rightColumn = new VBox {
+        alignment = Pos.TopRight
+        spacing = 10
+        minWidth = 250
+
+        children += new Label {
+          text = "SPIELER ÜBERSICHT"
+          style = "-fx-font: bold 18pt sans-serif; -fx-text-fill: white;"
+        }
+
+        children += playersInfoLabel
+      }
+
+      children = Seq(leftColumn, rightColumn)
+      HBox.setHgrow(leftColumn, Priority.Always)
+    }
+
+
+
     stage = new JFXApp3.PrimaryStage {
-      title = "ScalaFX Monopoly"
+      title = "Monopoly"
       scene = new Scene {
         fill = Color.rgb(38, 38, 38)
-        content = rootLayout
+        content = mainLayout
       }
     }
-    // Set initial button states based on the controller's initial state
+    updatePlayersInfo()
     updateButtonStates()
   }
 
-  private def createButtonPanel(): HBox = {
+  private def updatePlayersInfo(): Unit = {
+    gameController.foreach { ctrl =>
+      val players = ctrl.game.players
+      val currentPlayer = ctrl.currentPlayer
+
+      val playersInfoBuilder = new StringBuilder()
+
+      players.foreach { player =>
+        val currentMarker = if (player == currentPlayer) "▶ " else ""
+        val playerName = player.name
+
+        playersInfoBuilder.append(
+          s"$currentMarker $playerName\n" +
+            s"   Position: ${player.position}\n" +
+            s"   Guthaben: ${player.balance}€\n\n"
+        )
+      }
+
+      playersInfoLabel.text = playersInfoBuilder.toString()
+    }
+  }
+
+  def createButtonPanel(): HBox = {
     new HBox {
       alignment = Pos.Center
       spacing = 15
@@ -85,7 +137,6 @@ object GUI extends JFXApp3 with Observer {
       buyPropertyButton.minHeight = 40
       buyPropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #f0ad4e; -fx-text-fill: white;"
       buyPropertyButton.onAction = _ => {
-        //gameController.foreach(_.handleInput(enter))
         gameController.foreach(_.handleInput(y))
       }
 
@@ -118,14 +169,15 @@ object GUI extends JFXApp3 with Observer {
         gameController.foreach(_.handleInput(end))
       }
 
-      children = Seq(rollDiceButton, buyPropertyButton, endTurnButton, payJailFineButton, confirmBuyHouseButton, declineBuyHouseButton)
-    }
+      children = Seq(
+        rollDiceButton, buyPropertyButton, endTurnButton,
+        payJailFineButton
+      )    }
   }
 
   private def updateButtonStates(): Unit = {
     gameController.foreach { ctrl =>
       val currentState = ctrl.state
-      println(s"Current GUI State: $currentState")
 
       rollDiceButton.disable = true
       buyPropertyButton.disable = true
@@ -141,7 +193,6 @@ object GUI extends JFXApp3 with Observer {
           endTurnButton.disable = true
 
         case RollingState() =>
-        // No buttons enabled during automatic rolling
           rollDiceButton.disable = false
 
         case JailState() =>
@@ -152,26 +203,17 @@ object GUI extends JFXApp3 with Observer {
         case MovingState(_) =>
           gameController.foreach(_.handleInput(enter))
 
-        // Buttons are typically enabled by the *next* state after movement
-        // For now, keep disabled
-
         case PropertyDecisionState(_) =>
           buyPropertyButton.disable = false
-          endTurnButton.disable = false // For declining to buy
-
+          endTurnButton.disable = false
 
         case BuyPropertyState(_) =>
           gameController.foreach(_.handleInput(enter))
 
-        // No direct button interaction here, it's an action state
-
-
         case AdditionalActionsState(_) =>
-          //rollDiceButton.disable = !ctrl.currentPlayer. // Check if current player can roll again (e.g., if they rolled doubles)
           endTurnButton.disable = false
 
         case BuyHouseState(_) =>
-        // Usually, a dialog for selecting property/house count. No direct buttons here.
 
         case ConfirmBuyHouseState(_, _) =>
           confirmBuyHouseButton.disable = false
@@ -179,9 +221,39 @@ object GUI extends JFXApp3 with Observer {
 
         case EndTurnState() =>
           gameController.foreach(_.handleInput(enter))
-
-        // This state transitions immediately, so no buttons are needed.
       }
+    }
+  }
+
+  private def updateTurnInfo(): Unit = {
+    gameController.foreach { ctrl =>
+      val turnInfo = ctrl.getTurnInfo
+      val infoBuilder = new StringBuilder()
+
+      turnInfo.diceRoll1 match {
+        case 0 =>
+        case _ => infoBuilder.append(s"Würfelergebnis: ${turnInfo.diceRoll1} und ${turnInfo.diceRoll2} (Summe: ${turnInfo.diceRoll1 + turnInfo.diceRoll2})\n")
+      }
+
+      turnInfo.landedField.foreach(field =>
+        infoBuilder.append(s"Gelandet auf: ${field.name}\n")
+      )
+
+      turnInfo.boughtProperty.foreach(property =>
+        infoBuilder.append(s"Gekaufte Immobilie: ${property.name}\n")
+      )
+
+      turnInfo.builtHouse.foreach(property =>
+        infoBuilder.append(s"Haus gebaut auf: ${property.name}\n")
+      )
+
+      (turnInfo.paidRent, turnInfo.rentPaidTo) match {
+        case (Some(rent), Some(owner)) =>
+          infoBuilder.append(s"Miete bezahlt: ${rent}€ an ${owner.name}\n")
+        case _ =>
+      }
+
+      turnInfoLabel.text = infoBuilder.toString()
     }
   }
 
@@ -198,6 +270,11 @@ object GUI extends JFXApp3 with Observer {
   }
 
   override def update(): Unit = {
-    updateBoard()
+    Platform.runLater {
+      boardPanel.foreach(_.buildBoard())
+      updateTurnInfo()
+      updateButtonStates()
+      updatePlayersInfo()
+    }
   }
 }

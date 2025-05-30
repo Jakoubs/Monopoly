@@ -38,8 +38,8 @@ object Monopoly:
   }
 
   def defineGame(): MonopolyGame = {
-    println("play with sound? (y/n)")
-    val soundInput = readLine()
+    //println("play with sound? (y/n)")
+    val soundInput = "n"//readLine()
     val isTestBoard = soundInput == "yT" || soundInput == "nT"
     val soundBool = soundInput == "y" || soundInput == "yT"
 
@@ -50,8 +50,8 @@ object Monopoly:
     var playerVector = Vector[Player]()
 
     def askForPlayerCount(): Int = {
-      println("How many Player? (2-4):")
-      val input = scala.io.StdIn.readLine()
+      /*println("How many Player? (2-4):")
+     val input = scala.io.StdIn.readLine()
       try {
         val playerCount = input.toInt
         if (playerCount >= 2 && playerCount <= 4) {
@@ -64,9 +64,9 @@ object Monopoly:
         case _: NumberFormatException =>
           println("Invalid input. Please enter a number.")
           2
-      }
+      }*/
+      4
     }
-
     val playerAnz = askForPlayerCount()
 
     for (i <- 1 to playerAnz) {
