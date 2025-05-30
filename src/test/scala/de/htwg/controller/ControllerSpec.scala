@@ -1,5 +1,6 @@
 package de.htwg.controller
 
+import de.htwg.controller.OpEnum.end
 import de.htwg.controller.OpEnum.enter
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
@@ -15,6 +16,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
   val fields = Vector(
     GoField,
     PropertyField("brown1", 2, 100, 10, None, color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0)),
+    PropertyField("Brown2",3,200,20,Some(player1),Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
     JailField
   )
 
@@ -53,10 +55,16 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     "notify observers when handleInput is called" in {
       var notified = false
       controller.add(() => notified = true)
-      controller.handleInput(enter)
+      controller.handleInput(end)
       notified shouldBe true
     }
+    "getInventory should return the correct inventory string" in {
+      val expectedInventoryString = s"INVENTORY Player: ${player1.name}| idx:3[0]"
 
+      val actualInventoryString = controller.getInventory
+
+      actualInventoryString should be(expectedInventoryString)
+    }
     "update board and player correctly" in {
       val updatedField = PropertyField("brown1", 2, 100, 10, Some(player1), color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
       val updatedPlayer = player1.copy(balance = 1300)

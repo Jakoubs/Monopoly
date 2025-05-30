@@ -78,9 +78,9 @@ object Monopoly:
     val board = Board(
       Vector(
         GoField,
-        PropertyField("brown1", 2, 60, 2, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
+        PropertyField("brown1", 2, 60, 2, Some(playerVector.head), color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(5)),
         CommunityChestField(3),
-        PropertyField("brown2", 4, 60, 4, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
+        PropertyField("brown2", 4, 60, 4, Some(playerVector.head), color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
         TaxField(100, 5),
         TrainStationField("Marklylebone Station", 6,200, None),
         PropertyField("lightBlue1", 7, 100, 6, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(50, false), PropertyField.House(0)),

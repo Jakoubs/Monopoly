@@ -13,7 +13,7 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       val mockDice = () => (3, 4)
       val updatedPlayer = strategy.executeTurn(initialPlayer, mockDice)
       updatedPlayer.position should be(12)
-      //updatedPlayer.jailTurns should be(0)
+      updatedPlayer.consecutiveDoubles should be(0)
     }
 
     "move a player and give extra turn if dice are the same" in {
@@ -22,7 +22,7 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       val mockDice = () => (3, 3)
       val updatedPlayer = strategy.executeTurn(initialPlayer, mockDice)
       updatedPlayer.position should be(11)
-      //updatedPlayer.jailTurns should be(0) // Überprüfe, dass der Jail-Zähler nicht beeinflusst wird
+      updatedPlayer.consecutiveDoubles should be(0)
     }
 
     "move a player past Go and collect money" in {
@@ -52,7 +52,8 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       val updatedPlayer = strategy.executeTurn(initialPlayer, mockDice)
       updatedPlayer.isInJail should be(false)
       updatedPlayer.position should be(14)
-      //updatedPlayer.jailTurns should be(0)
+      updatedPlayer.consecutiveDoubles should be(0)
+
     }
 
     "increment jail turns if no doubles are rolled" in {
@@ -61,7 +62,8 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       val mockDice = () => (3, 4)
       val updatedPlayer = strategy.executeTurn(initialPlayer, mockDice)
       updatedPlayer.isInJail should be(true)
-      //updatedPlayer.jailTurns should be(2)
+      updatedPlayer.consecutiveDoubles should be(2)
+
       updatedPlayer.position should be(10) // Position sollte sich nicht ändern
     }
 
@@ -72,7 +74,7 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       val updatedPlayer = strategy.executeTurn(initialPlayer, mockDice)
       updatedPlayer.isInJail should be(false)
       updatedPlayer.balance should be(1450)
-      //updatedPlayer.jailTurns should be(0)
+      updatedPlayer.consecutiveDoubles should be(0)
       updatedPlayer.position should be(10) // Position sollte sich nicht ändern
     }
 

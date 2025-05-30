@@ -47,7 +47,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
   val initialGame = MonopolyGame(Vector(player1), board, player1, false)
 
   "PayJailHandler" should {
-    "handle '1' and call payJailFee on controller and return RollingState if player has enough balance" in {
+    "handle 'pay' and call payJailFee on controller and return RollingState if player has enough balance" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
       val handler = PayJailHandler(controller)
       val result = handler.handle(pay)
@@ -55,7 +55,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
       result shouldBe Some(RollingState())
     }
 
-    "handle '1' and not call payJailFee and return JailState if player does not have enough balance" in {
+    "handle 'pay' and not call payJailFee and return JailState if player does not have enough balance" in {
       val controller = new TestController(initialGame.copy(players = Vector(player1.copy(balance = 20)), currentPlayer = player1.copy(balance = 20)), mockDiceNonDoubles)
       val handler = PayJailHandler(controller)
       val result = handler.handle(pay)
@@ -65,15 +65,15 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
 
     /*"not handle other input and call next handler" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
-      val nextHandlerStub = new NextHandlerStub("2", Some(JailState()))
+      val nextHandlerStub = new NextHandlerStub(OpEnum.roll, Some(JailState()))
       val handler = PayJailHandler(controller, Some(nextHandlerStub))
-      handler.handle("2") shouldBe Some(JailState())
-      nextHandlerStub.handleCalledWith shouldBe Some("2")
-    }*/
+      handler.handle(OpEnum.roll) shouldBe Some(JailState())
+      nextHandlerStub.handleCalledWith shouldBe Some(OpEnum.roll)
+    }
   }
 
   "RollDoublesJailHandler" should {
-    "handle '3', call updatePlayer on controller and return MovingState if doubles are rolled" in {
+    "handle 'roll', call updatePlayer on controller and return MovingState if doubles are rolled" in {
       val controller = new TestController(initialGame, mockDiceDoubles)
       val handler = RollDoublesJailHandler(controller)
       val result = handler.handle(roll)
@@ -83,7 +83,7 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
       result.get shouldBe a[MovingState]
     }
 
-    "handle '3', call updatePlayer on controller and return JailState if no doubles are rolled" in {
+    "handle 'roll', call updatePlayer on controller and return JailState if no doubles are rolled" in {
       val controller = new TestController(initialGame, mockDiceNonDoubles)
       val handler = RollDoublesJailHandler(controller)
       val result = handler.handle(roll)

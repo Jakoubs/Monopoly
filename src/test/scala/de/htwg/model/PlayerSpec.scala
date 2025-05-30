@@ -12,6 +12,7 @@ class PlayerSpec extends AnyWordSpec {
       player.balance should be(1000)
       player.position should be(5)
       player.isInJail should be(false)
+      player.consecutiveDoubles should be(0)
     }
 
     "be able to change position index when not in jail" in {
@@ -19,6 +20,12 @@ class PlayerSpec extends AnyWordSpec {
       val updatedPlayer = player.moveToIndex(4)
       updatedPlayer.position shouldEqual 4
       updatedPlayer.isInJail should be(false)
+    }
+
+    "increase consecutiveDoubles when incrementDoubles" in {
+      val player = Player("TestPlayer", 100, 5)
+      val updatedPlayer = player.incrementDoubles()
+      updatedPlayer.consecutiveDoubles shouldEqual 1
     }
 
     "not be able to change index when in jail" in {
@@ -40,7 +47,6 @@ class PlayerSpec extends AnyWordSpec {
       updatedPlayer.position shouldEqual 11
       updatedPlayer.isInJail should be(true)
     }
-
     /*
     "roll the dice and move position" in {
       val player = Player("TestPlayer", 100, position = 5, isInJail = false, 0)

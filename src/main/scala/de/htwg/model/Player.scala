@@ -7,18 +7,13 @@ case class Player(name: String,
                   balance: Int,
                   position: Int = 1,
                   isInJail: Boolean = false,
-                  consecutiveDoubles: Int
+                  consecutiveDoubles: Int = 0
                  ) {
 
   def moveToIndex(index: Int): Player = {
     if (!isInJail) {
-      if(index == 0){
-        val newPlayer = this.copy(position = 40)
-        return newPlayer
-      }else {
         val newPlayer = this.copy(position = index)
         return newPlayer
-      }
     }
     this
   }

@@ -23,6 +23,8 @@ class Tui(controller: Controller) extends Observer {
           input match {
             case "1" => controller.handleInput(OpEnum.pay)
             case "3" => controller.handleInput(OpEnum.roll)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.pay)
           }
 
@@ -33,6 +35,8 @@ class Tui(controller: Controller) extends Observer {
           input match {
             case "y" => controller.handleInput(OpEnum.y)
             case "n" => controller.handleInput(OpEnum.n)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.n)
           }
         case _: AdditionalActionsState =>
@@ -43,6 +47,8 @@ class Tui(controller: Controller) extends Observer {
           input match {
             case "1" => controller.handleInput(OpEnum.buy)
             case "2" => controller.handleInput(OpEnum.end)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.end)
           }
         case _: RollingState =>
@@ -50,6 +56,8 @@ class Tui(controller: Controller) extends Observer {
           val input = readLine()
           input match {
             case "" => controller.handleInput(OpEnum.enter)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _: MovingState =>
@@ -58,6 +66,8 @@ class Tui(controller: Controller) extends Observer {
           val input = readLine()
           input match {
             case "" => controller.handleInput(OpEnum.enter)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _: BuyPropertyState =>
@@ -65,6 +75,8 @@ class Tui(controller: Controller) extends Observer {
           val input = readLine()
           input match {
             case "" => controller.handleInput(OpEnum.enter)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _: EndTurnState =>
@@ -77,23 +89,29 @@ class Tui(controller: Controller) extends Observer {
         case _: BuyHouseState =>
           println("Which House do you want to buy? (1-40)")
           val input = readLine()
-
-          val houseNumber: Int = input.toIntOption match {
-            case Some(num) if num >= 1 && num <= 40 => num
+          input match {
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ =>
-              println("Invalid input. Defaulting to house 1.")
-              1
+              val houseNumber: Int = input.toIntOption match {
+                case Some(num) if num >= 1 && num <= 40 => num
+                case _ =>
+                  println("Invalid input. Defaulting to house 1.")
+                  1
+              }
+              controller.handleInput(OpEnum.fieldSelected(houseNumber))
           }
-          controller.handleInput(OpEnum.fieldSelected(houseNumber))
-
         case _: ConfirmBuyHouseState =>
           println("Do you want to Undo the House purchase? (y/n)")
           val input = readLine()
           input match {
-            case "" => controller.handleInput(OpEnum.y)
+            case "y" => controller.handleInput(OpEnum.y)
             case "n" => controller.handleInput(OpEnum.n)
+            case "u" => controller.handleInput(OpEnum.undo)
+            case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.n)
           }
+
         case _ =>
           println("Press enter to continue...")
           val input = readLine()
