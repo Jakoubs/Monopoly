@@ -7,8 +7,8 @@ import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Red, Yellow, Green, L
 import de.htwg.model.BoardPrinter
 
 class BoardPrinterSpec extends AnyWordSpec {
-  val player1 = Player("A", 1500, 12)
-  val player2 = Player("B", 1500, 1)
+  val player1 = Player("A", 1500, 12, isInJail = false, 0)
+  val player2 = Player("B", 1500, 1, isInJail = false, 0)
   val brownProperty1 = PropertyField("Brown1", 2, 100, 10, None, Brown)
   val brownProperty1Owned = brownProperty1.copy(owner = Some(player1))
   val brownProperty1WithHouse = brownProperty1Owned.copy(house = PropertyField.House(1))
@@ -286,7 +286,7 @@ class BoardPrinterSpec extends AnyWordSpec {
       }
 
       "handle multiple players on same index" in {
-        val player3 = Player("C", 1500, 12)
+        val player3 = Player("C", 1500, 12, isInJail = false, 0)
         val gameWithMultiplePlayersOnSameIndex =
           MonopolyGame(Vector(player1, player2, player3), board, player1, false)
         val playerString = BoardPrinter.playersOnIndex(gameWithMultiplePlayersOnSameIndex, 12, false)
