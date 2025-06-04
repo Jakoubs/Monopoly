@@ -9,7 +9,7 @@ lazy val root = (project in file("."))
   )
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
-libraryDependencies += "org.scalafx" %% "scalafx" % "24.0.0-R35"
+libraryDependencies += "org.scalafx" %% "scalafx" % "20.0.0-R31"
 Compile/mainClass := Some("de.htwg.Monopoly")
 
 
@@ -32,4 +32,15 @@ libraryDependencies ++= {
   }
   Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
     .map(m => "org.openjfx" % s"javafx-$m" % "16" classifier osName)
+}
+
+import sbtassembly.AssemblyPlugin.autoImport._
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", "substitute", "config", xs @ _*) => MergeStrategy.first
+  case PathList("META-INF", "substitute", "config", "resourcebundles") => MergeStrategy.first
+  case PathList("META-INF", "substitute", "config", xs @ _*) => MergeStrategy.first
+  case PathList("META-INF", xs @ _*) if xs.last == "module-info.class" => MergeStrategy.discard
+  case PathList("META-INF", xs @ _*) => MergeStrategy.first
+  case x => (assemblyMergeStrategy in assembly).value(x)
 }

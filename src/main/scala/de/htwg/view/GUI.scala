@@ -15,7 +15,7 @@ import de.htwg.model.BoardField
 import de.htwg.view.BoardPanel
 import de.htwg.model.{Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.controller.OpEnum
-import de.htwg.controller.OpEnum.{buy, end, enter, n, pay, y}
+import de.htwg.controller.OpEnum.{buy, end, enter, n, pay, redo, undo, y}
 import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, PropertyDecisionState, RollingState, StartTurnState}
 import scalafx.collections.ObservableBuffer
 
@@ -29,12 +29,16 @@ object GUI extends JFXApp3 with Observer {
   private lazy val payJailFineButton = new Button("Kaution zahlen")
   private lazy val confirmBuyHouseButton = new Button("Bestätigen")
   private lazy val declineBuyHouseButton = new Button("Abbrechen")
+  private lazy val undoButton = new Button("Undo")
+  private lazy val redoButton = new Button("Redo")
+
   private lazy val turnInfoLabel = new Label {
     style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
     wrapText = true
     maxWidth = Double.MaxValue
   }
-  private lazy val playersInfoLabel = new Label {
+  private lazy val
+  playersInfoLabel = new Label {
     style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
     wrapText = true
     maxWidth = Double.MaxValue
@@ -77,8 +81,22 @@ object GUI extends JFXApp3 with Observer {
           text = "SPIELER ÜBERSICHT"
           style = "-fx-font: bold 18pt sans-serif; -fx-text-fill: white;"
         }
-
+        undoButton.minWidth = 100
+        undoButton.minHeight = 40
+        undoButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #1e81b0; -fx-text-fill: white;"
+        undoButton.onAction = _ => {
+          gameController.foreach(_.handleInput(undo))
+        }
+        redoButton.minWidth = 100
+        redoButton.minHeight = 40
+        redoButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #eeeee4; -fx-text-fill: black;"
+        redoButton.onAction = _ => {
+          gameController.foreach(_.handleInput(redo))
+        }
         children += playersInfoLabel
+        children += undoButton
+        children += redoButton
+
       }
 
       children = Seq(leftColumn, rightColumn)

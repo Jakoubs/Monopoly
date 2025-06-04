@@ -14,13 +14,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Finde die generierte JAR-Datei (angepasster Suchpfad)
-JAR_FILE=$(find "$PROJECT_DIR/target/scala-3.3.5" -name "monopoly*.jar" -o -name "Monopoly*.jar" 2>/dev/null | head -n 1)
+# Finde die generierte JAR-Datei (korrekte Suchlogik)
+JAR_FILE=$(find "$PROJECT_DIR/target/scala-3.3.5" \( -iname "monopoly*.jar" -o -iname "Monopoly*.jar" \) 2>/dev/null | head -n 1)
 
 # Wenn keine JAR gefunden wurde, suche in anderen möglichen Verzeichnissen
 if [ -z "$JAR_FILE" ]; then
     echo "Suche JAR-Datei in alternativen Verzeichnissen..."
-    JAR_FILE=$(find "$PROJECT_DIR/target" -name "*.jar" 2>/dev/null | head -n 1)
+    JAR_FILE=$(find "$PROJECT_DIR/target" -iname "*.jar" 2>/dev/null | head -n 1)
 fi
 
 if [ -z "$JAR_FILE" ]; then

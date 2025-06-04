@@ -39,7 +39,7 @@ object Monopoly:
 
   def defineGame(): MonopolyGame = {
     //println("play with sound? (y/n)")
-    val soundInput = "n"//readLine()
+    val soundInput = "y"//readLine()
     val isTestBoard = soundInput == "yT" || soundInput == "nT"
     val soundBool = soundInput == "y" || soundInput == "yT"
 

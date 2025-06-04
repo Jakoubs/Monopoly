@@ -14,7 +14,7 @@ class BoardPanel(controller: Controller) extends GridPane {
   private val numRows = 11
   private val numCols = 11
 
-  private val scaleFactor = .44
+  private val scaleFactor = .55
   private val topw = 120 * scaleFactor
   private val toph = 180 * scaleFactor
   private val sidew = 180 * scaleFactor
