@@ -1,6 +1,7 @@
 package de.htwg.controller
 
-import de.htwg.model.{Board, Player, PropertyField, TrainStationField, UtilityField, BoardField, Dice}
+import de.htwg.model.{Player, PropertyField, TrainStationField, UtilityField, BoardField, Dice}
+import de.htwg.Board
 import de.htwg.MonopolyGame
 import de.htwg.controller.GameState
 

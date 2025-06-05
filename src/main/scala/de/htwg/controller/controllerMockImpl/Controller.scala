@@ -3,12 +3,14 @@ package de.htwg.controller.mockImpl
 import de.htwg.controller._
 import de.htwg.model._
 import de.htwg.MonopolyGame
+import de.htwg.Board
+
 
 class ControllerMock extends ControllerInterface {
   override def game: MonopolyGame = null
   override def dice: Dice = null
   override def state: GameState = null
-  override def currentPlayer: Player = Player("Mock", 0, 1500, 0, false, 0, 0, false)
+  override def currentPlayer: Player = Player("Mock", 1500,0, false, 0)
   override def board: Board = null
   override def players: Vector[Player] = Vector(currentPlayer)
   override def sound: Boolean = false

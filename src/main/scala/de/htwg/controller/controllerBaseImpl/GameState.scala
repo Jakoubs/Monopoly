@@ -67,7 +67,7 @@ case class RollingState(isDouble: Boolean = false) extends GameState {
       if (updatedPlayer.consecutiveDoubles >= 3) {
         val jailedPlayer = updatedPlayer.goToJail()
         controller.updatePlayer(jailedPlayer)
-        return EndTurnState()
+        EndTurnState()
       }
     } else {
 
