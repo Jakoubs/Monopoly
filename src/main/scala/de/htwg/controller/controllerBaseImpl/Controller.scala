@@ -34,7 +34,7 @@ case class TurnInfo(
                      rentPaidTo: Option[Player] = None
                    )
 
-class Controller(var game: MonopolyGame, val dice: Dice,val playerIntf: PlayerInterface) extends Observable{
+class Controller(var game: IMonopolyGame) extends Observable{
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()
@@ -44,8 +44,7 @@ class Controller(var game: MonopolyGame, val dice: Dice,val playerIntf: PlayerIn
     currentTurnInfo = newInfo
   }
 
-
-  var state: GameState = StartTurnState()
+  
   def currentPlayer: Player = game.currentPlayer
   def board: Board = game.board
   def players: Vector[Player] = game.players
@@ -56,7 +55,7 @@ class Controller(var game: MonopolyGame, val dice: Dice,val playerIntf: PlayerIn
       case OpEnum.undo => undo()
       case OpEnum.redo => redo()
       case _ =>
-        state = state.handle(input, this)
+        game = game.handle(input, this)
     }
     notifyObservers()
 

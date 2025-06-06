@@ -1,7 +1,5 @@
 package de.htwg.model.modelMockImpl
 
-import de.htwg.model.DiceInterface
-
 class MockDice(fixed1: Int = 1, fixed2: Int = 1) extends DiceInterface {
 
   override def rollDice(valid: Boolean): (Int, Int) =

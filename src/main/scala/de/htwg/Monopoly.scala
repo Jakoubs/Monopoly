@@ -130,10 +130,4 @@ object Monopoly:
     val availableEmojis = emojis.filterNot(e => vektor.exists(_.name == e))
     Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
   }
-
-case class MonopolyGame(
-                         players: Vector[Player],
-                         board: Board,
-                         currentPlayer: Player,
-                         sound: Boolean
-                       )
+}
