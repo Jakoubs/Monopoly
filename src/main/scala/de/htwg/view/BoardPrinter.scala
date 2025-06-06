@@ -22,7 +22,7 @@ object BoardPrinter {
       "| |  ____ |     | |",
       "| |_____| |_____| |"
     )
-//Hallo
+//Hallo TIm
     val fields2To10 = game.board.fields.filter(field => field.index > 1 && field.index < 11)
 
     val line2 = fields2To10.foldLeft(baseLines(0))((line, field) =>
