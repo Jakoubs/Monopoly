@@ -15,7 +15,7 @@ class BoardPanel(controller: Controller) extends GridPane {
   private val numRows = 11
   private val numCols = 11
 
-  private val scaleFactor = .55
+  private val scaleFactor = .40
   private val topw = 120 * scaleFactor
   private val toph = 180 * scaleFactor
   private val sidew = 180 * scaleFactor
@@ -191,7 +191,7 @@ class BoardPanel(controller: Controller) extends GridPane {
       row <- 1 until numRows - 1
       boardIndex = 10 + row
     } add(new HBox {
-      val stripeWidth = sidew / 4
+      val stripeWidth = sidew / 3
       val contentWidth = sidew - stripeWidth
 
       children = Seq(
@@ -238,7 +238,7 @@ class BoardPanel(controller: Controller) extends GridPane {
       row <- 1 until numRows - 1
       boardIndex = 30 + (numRows - 1 - row)
     } add(new HBox {
-      val stripeWidth = sidew / 4
+      val stripeWidth = sidew / 3
       val contentWidth = sidew - stripeWidth
 
       children = Seq(

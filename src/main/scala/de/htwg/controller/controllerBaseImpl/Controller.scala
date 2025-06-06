@@ -150,7 +150,5 @@ class Controller(var game: MonopolyGame, val dice: Dice,val playerIntf: PlayerIn
       .mapValues(_.size)
       .toMap
   }
-
-
 }
 

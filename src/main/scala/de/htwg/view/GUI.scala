@@ -149,9 +149,9 @@ object GUI extends JFXApp3 with Observer {
       rollDiceButton.minHeight = 40
       rollDiceButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
       rollDiceButton.onAction = _ => {
-        gameController.foreach(_.handleInput(enter))
-        gameController.foreach(_.handleInput(enter))
-        gameController.foreach(_.handleInput(enter))
+        //gameController.foreach(_.handleInput(enter))
+        //gameController.foreach(_.handleInput(enter))
+        //gameController.foreach(_.handleInput(enter))
           val timeline = new Timeline {
             var count = 0
             val maxRolls = 19
@@ -275,7 +275,7 @@ object GUI extends JFXApp3 with Observer {
 
         case BuyPropertyState(_) =>
           rollDiceButton.disable = true
-          buyPropertyButton.disable = true
+          buyPropertyButton.disable = false
           endTurnButton.disable = true
           payJailFineButton.disable = true
           confirmBuyHouseButton.disable = true
@@ -308,7 +308,7 @@ object GUI extends JFXApp3 with Observer {
         case EndTurnState() =>
           rollDiceButton.disable = true
           buyPropertyButton.disable = true
-          endTurnButton.disable = true
+          endTurnButton.disable = false
           payJailFineButton.disable = true
           confirmBuyHouseButton.disable = true
           declineBuyHouseButton.disable = true

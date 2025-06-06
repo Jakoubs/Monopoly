@@ -10,7 +10,7 @@ import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, TaxField, TrainStationField, UtilityField}
-import de.htwg.model.modelMockImpl.MockPlayer
+import de.htwg.model.modelMockImpl.{MockDice, MockPlayer}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future // Import Future for asynchronous execution
@@ -28,13 +28,11 @@ object Monopoly:
     val controller = Controller(game, dice,MockPlayer)
     gameController = Some(controller) // Store the controller
 
-    // Launch the TUI in a separate Future (on a separate thread)
     Future {
       val tui = Tui(controller)
-      tui.run() // This will block this Future's thread, not the main thread.
+      tui.run()
     }
 
-    // Launch the GUI. The GUI's start() method will then retrieve the controller.
     GUI.main(args)
   }
 

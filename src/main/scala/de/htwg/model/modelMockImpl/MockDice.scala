@@ -9,4 +9,5 @@ class MockDice(fixed1: Int = 1, fixed2: Int = 1) extends DiceInterface {
 
   override def rollDice(d1: Int, d2: Int): (Int, Int) =
     (d1, d2)
+
 }
