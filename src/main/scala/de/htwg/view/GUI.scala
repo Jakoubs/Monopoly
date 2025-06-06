@@ -152,33 +152,35 @@ object GUI extends JFXApp3 with Observer {
         //gameController.foreach(_.handleInput(enter))
         //gameController.foreach(_.handleInput(enter))
         //gameController.foreach(_.handleInput(enter))
-          val timeline = new Timeline {
-            var count = 0
-            val maxRolls = 19
-            keyFrames = KeyFrame(Duration(60), onFinished = _ => {
-              val value1 = Random.nextInt(6)
-              val value2 = Random.nextInt(6)
-              diceImageView1.image = diceImages(value1)
-              diceImageView2.image = diceImages(value2)
-              count += 1
-              if (count >= maxRolls) {
-                stop()
-                gameController.foreach { ctrl =>
-                  val turnInfo = ctrl.getTurnInfo
-                  val d1 = if (turnInfo.diceRoll1 > 0) turnInfo.diceRoll1 - 1 else 0
-                  val d2 = if (turnInfo.diceRoll2 > 0) turnInfo.diceRoll2 - 1 else 0
-                  diceImageView1.image = diceImages(d1)
-                  diceImageView2.image = diceImages(d2)
-                  ctrl.handleInput(enter)
-                  ctrl.handleInput(enter)
-                  ctrl.handleInput(enter)
+        val timeline = new Timeline {
+          var count = 0
+          val maxRolls = 19
+          keyFrames = KeyFrame(Duration(60), onFinished = _ => {
+            val value1 = Random.nextInt(6)
+            val value2 = Random.nextInt(6)
+            diceImageView1.image = diceImages(value1)
+            diceImageView2.image = diceImages(value2)
+            count += 1
+            if (count >= maxRolls) {
+              stop()
+              gameController.foreach { ctrl =>
+                ctrl.handleInput(enter)
+                ctrl.handleInput(enter)
+                ctrl.handleInput(enter)
+
+                // Im Observer-Update (update()):
+                val turnInfo = gameController.get.getTurnInfo
+                if (turnInfo.diceRoll1 > 0 && turnInfo.diceRoll2 > 0) {
+                  diceImageView1.image = diceImages(turnInfo.diceRoll1 - 1)
+                  diceImageView2.image = diceImages(turnInfo.diceRoll2 - 1)
                 }
               }
-            })
-            cycleCount = maxRolls
-          }
-          timeline.playFromStart()
+            }
+          })
+          cycleCount = maxRolls
         }
+        timeline.playFromStart()
+      }
 
       buyPropertyButton.minWidth = 100
       buyPropertyButton.minHeight = 40
@@ -227,6 +229,7 @@ object GUI extends JFXApp3 with Observer {
       )
     }
   }
+
 
   private def updateButtonStates(): Unit = {
     gameController.foreach { ctrl =>
