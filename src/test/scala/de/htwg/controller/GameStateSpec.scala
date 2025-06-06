@@ -6,7 +6,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.controller.*
 import de.htwg.controller.OpEnum.{buy, enter, fieldSelected, n, pay, roll, y}
 import de.htwg.model.*
-import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import org.scalatest.matchers.should.Matchers.shouldBe
 

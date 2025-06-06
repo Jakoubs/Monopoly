@@ -1,6 +1,6 @@
 package de.htwg.controller
 
-import de.htwg.model.{BuyableField, Player, PropertyField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{BuyableField, Player, PropertyField, TrainStationField, UtilityField}
 import scala.util.{Try, Success, Failure}
 
 

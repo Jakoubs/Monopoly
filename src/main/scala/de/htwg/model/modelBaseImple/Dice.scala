@@ -1,10 +1,9 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
 
 import scala.util.Random
-import de.htwg.model.SoundPlayer
 
 class Dice:
-  print("rolling....")
+
   def rollDice(valid: Boolean): (Int, Int) = {
     if(valid) {
       SoundPlayer().playBackground("src/main/resources/RollDice.wav")

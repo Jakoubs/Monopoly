@@ -1,11 +1,13 @@
 package de.htwg.controller
 
-import de.htwg.model.{BoardPrinter, Player, SoundPlayer, *}
-import de.htwg.model.PropertyField.calculateRent
+import de.htwg.model.*
+import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 import de.htwg.{Board, MonopolyGame}
 import de.htwg.util.util.Observable
 import de.htwg.controller.GameState
-
+import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField, TrainStationField, UtilityField}
+import de.htwg.view.BoardPrinter
+import de.htwg.model.PlayerInterface
 import java.awt.Choice
 import scala.collection.mutable
 import scala.io.StdIn.readLine
@@ -32,7 +34,7 @@ case class TurnInfo(
                      rentPaidTo: Option[Player] = None
                    )
 
-class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
+class Controller(var game: MonopolyGame, val dice: Dice,val playerIntf: PlayerInterface) extends Observable{
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()

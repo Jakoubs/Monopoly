@@ -5,7 +5,8 @@ import de.htwg.controller.OpEnum.enter
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import de.htwg.model.*
-import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.{Dice, GoField, JailField, Player, PropertyField, TrainStationField, UtilityField}
 import de.htwg.{Board, MonopolyGame}
 
 class ControllerSpec extends AnyWordSpec with Matchers {

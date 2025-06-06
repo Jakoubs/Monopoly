@@ -1,7 +1,10 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
+
 import de.htwg.MonopolyGame
-import de.htwg.model.PropertyField.*
-import scala.util.{Try, Success, Failure}
+import de.htwg.model.modelBaseImple.PropertyField.*
+import de.htwg.model.*
+
+import scala.util.{Failure, Success, Try}
 
 trait BuyableField extends BoardField {
   val price: Int

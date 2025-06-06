@@ -2,13 +2,13 @@ package de.htwg.controller
 
 import de.htwg.MonopolyGame
 import de.htwg.Board
-import de.htwg.model.{BoardField, Dice, Player}
 import de.htwg.controller.PayJailHandler
 import de.htwg.controller.MovingState
 import de.htwg.controller.JailState
 import de.htwg.controller.OpEnum.*
 import de.htwg.controller.RollingState
 import de.htwg.controller.StartTurnState
+import de.htwg.model.modelBaseImple.{BoardField, Dice, Player}
 import de.htwg.util.util.Observable
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

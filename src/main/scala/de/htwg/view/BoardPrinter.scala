@@ -1,7 +1,8 @@
-package de.htwg.model
+package de.htwg.view
 
 import de.htwg.MonopolyGame
-import de.htwg.model.{BoardField, CommunityChestField, FreeParkingField, PropertyField, TrainStationField, UtilityField}
+import de.htwg.model.*
+import de.htwg.model.modelBaseImple.{BoardField, CommunityChestField, FreeParkingField, PropertyField, TrainStationField, UtilityField}
 
 object BoardPrinter {
   def getBoardAsString(game: MonopolyGame): String = {

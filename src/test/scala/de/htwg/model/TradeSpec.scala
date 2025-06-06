@@ -1,5 +1,6 @@
 package de.htwg.model
 
+import de.htwg.model.modelBaseImple.{Player, Trade}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 

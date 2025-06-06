@@ -3,8 +3,9 @@ package de.htwg.controller
 import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
-import de.htwg.model.{JailField, *}
-import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.{BoardField, BuyableField, ChanceField, CommunityChestField, Dice, GoField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 
 class CommandSpec extends AnyWordSpec {
 

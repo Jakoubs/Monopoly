@@ -1,9 +1,10 @@
 package de.htwg.controller.mockImpl
 
-import de.htwg.controller._
-import de.htwg.model._
+import de.htwg.controller.*
+import de.htwg.model.*
 import de.htwg.MonopolyGame
 import de.htwg.Board
+import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField}
 
 
 class ControllerMock extends ControllerInterface {

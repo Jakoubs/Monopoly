@@ -1,9 +1,11 @@
 package de.htwg.model
 
+import de.htwg.model.modelBaseImple.SoundPlayer
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
+
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class SoundPlayerTest extends AnyWordSpec {
   "SoundPlayer" should {

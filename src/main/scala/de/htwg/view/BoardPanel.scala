@@ -6,8 +6,9 @@ import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, HBox, VBox}
 import scalafx.scene.paint.Color
 import de.htwg.controller.Controller
-import de.htwg.model.{BoardField, GoField, GoToJailField, JailField, PropertyField, TaxField, TrainStationField, UtilityField}
-import de.htwg.model.PropertyField.Color as PropertyColor
+import de.htwg.model.modelBaseImple.Player
+import de.htwg.model.modelBaseImple.PropertyField.Color as PropertyColor
+import de.htwg.model.modelBaseImple.{BoardField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 
 class BoardPanel(controller: Controller) extends GridPane {
 
@@ -51,17 +52,17 @@ class BoardPanel(controller: Controller) extends GridPane {
       field match {
         case pf: PropertyField =>
           pf.owner match {
-            case Some(owner) => s" ${owner.name} ${pf.house.amount}🏠"
+            case Some(owner: Player) => s" ${owner.name} ${pf.house.amount}🏠"
             case None => ""
           }
         case ts: TrainStationField =>
           ts.owner match {
-            case Some(owner) => s" ${owner.name}"
+            case Some(owner: Player) => s" ${owner.name}"
             case None => ""
           }
         case uf: UtilityField =>
           uf.owner match {
-            case Some(owner) => s" ${owner.name}"
+            case Some(owner: Player) => s" ${owner.name}"
             case None => ""
           }
         case _ => ""
@@ -77,17 +78,17 @@ class BoardPanel(controller: Controller) extends GridPane {
       field match {
         case pf: PropertyField =>
           pf.owner match {
-            case Some(owner) => s" ${owner.name}\n ${pf.house.amount}\n🏠"
+            case Some(owner: Player) => s" ${owner.name}\n ${pf.house.amount}\n🏠"
             case None => ""
           }
         case ts: TrainStationField =>
           ts.owner match {
-            case Some(owner) => s" ${owner.name}"
+            case Some(owner: Player) => s" ${owner.name}"
             case None => ""
           }
         case uf: UtilityField =>
           uf.owner match {
-            case Some(owner) => s" ${owner.name}"
+            case Some(owner: Player) => s" ${owner.name}"
             case None => ""
           }
         case _ => ""

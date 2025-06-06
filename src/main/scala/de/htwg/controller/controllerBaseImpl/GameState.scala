@@ -5,13 +5,14 @@ import de.htwg.controller.TurnInfo
 import de.htwg.util.util.Observable
 import de.htwg.controller.*
 import de.htwg.controller.OpEnum
-import de.htwg.controller.StartTurnState // Import des GameState-Traits
-import de.htwg.controller.RollingState // Import des RollingState (falls verwendet)
-import de.htwg.controller.JailState // Import des JailState (falls verwendet)
-import de.htwg.controller.MovingState // Import des MovingState (falls verwendet)
+import de.htwg.controller.StartTurnState
+import de.htwg.controller.RollingState
+import de.htwg.controller.JailState
+import de.htwg.controller.MovingState
 import de.htwg.controller.PayJailHandler
 import de.htwg.controller.RollDoublesJailHandler
 import de.htwg.controller.InvalidJailInputHandler
+import de.htwg.model.modelBaseImple.{Player, BuyableField, FreeParkingField, GoToJailField, PropertyField, RentVisitor, TaxField}
 
 
 sealed trait GameState {
@@ -107,7 +108,7 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
         buyableField.owner match {
           case Some(owner) if owner != updatedPlayer =>
             val rentVisitor = new RentVisitor(updatedPlayer, controller.players, controller.board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
-            val rent = currentField.accept(rentVisitor)
+            val rent: Int = currentField.accept(rentVisitor)
 
             if (updatedPlayer.balance >= rent) {
               val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
@@ -127,7 +128,7 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
         EndTurnState()
       case _: TaxField =>
         val rentVisitorTax = new RentVisitor(updatedPlayer, controller.players, controller.board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
-        val rent = currentField.accept(rentVisitorTax)
+        val rent: Int = currentField.accept(rentVisitorTax)
         if(updatedPlayer.balance >= rent) {
           val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
           val freeParking = controller.board.fields(20).asInstanceOf[FreeParkingField]

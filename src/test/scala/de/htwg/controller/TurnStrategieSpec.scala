@@ -1,6 +1,6 @@
 package de.htwg.controller
 
-import de.htwg.model.Player
+import de.htwg.model.modelBaseImple.Player
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

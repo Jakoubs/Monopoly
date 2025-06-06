@@ -1,9 +1,9 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
 
-import javax.sound.sampled.{AudioInputStream, AudioSystem, Clip, LineEvent}
 import java.io.File
-import scala.concurrent.{Future, Promise}
+import javax.sound.sampled.{AudioInputStream, AudioSystem, Clip, LineEvent}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
 
 class SoundPlayer {
   def playBackground(filePath: String): Unit = {
