@@ -16,4 +16,5 @@ trait IMonopolyGame {
   def buyProperty(): (Boolean, IMonopolyGame)
   def endTurn(): IMonopolyGame
   def toggleSound(): IMonopolyGame
+  
 }

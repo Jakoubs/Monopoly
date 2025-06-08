@@ -10,7 +10,8 @@ import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, TaxField, TrainStationField, UtilityField}
-import de.htwg.model.modelMockImpl.{MockDice, MockPlayer}
+import de.htwg.model.modelMockImpl.MockPlayer
+import de.htwg.model.IMonopolyGame
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future // Import Future for asynchronous execution
@@ -18,14 +19,12 @@ import scala.concurrent.Future // Import Future for asynchronous execution
 case class Board(fields: Vector[BoardField])
 
 object Monopoly:
-  // Make the controller a global variable or pass it to GUI.main
-  // Option 1: Global var (less ideal for large apps, but simple for now)
   var gameController: Option[Controller] = None // Option to hold the controller
 
   def main(args: Array[String]): Unit = {
     val game = defineGame()
     val dice = Dice()
-    val controller = Controller(game, dice,MockPlayer)
+    val controller = Controller(game)
     gameController = Some(controller) // Store the controller
 
     Future {
@@ -36,7 +35,7 @@ object Monopoly:
     GUI.main(args)
   }
 
-  def defineGame(): MonopolyGame = {
+  def defineGame(): IMonopolyGame = {
     //println("play with sound? (y/n)")
     val soundInput = "y"//readLine()
     val isTestBoard = soundInput == "yT" || soundInput == "nT"
@@ -118,7 +117,7 @@ object Monopoly:
         PropertyField("DarkBlue2", 40, 400, 50, None, color = PropertyField.Color.DarkBlue, PropertyField.Mortgage(200, false), PropertyField.House(0))
       )
     )
-    MonopolyGame(playerVector, board, playerVector.head, soundBool)
+    IMonopolyGame(playerVector, board, playerVector.head, soundBool)
   }
 
   def randomEmoji(vektor: Vector[Player]): String = {
@@ -130,4 +129,3 @@ object Monopoly:
     val availableEmojis = emojis.filterNot(e => vektor.exists(_.name == e))
     Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
   }
-}

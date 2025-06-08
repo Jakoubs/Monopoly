@@ -1,10 +1,10 @@
 package de.htwg.model.modelMockImpl
 
-import de.htwg.model.PlayerInterface
+import de.htwg.model.IPlayer
 import de.htwg.model.modelBaseImple.Player
 import scala.util.{Try, Success}
 
-object MockPlayer extends PlayerInterface {
+object MockPlayer extends IPlayer {
 
   // Optional: ein Dummy-Player, falls du Standarddaten brauchst
   val dummyPlayer: Player = Player("Mocky", position = 1, balance = 1000, isInJail = false, consecutiveDoubles = 0)

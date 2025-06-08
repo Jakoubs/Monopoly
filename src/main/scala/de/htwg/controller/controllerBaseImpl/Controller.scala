@@ -2,12 +2,13 @@ package de.htwg.controller
 
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.calculateRent
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.{Board}
+import de.htwg.model.IMonopolyGame
+import de.htwg.model.modelBaseImple._
 import de.htwg.util.util.Observable
 import de.htwg.controller.GameState
 import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField, TrainStationField, UtilityField}
 import de.htwg.view.BoardPrinter
-import de.htwg.model.PlayerInterface
 import java.awt.Choice
 import scala.collection.mutable
 import scala.io.StdIn.readLine
@@ -44,10 +45,10 @@ class Controller(var game: IMonopolyGame) extends Observable{
     currentTurnInfo = newInfo
   }
 
-  
-  def currentPlayer: Player = game.currentPlayer
+
+  def currentPlayer: IPlayer = game.currentPlayer
   def board: Board = game.board
-  def players: Vector[Player] = game.players
+  def players: Vector[IPlayer] = game.players
   def sound: Boolean = game.sound
 
   def handleInput(input: OpEnum): Unit = {
@@ -58,7 +59,6 @@ class Controller(var game: IMonopolyGame) extends Observable{
         game = game.handle(input, this)
     }
     notifyObservers()
-
   }
 
   def updatePlayer(player: Player): Unit = {
@@ -70,7 +70,8 @@ class Controller(var game: IMonopolyGame) extends Observable{
     val updatedFields = game.board.fields.updated(field.index-1, field)
     val updatedBoard = game.board.copy(fields = updatedFields)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
+    game = game.updateBoardPlayer(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
+    //game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
   }
 
   def switchToNextPlayer(): Unit = {
@@ -81,9 +82,9 @@ class Controller(var game: IMonopolyGame) extends Observable{
   }
 
   def executeCommand(cmd: Command): Unit = {
-    cmd.previousGameStates = Some(state)   // Zustand vor Ausführung
+    cmd.previousGameStates = Some(game.state)   // Zustand vor Ausführung
     cmd.execute()
-    cmd.nextGameStates = Some(state)       // Zustand nach Ausführung
+    cmd.nextGameStates = Some(game.state)       // Zustand nach Ausführung
     undoStack.push(cmd)
     redoStack.clear()
   }
@@ -92,7 +93,7 @@ class Controller(var game: IMonopolyGame) extends Observable{
     if (undoStack.nonEmpty) {
       val cmd = undoStack.pop()
       cmd.undo()
-      cmd.previousGameStates.foreach(state = _) 
+      cmd.previousGameStates.foreach(game.state = _)
       redoStack.push(cmd)
     }
   }
@@ -101,7 +102,7 @@ class Controller(var game: IMonopolyGame) extends Observable{
     if (redoStack.nonEmpty) {
       val cmd = redoStack.pop()
       cmd.execute()
-      cmd.nextGameStates.foreach(state = _) 
+      cmd.nextGameStates.foreach(game.state = _)
       undoStack.push(cmd)
       notifyObservers()
     }

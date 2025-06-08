@@ -1,15 +1,15 @@
 package de.htwg.view
 
-import de.htwg.MonopolyGame
+import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.{BoardField, CommunityChestField, FreeParkingField, PropertyField, TrainStationField, UtilityField}
 
 object BoardPrinter {
-  def getBoardAsString(game: MonopolyGame): String = {
+  def getBoardAsString(game: IMonopolyGame): String = {
     printTop(game) + printSides(game) + printBottom(game)
   }
 
-  private def printTop(game: MonopolyGame): String = {
+  private def printTop(game: IMonopolyGame): String = {
     val fieldNames = game.board.fields.slice(0, 5)
     val fieldData = (0 to 4).map(i => formatField(fieldNames.lift(i)))
 
@@ -46,7 +46,7 @@ object BoardPrinter {
   }
 
 
-  private def printSides(game: MonopolyGame): String = {
+  private def printSides(game: IMonopolyGame): String = {
     val sideRows = (12 to 20).map { a =>
       val fieldAIndex = 52 - a
       val fieldA = game.board.fields.find(_.index == fieldAIndex)
@@ -75,7 +75,7 @@ object BoardPrinter {
   }
 
 
-  private def printBottom(game: MonopolyGame): String = {
+  private def printBottom(game: IMonopolyGame): String = {
     val fixedLines = List(
       "|   GO TO JAIL    |                                                                                |  FREE PARIKING  |",
       "|     ---->       |                                                                                |   ______        |",
@@ -117,7 +117,7 @@ object BoardPrinter {
   }
 
   // alle deine Methoden wie formatField, fillSpace usw. hierher verschieben!
-  private def getFieldsData(game: MonopolyGame,currentIndex: Int): (String, String, String, String) = {
+  private def getFieldsData(game: IMonopolyGame,currentIndex: Int): (String, String, String, String) = {
     val batchIndex = currentIndex - 12
     val startIdx = batchIndex * 4 + 5
 
@@ -183,7 +183,7 @@ object BoardPrinter {
     }
   }
 
-  def playersOnIndex(game: MonopolyGame,idx: Int, inJail: Boolean): String = {
+  def playersOnIndex(game: IMonopolyGame,idx: Int, inJail: Boolean): String = {
     game.players
       .filter(p => p.position == idx && p.isInJail == inJail)
       .map(_.name + " ")
@@ -191,7 +191,7 @@ object BoardPrinter {
   }
 
 
-  def getStats(game: MonopolyGame): (String, String, String, String) = {
+  def getStats(game: IMonopolyGame): (String, String, String, String) = {
     val playerInfos = game.players.map(p =>
       s"${p.name} pos[${p.position}], balance[${p.balance}], isInJail[${p.isInJail}]    "
     )
@@ -207,7 +207,7 @@ object BoardPrinter {
 
 
 
-  def getInventoryString(game: MonopolyGame): String = {
+  def getInventoryString(game: IMonopolyGame): String = {
     val header = s"INVENTORY Player: ${game.currentPlayer.name}| "
 
     val inventoryItems = game.board.fields.collect {
