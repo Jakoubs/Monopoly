@@ -17,7 +17,7 @@
 [License](#-license)
 
 <div align="center">
-    <img src="src/main/resources/git6.svg" alt="Monopoly Game Terminal Demo" width="800"/>
+    <img src="src/main/resources/images/git6.svg" alt="Monopoly Game Terminal Demo" width="800"/>
 </div>
 
 </div>
