@@ -19,7 +19,7 @@ case class Player(name: String,
     }
     this
   }
-  
+
   def incrementDoubles(): Player = copy(consecutiveDoubles = consecutiveDoubles + 1)
   def resetDoubles(): Player = copy(consecutiveDoubles = 0)
 

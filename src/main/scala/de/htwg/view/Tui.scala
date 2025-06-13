@@ -3,8 +3,7 @@ package de.htwg.view
 import de.htwg.controller.{Controller, TurnInfo}
 import de.htwg.util.util.Observer
 import de.htwg.controller.OpEnum
-import de.htwg.model.modelBaseImple.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState}
-
+import de.htwg.model.modelBaseImple._
 import scala.io.StdIn.readLine
 
 class Tui(controller: Controller) extends Observer {
@@ -15,7 +14,7 @@ class Tui(controller: Controller) extends Observer {
     println(controller.getBoardString)
 
     while (!controller.isGameOver) {
-      controller.state match {
+      controller.game.state match {
         case _: JailState =>
           println("You're in jail! Options:")
           println("1. Pay €50 to get out")

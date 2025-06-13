@@ -4,6 +4,7 @@ import de.htwg.controller.*
 import de.htwg.model.modelBaseImple.*
 import de.htwg.model.*
 import de.htwg.util.util.Observable
+import de.htwg.controller.RollDiceCommand
 
 
 sealed trait GameState {
@@ -37,13 +38,11 @@ case class JailState() extends GameState {
 
 case class RollingState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
+    val (d1, d2) = controller.game.rollDice(controller.game.sound)
     val command = RollDiceCommand(controller.game.sound)
     controller.executeCommand(controller.game)
-    val (d1, d2) = command.getResult
     val isDouble = d1 == d2
     
-
-    // Update turn info
     controller.updateTurnInfo(
       TurnInfo(
         diceRoll1 = d1,
@@ -68,6 +67,22 @@ case class RollingState(isDouble: Boolean = false) extends GameState {
     }
 
     MovingState(() => (d1, d2))
+  }
+}
+
+case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) extends GameState {
+  def handle(input: OpEnum, controller: Controller): GameState = {
+    input match {
+      case OpEnum.y =>
+        //command.undo() WIE JETZT UNO? TODO 
+        AdditionalActionsState(isDouble)
+      case _ =>
+        if (isDouble) {
+          RollingState()
+        } else {
+          EndTurnState()
+        }
+    }
   }
 }
 

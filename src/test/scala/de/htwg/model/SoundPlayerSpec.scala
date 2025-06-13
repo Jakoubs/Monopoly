@@ -13,7 +13,7 @@ class SoundPlayerTest extends AnyWordSpec {
       // Test playBackground method
       val soundPlayer = new SoundPlayer()
       noException should be thrownBy {
-        soundPlayer.playBackground("src/main/resources/RollDice.wav")
+        soundPlayer.playBackground("src/main/resources/sound/RollDice.wav")
       }
     }
     /*

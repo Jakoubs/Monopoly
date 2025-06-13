@@ -1,12 +1,12 @@
 package de.htwg.controller
 import de.htwg.model.modelBaseImple.{Dice}
-import de.htwg.model.IPlayer
+import de.htwg.model.modelBaseImple.Player
 
 trait TurnStrategy {
-  def executeTurn(player: IPlayer, dice: () => (Int, Int)): IPlayer
+  def executeTurn(player: Player, dice: () => (Int, Int)): Player
 }
 case class RegularTurnStrategy() extends TurnStrategy {
-  override def executeTurn(player: IPlayer, dice: () => (Int, Int)): IPlayer = {
+  override def executeTurn(player: Player, dice: () => (Int, Int)): Player = {
     if (player.isInJail) return player
 
     val (diceA, diceB) = dice()
@@ -22,7 +22,7 @@ case class RegularTurnStrategy() extends TurnStrategy {
 }
 
 case class JailTurnStrategy() extends TurnStrategy {
-  override def executeTurn(player: IPlayer, dice: () => (Int, Int)): IPlayer = {
+  override def executeTurn(player: Player, dice: () => (Int, Int)): Player = {
     if (player.isInJail) {
       val (diceA, diceB) = dice()
       if (diceA == diceB) {

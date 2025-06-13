@@ -14,7 +14,7 @@ import scalafx.application.Platform
 import de.htwg.view.BoardPanel
 import de.htwg.controller.OpEnum
 import de.htwg.controller.OpEnum.{buy, end, enter, n, pay, redo, undo, y}
-import de.htwg.model.modelBaseImple.{AdditionalActionsState, BoardField, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Dice, EndTurnState, GameState, GoField, GoToJailField, JailField, JailState, MovingState, Player, PropertyDecisionState, PropertyField, RollingState, StartTurnState, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{AdditionalActionsState, BoardField, BuyHouseState, BuyPropertyState,ConfirmBuyHouseState, Dice, EndTurnState, GameState, GoField, GoToJailField, JailField, JailState, MovingState, Player, PropertyDecisionState, PropertyField, RollingState, StartTurnState, TaxField, TrainStationField, UtilityField}
 import scalafx.collections.ObservableBuffer
 import scalafx.animation.{KeyFrame, Timeline}
 import scalafx.util.Duration
@@ -36,8 +36,7 @@ object GUI extends JFXApp3 with Observer {
     style = "-fx-font: bold 32pt sans-serif; -fx-text-fill: white;"
   }
   val diceImages = (1 to 6).map(i =>
-    new Image(getClass.getResourceAsStream(s"/dice-$i.png"))
-  ).toArray
+    new Image(getClass.getResourceAsStream(s"/images/dice-$i.png"))).toArray
   private lazy val diceImageView1 = new ImageView {
     fitWidth = 48
     fitHeight = 48
@@ -232,7 +231,7 @@ object GUI extends JFXApp3 with Observer {
 
   private def updateButtonStates(): Unit = {
     gameController.foreach { ctrl =>
-      val currentState = ctrl.state
+      val currentState = ctrl.game.state
 
       currentState match {
         case StartTurnState() =>

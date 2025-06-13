@@ -6,7 +6,7 @@ class Dice:
 
   def rollDice(valid: Boolean): (Int, Int) = {
     if(valid) {
-      SoundPlayer().playBackground("src/main/resources/RollDice.wav")
+      SoundPlayer().playBackground("src/main/resources/sound/RollDice.wav")
     }
     val a = Random.nextInt(6) + 1
     val b = Random.nextInt(6) + 1

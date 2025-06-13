@@ -38,8 +38,8 @@ case class BuyHouseCommand(
 // Roll Dice Command - mit Würfelwerten als Parameter
 case class RollDiceCommand(sound: Boolean) extends Command {
   def execute(game: IMonopolyGame): IMonopolyGame = {
-    game.rollDice(sound)
-  }
+    val (dice1, dice2) = game.rollDice(true) 
+    game.rollDice(dice1, dice2)  }
 }
 
 // Pay Jail Fee Command - funktional

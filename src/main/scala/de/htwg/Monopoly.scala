@@ -2,17 +2,16 @@ package de.htwg
 
 import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.modelBaseImple.PropertyField.calculateRent
-
 import scala.io.StdIn.readLine
 import scala.util.Random
 import de.htwg.controller.Controller
 import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
-import de.htwg.model.modelBaseImple.{GameState,BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, MonopolyGame, Player, PropertyField, SoundPlayer, StartTurnState, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{GameState,BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, StartTurnState, TaxField, TrainStationField, UtilityField}
 import de.htwg.model.modelMockImpl.MockPlayer
 import de.htwg.model.IMonopolyGame
-
+import de.htwg.model.modelBaseImple.MonopolyGame
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future // Import Future for asynchronous execution
 
@@ -42,7 +41,7 @@ object Monopoly:
     val soundBool = soundInput == "y" || soundInput == "yT"
 
     if (soundBool) {
-      SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
+      SoundPlayer().playBackground("src/main/resources/sound/MonopolyJazz.wav")
     }
 
     var playerVector = Vector[Player]()
