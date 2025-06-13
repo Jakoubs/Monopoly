@@ -46,9 +46,10 @@ class Controller(var game: IMonopolyGame) extends Observable{
   }
 
   private var undoManager = new UndoManager()
-  def currentPlayer: IPlayer = game.currentPlayer
+
+  def currentPlayer: Player = game.currentPlayer
   def board: Board = game.board
-  def players: Vector[IPlayer] = game.players
+  def players: Vector[Player] = game.players
   def sound: Boolean = game.sound
 
   def handleInput(input: OpEnum): Unit = {
@@ -61,24 +62,19 @@ class Controller(var game: IMonopolyGame) extends Observable{
     notifyObservers()
   }
 
-  def updatePlayer(player: Player): Unit = {
-    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.copy(players = updatedPlayers, currentPlayer = player)
+  def updatePlayer(newPlayer: Player): Unit = {
+    game = game.withUpdatedPlayer(newPlayer)
+    notifyObservers()
   }
 
   def updateBoardAndPlayer(field: BoardField, player: Player): Unit = {
-    val updatedFields = game.board.fields.updated(field.index-1, field)
-    val updatedBoard = game.board.copy(fields = updatedFields)
-    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.updateBoardPlayer(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
-    //game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
+    game = game.withUpdatedBoardAndPlayer(field, player)
+    notifyObservers()
   }
 
   def switchToNextPlayer(): Unit = {
-    val currentIndex = game.players.indexOf(game.currentPlayer)
-    val nextIndex = (currentIndex + 1) % game.players.size
-    val nextPlayer = game.players(nextIndex)
-    game = game.copy(currentPlayer = nextPlayer)
+    game = game.withNextPlayer
+    notifyObservers()
   }
 
 
@@ -101,9 +97,9 @@ class Controller(var game: IMonopolyGame) extends Observable{
     game = nextGame
     notifyObservers()
   }
-  
+
   def isGameOver: Boolean = game.players.count(_.balance > 0) <= 1
-  
+
   def getBoardString: String = {
       BoardPrinter.getBoardAsString(game)
   }
