@@ -3,7 +3,7 @@ package de.htwg.controller
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 import de.htwg.Board
-import de.htwg.model.IMonopolyGame
+import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
 import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField, TrainStationField, UtilityField}

@@ -37,8 +37,8 @@ case class JailState() extends GameState {
 
 case class RollingState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
-    val command = RollDiceCommand(controller)
-    controller.executeCommand(command)
+    val command = RollDiceCommand(controller.game.sound)
+    controller.executeCommand(controller.game)
     val (d1, d2) = command.getResult
     val isDouble = d1 == d2
     
@@ -160,8 +160,8 @@ case class BuyPropertyState(isDouble: Boolean = false) extends GameState {
     val field = controller.board.fields(controller.currentPlayer.position-1)
     field match {
       case buyableField: BuyableField =>
-        val command = BuyCommand(controller, buyableField, controller.currentPlayer)
-        controller.executeCommand(command)
+        val command = BuyCommand( buyableField, controller.currentPlayer)
+        controller.executeCommand(controller.game)
         AdditionalActionsState(isDouble)
       case _ =>
         AdditionalActionsState(isDouble)
@@ -192,9 +192,9 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
       case OpEnum.fieldSelected(fieldId) =>
           controller.game.board.fields(fieldId - 1) match {
             case field: PropertyField =>
-              val command = BuyHouseCommand(controller, field, controller.currentPlayer)
-              controller.executeCommand(command)
-              ConfirmBuyHouseState(isDouble, command)
+              val command = BuyHouseCommand(field, controller.currentPlayer)
+              controller.executeCommand(controller.game)
+              EndTurnState()
             case _ =>
               if (isDouble){
                 RollingState()
@@ -204,22 +204,6 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
         }
       case _ =>
         this
-    }
-  }
-}
-
-case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) extends GameState {
-  def handle(input: OpEnum, controller: Controller): GameState = {
-    input match {
-      case  OpEnum.y =>
-        command.undo()
-        AdditionalActionsState(isDouble)
-      case _ =>
-        if (isDouble) {
-          RollingState()
-        } else {
-          EndTurnState()
-        }
     }
   }
 }

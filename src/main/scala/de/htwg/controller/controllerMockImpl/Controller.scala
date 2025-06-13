@@ -2,7 +2,7 @@ package de.htwg.controller.mockImpl
 
 import de.htwg.controller.*
 import de.htwg.model.*
-import de.htwg.MonopolyGame
+import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.Board
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GameState, Player, PropertyField}
 

@@ -1,12 +1,11 @@
 package de.htwg.model.modelBaseImple
 
 import de.htwg.Board
-import de.htwg.controller.GameState
 import de.htwg.model.{IMonopolyGame, IPlayer}
 import de.htwg.model.modelBaseImple.Player
 import de.htwg.model.IMonopolyGame
-import de.htwg.model.Player
-import de.htwg.controller.{GameState, StartTurnState}
+
+import scala.util.Try
 
 case class MonopolyGame(
                         players: Vector[Player],
@@ -15,7 +14,7 @@ case class MonopolyGame(
                         sound: Boolean,
                         state: GameState
                       ) extends IMonopolyGame {
-  
+
   def createGame: IMonopolyGame = {
     MonopolyGame(
       players = players,
@@ -25,7 +24,7 @@ case class MonopolyGame(
       state = StartTurnState()
     )
   }
-  
+
   override def withUpdatedPlayer(newPlayer: Player): IMonopolyGame = {
     val ps = players.updated(players.indexOf(currentPlayer), newPlayer)
     this.copy(players = ps, currentPlayer = newPlayer)
@@ -42,5 +41,16 @@ case class MonopolyGame(
     val idx = players.indexOf(currentPlayer)
     val next = players((idx + 1) % players.size)
     this.copy(currentPlayer = next)
+  }
+
+  override def buyHouse(field: PropertyField, player: Player): Try[IMonopolyGame] = {
+    PropertyField.House().buyHouse(player, field, this).map {
+      case (updatedField, updatedPlayer) =>
+        this.withUpdatedBoardAndPlayer(updatedField, updatedPlayer)
+    }
+  }
+
+  override def rollDice(valid: Boolean): (Int, Int) = {
+    Dice().rollDice(sound)
   }
 }

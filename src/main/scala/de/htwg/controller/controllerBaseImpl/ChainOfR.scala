@@ -28,8 +28,8 @@ case class PayJailHandler(override val controller: Controller, var nextHandler: 
   override def handle(input: OpEnum): Option[GameState] = {
     if (input == OpEnum.pay) {
       if (controller.currentPlayer.balance >= 50) {
-        val command = PayJailFeeCommand(controller, controller.currentPlayer)
-        command.execute()
+        val command = PayJailFeeCommand(controller.currentPlayer)
+        command.execute(controller.game)
         Some(RollingState())
       } else {
         Some(JailState()) 
@@ -44,10 +44,10 @@ case class RollDoublesJailHandler(override val controller: Controller, var nextH
   override def handle(input: OpEnum): Option[GameState] = {
     if (input == OpEnum.roll) {
       val strategy = JailTurnStrategy()
-      val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
+      val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.game.rollDice(controller.game.sound))
       controller.updatePlayer(updatedPlayer)
       if (!updatedPlayer.isInJail) {
-        Some(MovingState(() => controller.dice.rollDice(controller.sound)))
+        Some(MovingState(() => controller.game.rollDice(controller.game.sound)))
       } else {
         Some(JailState())
       }
