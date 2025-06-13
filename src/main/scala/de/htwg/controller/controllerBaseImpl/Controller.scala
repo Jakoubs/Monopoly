@@ -1,18 +1,11 @@
 package de.htwg.controller
 
-import de.htwg.model.*
-import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 import de.htwg.Board
-import de.htwg.model.modelBaseImple.MonopolyGame
+import de.htwg.model.*
 import de.htwg.model.modelBaseImple.*
-import de.htwg.util.util.Observable
-import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField, TrainStationField, UtilityField}
 import de.htwg.util.UndoManager
+import de.htwg.util.util.Observable
 import de.htwg.view.BoardPrinter
-
-import java.awt.Choice
-import scala.collection.mutable
-import scala.io.StdIn.readLine
 
 enum OpEnum:
   case roll

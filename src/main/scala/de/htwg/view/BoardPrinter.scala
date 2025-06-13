@@ -1,6 +1,5 @@
 package de.htwg.view
 
-import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.{BoardField, CommunityChestField, FreeParkingField, PropertyField, TrainStationField, UtilityField}
 

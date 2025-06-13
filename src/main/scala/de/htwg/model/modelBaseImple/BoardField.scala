@@ -1,6 +1,5 @@
 package de.htwg.model.modelBaseImple
 
-import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.modelBaseImple.PropertyField.*
 import de.htwg.model.*
 
@@ -44,7 +43,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
         ((baseHousePrice + 9) / 10) * 10
       }
 
-      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): Try[(PropertyField, Player)] = {
+      def buyHouse(player: Player, field: PropertyField, game: IMonopolyGame): Try[(PropertyField, Player)] = {
         // Step 1: Check if the player owns the property.
         // We use flatMap on Try to chain operations. If the initial check fails, it immediately returns Failure.
         val checkOwnership: Try[Unit] = field.owner match {

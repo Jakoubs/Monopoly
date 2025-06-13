@@ -1,14 +1,12 @@
 package de.htwg.controller.mockImpl
 
+import de.htwg.Board
 import de.htwg.controller.*
 import de.htwg.model.*
-import de.htwg.model.modelBaseImple.MonopolyGame
-import de.htwg.Board
-import de.htwg.model.modelBaseImple.{BoardField, Dice, GameState, Player, PropertyField}
+import de.htwg.model.modelBaseImple.*
 
 
 class ControllerMock extends ControllerInterface {
-  def game: MonopolyGame = null
   override def dice: Dice = null
   override def state: GameState = null
   override def currentPlayer: Player = Player("Mock", 1500,0, false, 0)
