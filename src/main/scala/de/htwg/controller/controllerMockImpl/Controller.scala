@@ -8,7 +8,7 @@ import de.htwg.model.modelBaseImple.{BoardField, Dice, GameState, Player, Proper
 
 
 class ControllerMock extends ControllerInterface {
-  override def game: MonopolyGame = null
+  def game: MonopolyGame = null
   override def dice: Dice = null
   override def state: GameState = null
   override def currentPlayer: Player = Player("Mock", 1500,0, false, 0)

@@ -1,12 +1,10 @@
 package de.htwg.controller
 
 import de.htwg.Board
-import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GameState, Player, PropertyField, TrainStationField, UtilityField}
 
 trait ControllerInterface {
 
-  def game: MonopolyGame
   def dice: Dice
   def state: GameState
   def currentPlayer: Player
