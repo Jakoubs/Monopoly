@@ -15,21 +15,17 @@ case class MonopolyGame(
                         sound: Boolean,
                         state: GameState
                       ) extends IMonopolyGame {
- def createGame: IMonopolyGame = {MonopolyGame(
-   players = players,
-   board = board,
-   currentPlayer = players.head,
-   sound = sound,
-   state = StartTurnState()
- )}
-}
-case class MonopolyGame (
-                         players: Vector[Player],
-                         board: Board,
-                         currentPlayer: Player,
-                         sound: Boolean,
-                         state: GameState
-                       ) extends IMonopolyGame {
+  
+  def createGame: IMonopolyGame = {
+    MonopolyGame(
+      players = players,
+      board = board,
+      currentPlayer = players.head,
+      sound = sound,
+      state = StartTurnState()
+    )
+  }
+  
   override def withUpdatedPlayer(newPlayer: Player): IMonopolyGame = {
     val ps = players.updated(players.indexOf(currentPlayer), newPlayer)
     this.copy(players = ps, currentPlayer = newPlayer)
