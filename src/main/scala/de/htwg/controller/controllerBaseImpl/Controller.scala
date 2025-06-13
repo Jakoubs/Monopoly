@@ -7,7 +7,9 @@ import de.htwg.model.IMonopolyGame
 import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
 import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField, TrainStationField, UtilityField}
+import de.htwg.util.UndoManager
 import de.htwg.view.BoardPrinter
+
 import java.awt.Choice
 import scala.collection.mutable
 import scala.io.StdIn.readLine
@@ -36,15 +38,13 @@ case class TurnInfo(
 
 class Controller(var game: IMonopolyGame) extends Observable{
   var currentTurnInfo: TurnInfo = TurnInfo()
-  private val undoStack: mutable.Stack[Command] = mutable.Stack()
-  private val redoStack: mutable.Stack[Command] = mutable.Stack()
 
   def getTurnInfo: TurnInfo = currentTurnInfo
   def updateTurnInfo(newInfo: TurnInfo): Unit = { // Setter-Methode
     currentTurnInfo = newInfo
   }
 
-
+  private var undoManager = new UndoManager()
   def currentPlayer: IPlayer = game.currentPlayer
   def board: Board = game.board
   def players: Vector[IPlayer] = game.players
@@ -80,37 +80,29 @@ class Controller(var game: IMonopolyGame) extends Observable{
     game = game.copy(currentPlayer = nextPlayer)
   }
 
-  def executeCommand(cmd: Command): Unit = {
-    cmd.previousGameStates = Some(game.state)   // Zustand vor Ausführung
-    cmd.execute()
-    cmd.nextGameStates = Some(game.state)       // Zustand nach Ausführung
-    undoStack.push(cmd)
-    redoStack.clear()
+
+  def executeCommand(newGame: IMonopolyGame): Unit = {
+    undoManager = undoManager.doStep(game, newGame)
+    game = newGame
+    notifyObservers()
   }
 
   def undo(): Unit = {
-    if (undoStack.nonEmpty) {
-      val cmd = undoStack.pop()
-      cmd.undo()
-      cmd.previousGameStates.foreach(game.state = _)
-      redoStack.push(cmd)
-    }
+    val (previousGame, updatedManager) = undoManager.undo(game)
+    undoManager = updatedManager
+    game = previousGame
+    notifyObservers()
   }
 
   def redo(): Unit = {
-    if (redoStack.nonEmpty) {
-      val cmd = redoStack.pop()
-      cmd.execute()
-      cmd.nextGameStates.foreach(game.state = _)
-      undoStack.push(cmd)
-      notifyObservers()
-    }
-
+    val (nextGame, updatedManager) = undoManager.redo(game)
+    undoManager = updatedManager
+    game = nextGame
+    notifyObservers()
   }
-
+  
   def isGameOver: Boolean = game.players.count(_.balance > 0) <= 1
-
-
+  
   def getBoardString: String = {
       BoardPrinter.getBoardAsString(game)
   }
