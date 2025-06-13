@@ -4,7 +4,7 @@ import de.htwg.controller.Controller
 import de.htwg.controller.PayJailFeeCommand
 import de.htwg.controller.JailTurnStrategy
 import de.htwg.controller.OpEnum.roll
-import de.htwg.model.modelBaseImple.Player
+import de.htwg.model.modelBaseImple.{GameState, JailState, MovingState, Player, RollingState}
 
 abstract class ActionHandler {
   val controller: Controller

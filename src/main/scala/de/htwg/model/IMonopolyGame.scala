@@ -1,7 +1,7 @@
 package de.htwg.model
 
 import de.htwg.Board
-import de.htwg.controller.{GameState, StartTurnState}
+import de.htwg.model.modelBaseImple.{GameState, StartTurnState}
 
 
 trait IMonopolyGame {
@@ -16,5 +16,4 @@ trait IMonopolyGame {
   def buyProperty(): (Boolean, IMonopolyGame)
   def endTurn(): IMonopolyGame
   def toggleSound(): IMonopolyGame
-  
 }

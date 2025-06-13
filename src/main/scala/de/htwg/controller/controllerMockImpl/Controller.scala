@@ -4,7 +4,7 @@ import de.htwg.controller.*
 import de.htwg.model.*
 import de.htwg.MonopolyGame
 import de.htwg.Board
-import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField}
+import de.htwg.model.modelBaseImple.{BoardField, Dice, GameState, Player, PropertyField}
 
 
 class ControllerMock extends ControllerInterface {

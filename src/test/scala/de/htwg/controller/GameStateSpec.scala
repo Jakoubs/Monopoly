@@ -7,7 +7,7 @@ import de.htwg.controller.*
 import de.htwg.controller.OpEnum.{buy, enter, fieldSelected, n, pay, roll, y}
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
-import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ChanceField, CommunityChestField, ConfirmBuyHouseState, Dice, EndTurnState, FreeParkingField, GoField, GoToJailField, JailField, JailState, MovingState, Player, PropertyDecisionState, PropertyField, RollingState, StartTurnState, TaxField, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import org.scalatest.matchers.should.Matchers.shouldBe
 

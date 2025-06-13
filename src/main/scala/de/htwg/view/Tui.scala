@@ -1,8 +1,9 @@
 package de.htwg.view
 
-import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState, TurnInfo}
+import de.htwg.controller.{Controller, TurnInfo}
 import de.htwg.util.util.Observer
 import de.htwg.controller.OpEnum
+import de.htwg.model.modelBaseImple.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, JailState, MovingState, PropertyDecisionState, RollingState}
 
 import scala.io.StdIn.readLine
 

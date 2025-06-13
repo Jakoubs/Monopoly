@@ -9,7 +9,7 @@ import de.htwg.controller.Controller
 import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
-import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{GameState,BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, MonopolyGame, Player, PropertyField, SoundPlayer, StartTurnState, TaxField, TrainStationField, UtilityField}
 import de.htwg.model.modelMockImpl.MockPlayer
 import de.htwg.model.IMonopolyGame
 
@@ -72,7 +72,6 @@ object Monopoly:
       playerVector = playerVector.appended(Player(playerName, 1500, 1,false,0))
       println(s"Spieler $playerName hinzugefügt.")
     }
-
     val board = Board(
       Vector(
         GoField,
@@ -117,7 +116,10 @@ object Monopoly:
         PropertyField("DarkBlue2", 40, 400, 50, None, color = PropertyField.Color.DarkBlue, PropertyField.Mortgage(200, false), PropertyField.House(0))
       )
     )
-    IMonopolyGame(playerVector, board, playerVector.head, soundBool)
+    val state: GameState = StartTurnState()
+    MonopolyGame(
+      playerVector, board, playerVector.head, soundBool, state
+    )
   }
 
   def randomEmoji(vektor: Vector[Player]): String = {

@@ -1,18 +1,9 @@
-package de.htwg.controller
+package de.htwg.model.modelBaseImple
 
-import de.htwg.model.*
-import de.htwg.controller.TurnInfo
-import de.htwg.util.util.Observable
 import de.htwg.controller.*
-import de.htwg.controller.OpEnum
-import de.htwg.controller.StartTurnState
-import de.htwg.controller.RollingState
-import de.htwg.controller.JailState
-import de.htwg.controller.MovingState
-import de.htwg.controller.PayJailHandler
-import de.htwg.controller.RollDoublesJailHandler
-import de.htwg.controller.InvalidJailInputHandler
-import de.htwg.model.modelBaseImple.{Player, BuyableField, FreeParkingField, GoToJailField, PropertyField, RentVisitor, TaxField}
+import de.htwg.model.modelBaseImple.*
+import de.htwg.model.*
+import de.htwg.util.util.Observable
 
 
 sealed trait GameState {
