@@ -1,6 +1,7 @@
 package de.htwg.model
 
 import de.htwg.Board
+import de.htwg.model.modelBaseImple.{GameState, StartTurnState}
 import de.htwg.controller.{Controller, GameState, OpEnum, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Player}
 

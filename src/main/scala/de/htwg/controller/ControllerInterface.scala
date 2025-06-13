@@ -1,9 +1,8 @@
 package de.htwg.controller
 
 import de.htwg.Board
-import de.htwg.MonopolyGame
-import de.htwg.controller.GameState
-import de.htwg.model.modelBaseImple.{BoardField, Dice, Player, PropertyField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.MonopolyGame
+import de.htwg.model.modelBaseImple.{BoardField, Dice, GameState, Player, PropertyField, TrainStationField, UtilityField}
 
 trait ControllerInterface {
 

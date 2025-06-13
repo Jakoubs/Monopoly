@@ -1,7 +1,8 @@
 package de.htwg.controller
+import de.htwg.model.IPlayer
+import de.htwg.model.modelBaseImple.{BuyableField, GameState, Player, PropertyField, TrainStationField, UtilityField}
 
-import de.htwg.model.modelBaseImple.{BuyableField, Player, PropertyField, TrainStationField, UtilityField}
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 
 trait Command {
@@ -17,7 +18,7 @@ trait Command {
                                                player: Player
                                              ) extends Command {
 
-    private var previousState: Option[(T, Player)] = None
+    private var previousState: Option[(T, IPlayer)] = None
 
     def execute(): Unit = {
       previousState = Some((field, player))
@@ -53,7 +54,7 @@ trait Command {
   }
 
   case class RollDiceCommand(controller: Controller) extends Command {
-    private var previousPlayerState: Option[Player] = None
+    private var previousPlayerState: Option[IPlayer] = None
     private var rollResult: (Int, Int) = (0, 0)
 
     def execute(): Unit = {
@@ -68,8 +69,8 @@ trait Command {
     def getResult: (Int, Int) = rollResult
   }
 
-  case class PayJailFeeCommand(controller: Controller, player: Player) extends Command {
-    private var previousState: Option[Player] = None
+  case class PayJailFeeCommand(controller: Controller, player: IPlayer) extends Command {
+    private var previousState: Option[IPlayer] = None
 
     def execute(): Unit = {
       previousState = Some(player)

@@ -14,8 +14,7 @@ import scalafx.application.Platform
 import de.htwg.view.BoardPanel
 import de.htwg.controller.OpEnum
 import de.htwg.controller.OpEnum.{buy, end, enter, n, pay, redo, undo, y}
-import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, PropertyDecisionState, RollingState, StartTurnState}
-import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{AdditionalActionsState, BoardField, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Dice, EndTurnState, GameState, GoField, GoToJailField, JailField, JailState, MovingState, Player, PropertyDecisionState, PropertyField, RollingState, StartTurnState, TaxField, TrainStationField, UtilityField}
 import scalafx.collections.ObservableBuffer
 import scalafx.animation.{KeyFrame, Timeline}
 import scalafx.util.Duration
