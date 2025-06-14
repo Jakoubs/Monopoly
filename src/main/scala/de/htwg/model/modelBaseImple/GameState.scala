@@ -13,7 +13,7 @@ sealed trait GameState {
 
 case class StartTurnState() extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
-    val player = controller.currentPlayer.resetDoubles()
+    val player = controller.currentPlayer.resetDoubles
     controller.updatePlayer(player)
 
     if (controller.currentPlayer.isInJail) {
@@ -52,17 +52,17 @@ case class RollingState(isDouble: Boolean = false) extends GameState {
 
     if (isDouble) {
       val player = controller.currentPlayer
-      val updatedPlayer = player.incrementDoubles()
+      val updatedPlayer = player.incrementDoubles
       controller.updatePlayer(updatedPlayer)
 
       if (updatedPlayer.consecutiveDoubles >= 3) {
-        val jailedPlayer = updatedPlayer.goToJail()
+        val jailedPlayer = updatedPlayer.goToJail
         controller.updatePlayer(jailedPlayer)
         EndTurnState()
       }
     } else {
 
-      val updatedPlayer = controller.currentPlayer.resetDoubles()
+      val updatedPlayer = controller.currentPlayer.resetDoubles
       controller.updatePlayer(updatedPlayer)
     }
 
@@ -113,47 +113,39 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
       case buyableField: BuyableField =>
         buyableField.owner match {
           case Some(owner) if owner != updatedPlayer =>
-            val rentVisitor = new RentVisitor(updatedPlayer, controller.players, controller.board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
+            val rentVisitor = new FieldVisitor(
+              updatedPlayer.asInstanceOf[Player],
+              controller.players.asInstanceOf[Vector[Player]],
+              controller.board,
+              diceResult,
+              ownedProperties.collect { case (p: Player, v) => (p, v) },
+              ownedTrainStations.collect { case (p: Player, v) => (p, v) },
+              ownedUtilities.collect { case (p: Player, v) => (p, v) }
+            )
             val rent: Int = currentField.accept(rentVisitor)
 
             if (updatedPlayer.balance >= rent) {
-              val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
-              val receivingPlayer = owner.copy(balance = owner.balance + rent)
+              val payingPlayer = updatedPlayer.changeBalance(-rent)
+              val receivingPlayer = owner.asInstanceOf[Player].copy(balance = owner.balance + rent)
               controller.updatePlayer(receivingPlayer)
-              controller.updatePlayer(payingPlayer)
+              controller.updatePlayer(payingPlayer.getOrElse(updatedPlayer))
               controller.updateTurnInfo(controller.getTurnInfo.copy(paidRent = Some(rent), rentPaidTo = Some(owner)))
             } else {
               controller.isGameOver
             }
             AdditionalActionsState(isDouble)
-          case _ => PropertyDecisionState()
         }
-      case _: GoToJailField =>
-        val jailedPlayer = updatedPlayer.goToJail()
-        controller.updatePlayer(jailedPlayer)
-        EndTurnState()
-      case _: TaxField =>
-        val rentVisitorTax = new RentVisitor(updatedPlayer, controller.players, controller.board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
-        val rent: Int = currentField.accept(rentVisitorTax)
-        if(updatedPlayer.balance >= rent) {
-          val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
-          val freeParking = controller.board.fields(20).asInstanceOf[FreeParkingField]
-          val updatedFreeParking = freeParking.copy(amount = freeParking.amount + rent)
-          controller.updateBoardAndPlayer(updatedFreeParking, payingPlayer)
-        }else {
-          controller.isGameOver
-        }
-        AdditionalActionsState(isDouble)
       case fp: FreeParkingField =>
-        val freeParkingPlayer = fp.apply(updatedPlayer)
-        val updatedFreeParkingField = fp.resetAmount()
-        controller.updateBoardAndPlayer(updatedFreeParkingField, freeParkingPlayer)
-        AdditionalActionsState(isDouble)
+          val freeParkingPlayer = fp.apply(updatedPlayer)
+          val updatedFreeParkingField = fp.resetAmount()
+          controller.updateBoardAndPlayer(updatedFreeParkingField, freeParkingPlayer)
+          AdditionalActionsState(isDouble)
       case _ =>
-        AdditionalActionsState(isDouble)
+          AdditionalActionsState(isDouble)
     }
   }
 }
+
 
 
 case class PropertyDecisionState(isDouble: Boolean = false) extends GameState {
@@ -207,7 +199,7 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
       case OpEnum.fieldSelected(fieldId) =>
           controller.game.board.fields(fieldId - 1) match {
             case field: PropertyField =>
-              val command = BuyHouseCommand(field, controller.currentPlayer.asInstanceOf[IPlayer])              
+              val command = BuyHouseCommand(field, controller.currentPlayer.asInstanceOf[IPlayer])
               controller.executeCommand(controller.game)
               EndTurnState()
             case _ =>
