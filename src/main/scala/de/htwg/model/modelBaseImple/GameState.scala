@@ -134,6 +134,8 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
               controller.isGameOver
             }
             AdditionalActionsState(isDouble)
+          case None =>
+            PropertyDecisionState(isDouble)
         }
       case fp: FreeParkingField =>
           val freeParkingPlayer = fp.apply(updatedPlayer)
