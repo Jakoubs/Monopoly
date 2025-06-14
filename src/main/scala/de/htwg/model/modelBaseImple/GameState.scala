@@ -74,7 +74,7 @@ case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) ext
   def handle(input: OpEnum, controller: Controller): GameState = {
     input match {
       case OpEnum.y =>
-        //command.undo() WIE JETZT UNO? TODO 
+        //command.undo() WIE JETZT UNO? TODO
         AdditionalActionsState(isDouble)
       case _ =>
         if (isDouble) {
@@ -175,7 +175,7 @@ case class BuyPropertyState(isDouble: Boolean = false) extends GameState {
     val field = controller.board.fields(controller.currentPlayer.position-1)
     field match {
       case buyableField: BuyableField =>
-        val command = BuyCommand( buyableField, controller.currentPlayer)
+        val command = BuyCommand(buyableField, controller.currentPlayer.asInstanceOf[IPlayer])
         controller.executeCommand(controller.game)
         AdditionalActionsState(isDouble)
       case _ =>
@@ -207,7 +207,7 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
       case OpEnum.fieldSelected(fieldId) =>
           controller.game.board.fields(fieldId - 1) match {
             case field: PropertyField =>
-              val command = BuyHouseCommand(field, controller.currentPlayer)
+              val command = BuyHouseCommand(field, controller.currentPlayer.asInstanceOf[IPlayer])              
               controller.executeCommand(controller.game)
               EndTurnState()
             case _ =>

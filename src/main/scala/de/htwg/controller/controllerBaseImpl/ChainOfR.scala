@@ -4,6 +4,7 @@ import de.htwg.controller.Controller
 import de.htwg.controller.PayJailFeeCommand
 import de.htwg.controller.JailTurnStrategy
 import de.htwg.controller.OpEnum.roll
+import de.htwg.model.IPlayer
 import de.htwg.model.modelBaseImple.{GameState, JailState, MovingState, Player, RollingState}
 
 abstract class ActionHandler {
@@ -28,7 +29,7 @@ case class PayJailHandler(override val controller: Controller, var nextHandler: 
   override def handle(input: OpEnum): Option[GameState] = {
     if (input == OpEnum.pay) {
       if (controller.currentPlayer.balance >= 50) {
-        val command = PayJailFeeCommand(controller.currentPlayer)
+        val command = PayJailFeeCommand(controller.currentPlayer.asInstanceOf[IPlayer])
         command.execute(controller.game)
         Some(RollingState())
       } else {

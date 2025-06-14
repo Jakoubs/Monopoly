@@ -1,41 +1,41 @@
 package de.htwg.model.modelBaseImple
-
-import de.htwg.model.*
-
-case class Player(name: String,
-                  balance: Int,
-                  position: Int = 1,
-                  isInJail: Boolean = false,
-                  consecutiveDoubles: Int = 0
-                 ) {
-
-  def moveToIndex(index: Int): Player = {
-    if (!isInJail) {
-        val newPlayer = this.copy(position = index)
-        return newPlayer
+    
+    import de.htwg.model.IPlayer
+    import scala.util.{Try, Success}
+    
+    case class Player(
+                       name: String,
+                       balance: Int,
+                       position: Int = 1,
+                       isInJail: Boolean = false,
+                       consecutiveDoubles: Int = 0
+                     ) extends IPlayer {
+    
+      override def moveToIndex(index: Int): IPlayer = {
+        if (!isInJail) this.copy(position = index) else this
+      }
+    
+      override def incrementDoubles: IPlayer = {
+        this.copy(consecutiveDoubles = consecutiveDoubles + 1)
+      }
+    
+      override def resetDoubles: IPlayer = {
+        this.copy(consecutiveDoubles = 0)
+      }
+    
+      override def releaseFromJail: IPlayer = {
+        this.copy(isInJail = false)
+      }
+    
+      override def changeBalance(amount: Int): Try[IPlayer] = {
+        Success(this.copy(balance = balance + amount))
+      }
+    
+      override def goToJail: IPlayer = {
+        this.copy(position = 11, isInJail = true, consecutiveDoubles = 0)
+      }
     }
-    this
-  }
-
-  def incrementDoubles(): Player = copy(consecutiveDoubles = consecutiveDoubles + 1)
-  def resetDoubles(): Player = copy(consecutiveDoubles = 0)
-
-  def releaseFromJail(): Player = {
-    val newPlayer = this.copy(isInJail = false)
-    newPlayer
-  }
-  def changeBalance(amount: Int): Player = {
-    val newPlayer = this.copy(balance = balance + amount)
-    newPlayer
-  }
-
-  def goToJail(): Player = {
-    val newPlayer = this.copy(position = 11, isInJail = true,consecutiveDoubles = 0)
-    newPlayer
-  }
-
-}
-
-trait TurnStrategy {
-  def executeTurn(player: Player, dice: () => (Int, Int)): Player
-}
+    
+    trait TurnStrategy {
+      def executeTurn(player: Player, dice: () => (Int, Int)): Player
+    }

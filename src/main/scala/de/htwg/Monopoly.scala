@@ -1,19 +1,14 @@
 package de.htwg
 
-import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
-import de.htwg.model.modelBaseImple.PropertyField.calculateRent
-import scala.io.StdIn.readLine
-import scala.util.Random
 import de.htwg.controller.Controller
-import de.htwg.view.Tui
-import de.htwg.view.GUI
 import de.htwg.model.*
-import de.htwg.model.modelBaseImple.{GameState,BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, StartTurnState, TaxField, TrainStationField, UtilityField}
-import de.htwg.model.modelMockImpl.MockPlayer
-import de.htwg.model.IMonopolyGame
-import de.htwg.model.modelBaseImple.MonopolyGame
+import de.htwg.model.modelBaseImple.*
+import de.htwg.view.{GUI, Tui}
+import de.htwg.model.IPlayer
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future // Import Future for asynchronous execution
+import scala.concurrent.Future
+import scala.util.Random // Import Future for asynchronous execution
 
 case class Board(fields: Vector[BoardField])
 
@@ -44,7 +39,7 @@ object Monopoly:
       SoundPlayer().playBackground("src/main/resources/sound/MonopolyJazz.wav")
     }
 
-    var playerVector = Vector[Player]()
+    var playerVector = Vector[IPlayer]()
 
     def askForPlayerCount(): Int = {
       /*println("How many Player? (2-4):")
@@ -121,7 +116,7 @@ object Monopoly:
     )
   }
 
-  def randomEmoji(vektor: Vector[Player]): String = {
+  def randomEmoji(vektor: Vector[IPlayer]): String = {
     val emojis = List(
       "🐶", "🐱", "🐯", "🦁", "🐻", "🐼", "🦊", "🐺", "🦄", "🐲", "🦉",
       "🦅", "🐝", "🦋", "🐙", "🦑", "🦈", "🐊", "🦖", "🦓", "🦒", "🐘",
