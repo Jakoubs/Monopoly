@@ -40,9 +40,10 @@ case class RollingState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
     val (d1, d2) = controller.game.rollDice(controller.game.sound)
     val command = RollDiceCommand(controller.game.sound)
-    controller.executeCommand(controller.game)
+    val newGame = command.execute(controller.game)
+    controller.executeCommand(newGame)
     val isDouble = d1 == d2
-    
+    print(controller.currentPlayer.position)
     controller.updateTurnInfo(
       TurnInfo(
         diceRoll1 = d1,
@@ -58,7 +59,7 @@ case class RollingState(isDouble: Boolean = false) extends GameState {
       if (updatedPlayer.consecutiveDoubles >= 3) {
         val jailedPlayer = updatedPlayer.goToJail
         controller.updatePlayer(jailedPlayer)
-        EndTurnState()
+        return EndTurnState()
       }
     } else {
 
@@ -99,6 +100,7 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
 
     val updatedPlayer = strategy.executeTurn(controller.currentPlayer,() => (d1, d2))
     controller.updatePlayer(updatedPlayer)
+    println(controller.currentPlayer.position)
 
 
     val currentField = controller.board.fields(updatedPlayer.position - 1)
@@ -170,7 +172,8 @@ case class BuyPropertyState(isDouble: Boolean = false) extends GameState {
     field match {
       case buyableField: BuyableField =>
         val command = BuyCommand(buyableField, controller.currentPlayer.asInstanceOf[IPlayer])
-        controller.executeCommand(controller.game)
+        val newGame = command.execute(controller.game)
+        controller.executeCommand(newGame)
         AdditionalActionsState(isDouble)
       case _ =>
         AdditionalActionsState(isDouble)
@@ -202,7 +205,8 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
           controller.game.board.fields(fieldId - 1) match {
             case field: PropertyField =>
               val command = BuyHouseCommand(field, controller.currentPlayer.asInstanceOf[IPlayer])
-              controller.executeCommand(controller.game)
+              val newGame = command.execute(controller.game)
+              controller.executeCommand(newGame)
               EndTurnState()
             case _ =>
               if (isDouble){

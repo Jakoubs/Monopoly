@@ -15,6 +15,7 @@ package de.htwg.model.modelBaseImple
   ) extends IMonopolyGame {
 
     def createGame: IMonopolyGame = {
+      println("⚠️ [DEBUG] createGame wurde aufgerufen!") // <--- TEST
       MonopolyGame(
         players = players,
         board = board,
@@ -58,7 +59,8 @@ package de.htwg.model.modelBaseImple
     }
 
     override def handle(input: de.htwg.controller.OpEnum, controller: de.htwg.controller.Controller): IMonopolyGame = {
-      this.copy(state = state.handle(input, controller))
+      val newState = state.handle(input, controller)
+      controller.game.asInstanceOf[MonopolyGame].copy(state = newState)
     }
 
     override def movePlayer(steps: Int): IMonopolyGame = {

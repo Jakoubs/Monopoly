@@ -39,7 +39,8 @@ package de.htwg.controller
   case class RollDiceCommand(sound: Boolean) extends Command {
     def execute(game: IMonopolyGame): IMonopolyGame = {
       val (dice1, dice2) = game.rollDice(true)
-      game.rollDice(dice1, dice2)
+      val updatedGame = game.rollDice(dice1, dice2)
+      (updatedGame)
     }
   }
   

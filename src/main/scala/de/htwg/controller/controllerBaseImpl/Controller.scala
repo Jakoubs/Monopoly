@@ -56,23 +56,24 @@ package de.htwg.controller
   
     def updatePlayer(newPlayer: IPlayer): Unit = {
       game = game.withUpdatedPlayer(newPlayer)
+      println("updatePlayer")
       notifyObservers()
     }
   
     def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit = {
       game = game.withUpdatedBoardAndPlayer(field, player)
+      println("updateBoardAndPlayer")
       notifyObservers()
     }
   
     def switchToNextPlayer(): Unit = {
       game = game.withNextPlayer
+      print("nextplayer")
       notifyObservers()
     }
   
     def executeCommand(newGame: IMonopolyGame): Unit = {
       undoManager = undoManager.doStep(game, newGame)
-      game = newGame
-      notifyObservers()
     }
   
     def undo(): Unit = {
