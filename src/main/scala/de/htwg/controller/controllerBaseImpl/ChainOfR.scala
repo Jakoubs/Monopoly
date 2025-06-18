@@ -2,13 +2,12 @@ package de.htwg.controller.controllerBaseImpl
 
 import OpEnum.roll
 import de.htwg.controller.*
-import de.htwg.model.modelBaseImple.Player
+import de.htwg.model.IPlayer
 
 abstract class ActionHandler {
-  val controller: Controller
-  var nextHandler: Option[ActionHandler] // nextHandler ist jetzt var
+  var nextHandler: Option[ActionHandler] = None
 
-  def handle(input: OpEnum): Option[GameState]
+  def handle(input: OpEnum)(using controller: Controller): Option[GameState]
 
   def setNext(handler: ActionHandler): ActionHandler = {
     this match {
@@ -22,15 +21,16 @@ abstract class ActionHandler {
   }
 }
 
-case class PayJailHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
-  override def handle(input: OpEnum): Option[GameState] = {
+case class PayJailHandler() extends ActionHandler {
+  override def handle(input: OpEnum)(using controller: Controller): Option[GameState] = {
     if (input == OpEnum.pay) {
       if (controller.currentPlayer.balance >= 50) {
-        val command = PayJailFeeCommand(controller, controller.currentPlayer)
+        given IPlayer = controller.currentPlayer
+        val command = PayJailFeeCommand()
         command.execute()
         Some(RollingState())
       } else {
-        Some(JailState()) 
+        Some(JailState())
       }
     } else {
       nextHandler.flatMap(_.handle(input))
@@ -38,8 +38,8 @@ case class PayJailHandler(override val controller: Controller, var nextHandler: 
   }
 }
 
-case class RollDoublesJailHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
-  override def handle(input: OpEnum): Option[GameState] = {
+case class RollDoublesJailHandler() extends ActionHandler {
+  override def handle(input: OpEnum)(using controller: Controller): Option[GameState] = {
     if (input == OpEnum.roll) {
       val strategy = JailTurnStrategy()
       val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.game.rollDice(controller.sound))
@@ -55,8 +55,8 @@ case class RollDoublesJailHandler(override val controller: Controller, var nextH
   }
 }
 
-case class InvalidJailInputHandler(override val controller: Controller, var nextHandler: Option[ActionHandler] = None) extends ActionHandler {
-  override def handle(input: OpEnum): Option[GameState] = {
-    Some(JailState()) 
+case class InvalidJailInputHandler() extends ActionHandler {
+  override def handle(input: OpEnum)(using controller: Controller): Option[GameState] = {
+    Some(JailState())
   }
 }

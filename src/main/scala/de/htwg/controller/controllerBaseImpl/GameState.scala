@@ -5,9 +5,6 @@ import de.htwg.model.*
 import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
 
-trait GameStateContext:
-  def controller: Controller
-
 sealed trait GameState {
   def handle(input: OpEnum)(using controller: Controller): GameState
 }
@@ -27,9 +24,9 @@ case class StartTurnState() extends GameState {
 
 case class JailState() extends GameState {
   override def handle(input: OpEnum)(using controller: Controller): GameState = {
-    val payHandler = PayJailHandler(controller)
-    val rollHandler = RollDoublesJailHandler(controller)
-    val invalidHandler = InvalidJailInputHandler(controller)
+    val payHandler = PayJailHandler()
+    val rollHandler = RollDoublesJailHandler()
+    val invalidHandler = InvalidJailInputHandler()
 
     payHandler.setNext(rollHandler).setNext(invalidHandler)
 
@@ -39,11 +36,11 @@ case class JailState() extends GameState {
 
 case class RollingState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum)(using controller: Controller): GameState = {
-    val command = RollDiceCommand(controller)
+    val command = RollDiceCommand()
     controller.executeCommand(command)
     val (d1, d2) = command.getResult
     val isDouble = d1 == d2
-    
+
 
     // Update turn info
     controller.updateTurnInfo(
@@ -162,7 +159,8 @@ case class BuyPropertyState(isDouble: Boolean = false) extends GameState {
     val field = controller.board.fields(controller.currentPlayer.position-1)
     field match {
       case buyableField: BuyableField =>
-        val command = BuyCommand(controller, buyableField, controller.currentPlayer)
+        given IPlayer = controller.currentPlayer
+        val command = BuyCommand(buyableField, controller.currentPlayer)
         controller.executeCommand(command)
         AdditionalActionsState(isDouble)
       case _ =>
@@ -194,7 +192,9 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
       case OpEnum.fieldSelected(fieldId) =>
           controller.game.board.fields(fieldId - 1) match {
             case field: PropertyField =>
-              val command = BuyHouseCommand(controller, field, controller.currentPlayer)
+              given PropertyField = field
+              given IPlayer = controller.currentPlayer
+              val command = BuyHouseCommand()
               controller.executeCommand(command)
               ConfirmBuyHouseState(isDouble, command)
             case _ =>
@@ -232,5 +232,3 @@ case class EndTurnState() extends GameState {
     StartTurnState()
   }
 }
-
-

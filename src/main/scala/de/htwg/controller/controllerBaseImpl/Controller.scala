@@ -37,13 +37,15 @@ case class TurnInfo(
                      rentPaidTo: Option[IPlayer] = None
                    )
 
-class Controller(var game: IMonopolyGame) extends IController with Observable{ 
+class Controller(var game: IMonopolyGame) extends IController with Observable{
+  given controller: Controller = this
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()
 
   def getTurnInfo: TurnInfo = currentTurnInfo
-  def updateTurnInfo(newInfo: TurnInfo): Unit = { // Setter-Methode
+
+  def updateTurnInfo(newInfo: TurnInfo): Unit = {
     currentTurnInfo = newInfo
   }
 
@@ -147,7 +149,5 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
       .mapValues(_.size)
       .toMap
   }
-
-
 }
 

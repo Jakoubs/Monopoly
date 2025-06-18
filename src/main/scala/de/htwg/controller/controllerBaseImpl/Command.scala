@@ -13,11 +13,10 @@ trait Command {
   var nextGameStates: Option[GameState] = None
 }
 
-  case class BuyCommand[T <: BuyableField](
-                                               controller: Controller,
-                                               field: T,
-                                               player: IPlayer
-                                             ) extends Command {
+case class BuyCommand[T <: BuyableField](
+                                          field: T,
+                                          player: IPlayer
+                                        )(using controller: Controller) extends Command{
 
     private var previousState: Option[(T, IPlayer)] = None
 
@@ -34,7 +33,7 @@ trait Command {
     }
   }
 
-  case class BuyHouseCommand(controller: Controller, field: PropertyField, player: IPlayer) extends Command {
+  case class BuyHouseCommand()(using controller: Controller, field: PropertyField, player: IPlayer) extends Command {
     private var previousState: Option[(PropertyField, IPlayer)] = None
 
     def execute(): Unit = {
@@ -54,7 +53,7 @@ trait Command {
     }
   }
 
-  case class RollDiceCommand(controller: Controller) extends Command {
+case class RollDiceCommand()(using controller: Controller) extends Command {
     private var previousPlayerState: Option[IPlayer] = None
     private var rollResult: (Int, Int) = (0, 0)
 
@@ -70,8 +69,8 @@ trait Command {
     def getResult: (Int, Int) = rollResult
   }
 
-  case class PayJailFeeCommand(controller: Controller, player: IPlayer) extends Command {
-    private var previousState: Option[IPlayer] = None
+case class PayJailFeeCommand()(using controller: Controller, player: IPlayer) extends Command {
+  private var previousState: Option[IPlayer] = None
 
     def execute(): Unit = {
       previousState = Some(player)
