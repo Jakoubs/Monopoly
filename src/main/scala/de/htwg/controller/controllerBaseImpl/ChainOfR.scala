@@ -42,10 +42,10 @@ case class RollDoublesJailHandler(override val controller: Controller, var nextH
   override def handle(input: OpEnum): Option[GameState] = {
     if (input == OpEnum.roll) {
       val strategy = JailTurnStrategy()
-      val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.dice.rollDice(controller.sound))
+      val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.game.rollDice(controller.sound))
       controller.updatePlayer(updatedPlayer)
       if (!updatedPlayer.isInJail) {
-        Some(MovingState(() => controller.dice.rollDice(controller.sound)))
+        Some(MovingState(() => controller.game.rollDice(controller.sound)))
       } else {
         Some(JailState())
       }

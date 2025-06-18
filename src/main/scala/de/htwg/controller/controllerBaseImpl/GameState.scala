@@ -12,7 +12,7 @@ sealed trait GameState {
 
 case class StartTurnState() extends GameState {
   def handle(input: OpEnum, controller: Controller): GameState = {
-    val player = controller.currentPlayer.resetDoubles()
+    val player = controller.currentPlayer.resetDoubles
     controller.updatePlayer(player)
 
     if (controller.currentPlayer.isInJail) {
@@ -53,17 +53,17 @@ case class RollingState(isDouble: Boolean = false) extends GameState {
 
     if (isDouble) {
       val player = controller.currentPlayer
-      val updatedPlayer = player.incrementDoubles()
+      val updatedPlayer = player.incrementDoubles
       controller.updatePlayer(updatedPlayer)
 
       if (updatedPlayer.consecutiveDoubles >= 3) {
-        val jailedPlayer = updatedPlayer.goToJail()
+        val jailedPlayer = updatedPlayer.goToJail
         controller.updatePlayer(jailedPlayer)
         return EndTurnState()
       }
     } else {
 
-      val updatedPlayer = controller.currentPlayer.resetDoubles()
+      val updatedPlayer = controller.currentPlayer.resetDoubles
       controller.updatePlayer(updatedPlayer)
     }
 

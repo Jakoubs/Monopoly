@@ -1,8 +1,8 @@
 package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.controller.{Command, Controller}
+import de.htwg.controller.controllerBaseImpl.*
 import de.htwg.model.modelBaseImple.*
-
+import de.htwg.model.IPlayer
 import scala.util.{Failure, Success, Try}
 
 
@@ -16,10 +16,10 @@ trait Command {
   case class BuyCommand[T <: BuyableField](
                                                controller: Controller,
                                                field: T,
-                                               player: Player
+                                               player: IPlayer
                                              ) extends Command {
 
-    private var previousState: Option[(T, Player)] = None
+    private var previousState: Option[(T, IPlayer)] = None
 
     def execute(): Unit = {
       previousState = Some((field, player))
@@ -34,14 +34,14 @@ trait Command {
     }
   }
 
-  case class BuyHouseCommand(controller: Controller, field: PropertyField, player: Player) extends Command {
-    private var previousState: Option[(PropertyField, Player)] = None
+  case class BuyHouseCommand(controller: Controller, field: PropertyField, player: IPlayer) extends Command {
+    private var previousState: Option[(PropertyField, IPlayer)] = None
 
     def execute(): Unit = {
       previousState = Some((field, player))
 
       PropertyField.House().buyHouse(player, field, controller.game) match {
-        case Success((updatedField: PropertyField, updatedPlayer: Player)) =>
+        case Success((updatedField: PropertyField, updatedPlayer: IPlayer)) =>
           controller.updateBoardAndPlayer(updatedField, updatedPlayer)
         case Failure(exception) =>
       }
@@ -55,12 +55,12 @@ trait Command {
   }
 
   case class RollDiceCommand(controller: Controller) extends Command {
-    private var previousPlayerState: Option[Player] = None
+    private var previousPlayerState: Option[IPlayer] = None
     private var rollResult: (Int, Int) = (0, 0)
 
     def execute(): Unit = {
       previousPlayerState = Some(controller.currentPlayer)
-      rollResult = controller.dice.rollDice(controller.sound)
+      rollResult = controller.game.rollDice(controller.sound)
     }
 
     def undo(): Unit = {
@@ -70,12 +70,12 @@ trait Command {
     def getResult: (Int, Int) = rollResult
   }
 
-  case class PayJailFeeCommand(controller: Controller, player: Player) extends Command {
-    private var previousState: Option[Player] = None
+  case class PayJailFeeCommand(controller: Controller, player: IPlayer) extends Command {
+    private var previousState: Option[IPlayer] = None
 
     def execute(): Unit = {
       previousState = Some(player)
-      val updatedPlayer = player.copy(
+      val updatedPlayer = player.copyPlayer(
         isInJail = false,
         balance = player.balance - 50,
       )

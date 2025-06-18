@@ -3,7 +3,7 @@ package de.htwg
 import de.htwg.controller.controllerBaseImpl.Controller
 import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.modelBaseImple.PropertyField.calculateRent
-
+import de.htwg.model.modelBaseImple.MonopolyGame
 import scala.io.StdIn.readLine
 import scala.util.Random
 import de.htwg.view.Tui
@@ -24,7 +24,7 @@ object Monopoly:
   def main(args: Array[String]): Unit = {
     val game = defineGame()
     val dice = Dice()
-    val controller = Controller(game, dice)
+    val controller = Controller(game)
     gameController = Some(controller) // Store the controller
 
     // Launch the TUI in a separate Future (on a separate thread)
@@ -37,7 +37,7 @@ object Monopoly:
     GUI.main(args)
   }
 
-  def defineGame(): MonopolyGame = {
+  def defineGame(): IMonopolyGame = {
     //println("play with sound? (y/n)")
     val soundInput = "n"//readLine()
     val isTestBoard = soundInput == "yT" || soundInput == "nT"
@@ -47,24 +47,9 @@ object Monopoly:
       SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
     }
 
-    var playerVector = Vector[Player]()
+    var playerVector = Vector[IPlayer]()
 
     def askForPlayerCount(): Int = {
-      /*println("How many Player? (2-4):")
-     val input = scala.io.StdIn.readLine()
-      try {
-        val playerCount = input.toInt
-        if (playerCount >= 2 && playerCount <= 4) {
-          playerCount
-        } else {
-          println("Invalid player count. Please enter a number between 2 and 4.")
-          askForPlayerCount()
-        }
-      } catch {
-        case _: NumberFormatException =>
-          println("Invalid input. Please enter a number.")
-          2
-      }*/
       4
     }
     val playerAnz = askForPlayerCount()
@@ -122,7 +107,7 @@ object Monopoly:
     MonopolyGame(playerVector, board, playerVector.head, soundBool)
   }
 
-  def randomEmoji(vektor: Vector[Player]): String = {
+  def randomEmoji(vektor: Vector[IPlayer]): String = {
     val emojis = List(
       "🐶", "🐱", "🐯", "🦁", "🐻", "🐼", "🦊", "🐺", "🦄", "🐲", "🦉",
       "🦅", "🐝", "🦋", "🐙", "🦑", "🦈", "🐊", "🦖", "🦓", "🦒", "🐘",
@@ -131,10 +116,3 @@ object Monopoly:
     val availableEmojis = emojis.filterNot(e => vektor.exists(_.name == e))
     Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
   }
-
-case class MonopolyGame(
-                         players: Vector[Player],
-                         board: Board,
-                         currentPlayer: Player,
-                         sound: Boolean
-                       )

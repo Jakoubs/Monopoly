@@ -1,11 +1,14 @@
 package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.controller.{GameState, OpEnum, TurnInfo}
+import de.htwg.controller.controllerBaseImpl.{GameState, OpEnum, TurnInfo}
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.view.BoardPrinter
+import de.htwg.Board
+import de.htwg.model.modelBaseImple.MonopolyGame
+import de.htwg.model.IPlayer
 
 import java.awt.Choice
 import scala.collection.mutable
@@ -30,10 +33,10 @@ case class TurnInfo(
                      boughtProperty: Option[BoardField] = None,
                      builtHouse: Option[PropertyField] = None,
                      paidRent: Option[Int] = None,
-                     rentPaidTo: Option[Player] = None
+                     rentPaidTo: Option[IPlayer] = None
                    )
 
-class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
+class Controller(var game: IMonopolyGame) extends Observable{
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()
@@ -45,9 +48,9 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
 
   var state: GameState = StartTurnState()
-  def currentPlayer: Player = game.currentPlayer
+  def currentPlayer: IPlayer = game.currentPlayer
   def board: Board = game.board
-  def players: Vector[Player] = game.players
+  def players: Vector[IPlayer] = game.players
   def sound: Boolean = game.sound
 
   def handleInput(input: OpEnum): Unit = {
@@ -61,23 +64,22 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
 
   }
 
-  def updatePlayer(player: Player): Unit = {
-    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.copy(players = updatedPlayers, currentPlayer = player)
+  def updatePlayer(newPlayer: IPlayer): Unit = {
+    game = game.withUpdatedPlayer(newPlayer)
+    println("updatePlayer")
+    notifyObservers()
   }
 
-  def updateBoardAndPlayer(field: BoardField, player: Player): Unit = {
-    val updatedFields = game.board.fields.updated(field.index-1, field)
-    val updatedBoard = game.board.copy(fields = updatedFields)
-    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
+  def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit = {
+    game = game.withUpdatedBoardAndPlayer(field, player)
+    println("updateBoardAndPlayer")
+    notifyObservers()
   }
 
   def switchToNextPlayer(): Unit = {
-    val currentIndex = game.players.indexOf(game.currentPlayer)
-    val nextIndex = (currentIndex + 1) % game.players.size
-    val nextPlayer = game.players(nextIndex)
-    game = game.copy(currentPlayer = nextPlayer)
+    game = game.withNextPlayer
+    print("nextplayer")
+    notifyObservers()
   }
 
   def executeCommand(cmd: Command): Unit = {
@@ -125,14 +127,14 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
         s"In Jail: ${if (p.isInJail) "Yes" else "No"}"
   }
 
-  def getOwnedProperties(): Map[Player, List[PropertyField]] = {
+  def getOwnedProperties(): Map[IPlayer, List[PropertyField]] = {
     board.fields.collect {
         case p: PropertyField if p.owner.isDefined => (p.owner.get, p)
       }.groupBy(_._1)
       .map { case (player, tuples) => player -> tuples.map(_._2).toList }
   }
 
-  def getOwnedTrainStations(): Map[Player, Int] = {
+  def getOwnedTrainStations(): Map[IPlayer, Int] = {
     board.fields.collect {
         case t: TrainStationField if t.owner.isDefined => (t.owner.get, 1)
       }.groupBy(_._1)
@@ -141,7 +143,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       .toMap
   }
 
-  def getOwnedUtilities(): Map[Player, Int] = {
+  def getOwnedUtilities(): Map[IPlayer, Int] = {
     board.fields.collect {
         case u: UtilityField if u.owner.isDefined => (u.owner.get, 1)
       }.groupBy(_._1)
