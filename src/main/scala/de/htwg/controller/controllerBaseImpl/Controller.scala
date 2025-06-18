@@ -2,7 +2,7 @@ package de.htwg.controller.controllerBaseImpl
 
 import de.htwg.controller.controllerBaseImpl.{GameState, OpEnum, TurnInfo}
 import de.htwg.model.*
-import javax.inject.Inject
+import com.google.inject.{Guice, Inject}
 import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
 import de.htwg.view.BoardPrinter
