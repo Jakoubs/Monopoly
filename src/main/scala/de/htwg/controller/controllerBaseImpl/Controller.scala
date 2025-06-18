@@ -55,11 +55,12 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
   def sound: Boolean = game.sound
 
   def handleInput(input: OpEnum): Unit = {
+    given Controller = this
     input match {
       case OpEnum.undo => undo()
       case OpEnum.redo => redo()
       case _ =>
-        state = state.handle(input, this)
+        state = state.handle(input)
     }
     notifyObservers()
 
