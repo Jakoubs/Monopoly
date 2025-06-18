@@ -9,6 +9,7 @@ import de.htwg.view.BoardPrinter
 import de.htwg.Board
 import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.IPlayer
+import de.htwg.controller.IController
 
 import java.awt.Choice
 import scala.collection.mutable
@@ -36,7 +37,7 @@ case class TurnInfo(
                      rentPaidTo: Option[IPlayer] = None
                    )
 
-class Controller(var game: IMonopolyGame) extends Observable{
+class Controller(var game: IMonopolyGame) extends IController with Observable{ 
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()
