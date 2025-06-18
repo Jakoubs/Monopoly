@@ -10,31 +10,35 @@ import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, TaxField, TrainStationField, UtilityField}
-
+import com.google.inject.Guice
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future // Import Future for asynchronous execution
 
 case class Board(fields: Vector[BoardField])
 
 object Monopoly:
-  // Make the controller a global variable or pass it to GUI.main
-  // Option 1: Global var (less ideal for large apps, but simple for now)
-  var gameController: Option[Controller] = None // Option to hold the controller
 
   def main(args: Array[String]): Unit = {
-    val game = defineGame()
-    val dice = Dice()
-    val controller = Controller(game)
-    gameController = Some(controller) // Store the controller
+    val injector = Guice.createInjector(new MonopolyModule)
 
-    // Launch the TUI in a separate Future (on a separate thread)
+    // Get the controller instance from Guice
+    val controllerInstance = injector.getInstance(classOf[controller.controllerBaseImpl.Controller])
+
+    // Inject the controller into Tui
+    val tui = injector.getInstance(classOf[Tui]) // Tui is already @Inject, so this should work
+    // Ensure Tui's constructor takes Controller: class Tui @Inject() (controller: Controller)
+
+    // Pass the controller to GUI
+    val gui = injector.getInstance(classOf[GUI.type]) // GUI is an object, so it won't be constructed by Guice.
+    // We need to set its controller manually.
+    gui.setController(controllerInstance) // Call the setter method
+
     Future {
-      val tui = Tui(controller)
-      tui.run() // This will block this Future's thread, not the main thread.
+      tui.run() // tui.run(controller) is no longer needed if controller is injected into Tui
     }
 
-    // Launch the GUI. The GUI's start() method will then retrieve the controller.
-    GUI.main(args)
+    // 4. GUI starten
+    gui.main(args)
   }
 
   def defineGame(): IMonopolyGame = {

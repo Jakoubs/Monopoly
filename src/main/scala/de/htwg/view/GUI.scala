@@ -15,6 +15,7 @@ import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y}
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import scalafx.collections.ObservableBuffer
+import javax.inject.Inject
 
 object GUI extends JFXApp3 with Observer {
   private var gameController: Option[Controller] = None
@@ -38,13 +39,12 @@ object GUI extends JFXApp3 with Observer {
   }
 
   override def start(): Unit = {
-    Monopoly.gameController match {
+    gameController match {
       case Some(ctrl) =>
-        gameController = Some(ctrl)
         ctrl.add(this)
         boardPanel = Some(new BoardPanel(ctrl))
       case None =>
-        println("Error: Controller not set in Monopoly.main before GUI launch. Exiting.")
+        println("Error: Controller not set in GUI before start. Exiting.")
         Platform.exit()
         return
     }

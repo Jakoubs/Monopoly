@@ -9,7 +9,12 @@ lazy val root = (project in file("."))
   )
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
-libraryDependencies += "org.scalafx" %% "scalafx" % "20.0.0-R31"
+libraryDependencies += "org.scalafx" %% "scalafx" % "24.0.0-R35"
+libraryDependencies ++= Seq(
+  "com.google.inject"    % "guice"         % "7.0.0",
+  "net.codingwell"      %% "scala-guice"   % "7.0.0",
+  "javax.inject"        % "javax.inject"  % "1"
+)
 Compile/mainClass := Some("de.htwg.Monopoly")
 
 

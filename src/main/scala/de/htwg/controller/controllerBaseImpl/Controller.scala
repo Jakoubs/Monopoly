@@ -2,18 +2,15 @@ package de.htwg.controller.controllerBaseImpl
 
 import de.htwg.controller.controllerBaseImpl.{GameState, OpEnum, TurnInfo}
 import de.htwg.model.*
-import de.htwg.model.modelBaseImple.PropertyField.calculateRent
+import javax.inject.Inject
 import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
 import de.htwg.view.BoardPrinter
 import de.htwg.Board
-import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.IPlayer
 import de.htwg.controller.IController
 
-import java.awt.Choice
 import scala.collection.mutable
-import scala.io.StdIn.readLine
 
 enum OpEnum:
   case roll
@@ -37,7 +34,7 @@ case class TurnInfo(
                      rentPaidTo: Option[IPlayer] = None
                    )
 
-class Controller(var game: IMonopolyGame) extends IController with Observable{ 
+class Controller @Inject() (var game: IMonopolyGame) extends IController with Observable{ 
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()

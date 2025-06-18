@@ -2,10 +2,11 @@ package de.htwg.view
 
 import de.htwg.util.util.Observer
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
-
+import javax.inject.Inject
 import scala.io.StdIn.readLine
+import de.htwg.controller.IController
 
-class Tui(controller: Controller) extends Observer {
+class Tui @Inject() (controller: Controller) extends Observer {
 
   controller.add(this)
 

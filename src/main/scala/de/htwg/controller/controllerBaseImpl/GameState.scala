@@ -99,7 +99,7 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
     currentField match {
       case buyableField: BuyableField =>
         buyableField.owner match {
-          case Some(owner) if owner != updatedPlayer =>
+          case Some(owner) if owner != controller.currentPlayer =>
             val rentVisitor = new RentVisitor(updatedPlayer, controller.players, controller.board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
             val rent = currentField.accept(rentVisitor)
 
