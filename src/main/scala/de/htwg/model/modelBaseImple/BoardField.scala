@@ -16,7 +16,7 @@ trait BuyableField extends BoardField {
     owner match {
       case None if player.balance > price =>
         val updatedField = withNewOwner(player)
-        val updatedPlayer = player.copy(balance = player.balance - price)
+        val updatedPlayer = player.copyPlayer(balance = player.balance - price)
         (updatedField, updatedPlayer)
       case _ =>
         (this, player)
@@ -80,7 +80,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
               checkColorGroup.map { _ =>
                 // If all checks pass, proceed with the purchase
                 val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
-                val updatedPlayer = player.copy(balance = player.balance - housePrice)
+                val updatedPlayer = player.copyPlayer(balance = player.balance - housePrice)
                 (updatedField, updatedPlayer)
               }
             }
@@ -107,7 +107,7 @@ case object GoField extends BoardField {
   override val index: Int = 1
   override val name: String = "GoField"
   def addMoney(player: IPlayer): IPlayer = {
-    player.copy(balance = player.balance + 200)
+    player.copyPlayer(balance = player.balance + 200)
   }
 
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
@@ -122,7 +122,7 @@ case class GoToJailField() extends BoardField{
   override val index: Int = 31
   override val name: String = "GoToJail"
   def goToJail(player: IPlayer): IPlayer = {
-    player.goToJail()
+    player.goToJail
   }
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
@@ -131,7 +131,7 @@ case class FreeParkingField(amount: Int) extends BoardField{
   override val name: String = "FreeParking"
 
   def apply(player: IPlayer): IPlayer = {
-    player.copy(balance = player.balance + amount)
+    player.copyPlayer(balance = player.balance + amount)
   }
 
   def resetAmount(): FreeParkingField = {

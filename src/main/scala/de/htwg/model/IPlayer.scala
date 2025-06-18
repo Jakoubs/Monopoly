@@ -16,13 +16,13 @@ trait IPlayer {
   def incrementDoubles: IPlayer
   def resetDoubles: IPlayer
   def releaseFromJail: IPlayer
-  def changeBalance(amount: Int): Try[IPlayer]
+  def changeBalance(amount: Int): IPlayer
   def goToJail: IPlayer
-  def copyPlayer(balance: Int,
-                 position: Int = 1,
-                 isInJail: Boolean = false,
+  def copyPlayer(balance: Int = this.balance,
+                 position: Int = this.position,
+                 isInJail: Boolean = this.isInJail,
                  consecutiveDoubles: Int = 0): IPlayer
-  
+
 }
 object IPlayer {
   def create(

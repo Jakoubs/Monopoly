@@ -1,7 +1,7 @@
 package de.htwg.model
 
 import de.htwg.Board
-import de.htwg.model.modelBaseImple.{BoardField, GameState, PropertyField, StartTurnState}
+import de.htwg.model.modelBaseImple.{BoardField, PropertyField}
 
 import scala.util.Try
 
@@ -11,7 +11,7 @@ trait IMonopolyGame {
   def board: Board
   def currentPlayer: IPlayer
   def sound: Boolean
-  
+
   def rollDice(valid: Boolean): (Int, Int)
   def rollDice(dice1: Int, dice2: Int): IMonopolyGame
 
@@ -23,7 +23,6 @@ trait IMonopolyGame {
   def withUpdatedBoardAndPlayer(field: BoardField, player: IPlayer): IMonopolyGame
   def withNextPlayer: IMonopolyGame
 
-  //def handle(input: OpEnum, controller: Controller): IMonopolyGame
 
   def buyHouse(field: PropertyField, player: IPlayer): Try[IMonopolyGame]
 }

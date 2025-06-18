@@ -102,8 +102,8 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
             val rent = currentField.accept(rentVisitor)
 
             if (updatedPlayer.balance >= rent) {
-              val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
-              val receivingPlayer = owner.copy(balance = owner.balance + rent)
+              val payingPlayer = updatedPlayer.copyPlayer(balance = updatedPlayer.balance - rent)
+              val receivingPlayer = owner.copyPlayer(balance = owner.balance + rent)
               controller.updatePlayer(receivingPlayer)
               controller.updatePlayer(payingPlayer)
               controller.updateTurnInfo(controller.getTurnInfo.copy(paidRent = Some(rent), rentPaidTo = Some(owner)))
@@ -114,14 +114,14 @@ case class MovingState(dice: () => (Int, Int)) extends GameState {
           case _ => PropertyDecisionState()
         }
       case _: GoToJailField =>
-        val jailedPlayer = updatedPlayer.goToJail()
+        val jailedPlayer = updatedPlayer.goToJail
         controller.updatePlayer(jailedPlayer)
         EndTurnState()
       case _: TaxField =>
         val rentVisitorTax = new RentVisitor(updatedPlayer, controller.players, controller.board, diceResult, ownedProperties, ownedTrainStations, ownedUtilities)
         val rent = currentField.accept(rentVisitorTax)
         if(updatedPlayer.balance >= rent) {
-          val payingPlayer = updatedPlayer.copy(balance = updatedPlayer.balance - rent)
+          val payingPlayer = updatedPlayer.copyPlayer(balance = updatedPlayer.balance - rent)
           val freeParking = controller.board.fields(20).asInstanceOf[FreeParkingField]
           val updatedFreeParking = freeParking.copy(amount = freeParking.amount + rent)
           controller.updateBoardAndPlayer(updatedFreeParking, payingPlayer)

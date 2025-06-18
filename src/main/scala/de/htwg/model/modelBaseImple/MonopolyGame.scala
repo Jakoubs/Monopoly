@@ -56,10 +56,7 @@ case class MonopolyGame(
     this.withNextPlayer
   }
 
-  override def handle(input: de.htwg.controller.OpEnum, controller: de.htwg.controller.Controller): IMonopolyGame = {
-    val newState = state.handle(input, controller)
-    controller.game.asInstanceOf[MonopolyGame].copy(state = newState)
-  }
+
 
   override def movePlayer(steps: Int): IMonopolyGame = {
     val updatedPlayer = currentPlayer.moveToIndex(((currentPlayer.position + steps) % 40))

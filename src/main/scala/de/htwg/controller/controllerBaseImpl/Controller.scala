@@ -66,20 +66,14 @@ class Controller(var game: IMonopolyGame) extends Observable{
 
   def updatePlayer(newPlayer: IPlayer): Unit = {
     game = game.withUpdatedPlayer(newPlayer)
-    println("updatePlayer")
-    notifyObservers()
   }
 
   def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit = {
     game = game.withUpdatedBoardAndPlayer(field, player)
-    println("updateBoardAndPlayer")
-    notifyObservers()
   }
 
   def switchToNextPlayer(): Unit = {
     game = game.withNextPlayer
-    print("nextplayer")
-    notifyObservers()
   }
 
   def executeCommand(cmd: Command): Unit = {

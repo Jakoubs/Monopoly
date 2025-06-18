@@ -14,11 +14,11 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
   // Test Double für den Controller
   class TestController(initialGame: MonopolyGame, mockDice: Dice) extends Controller(initialGame, mockDice) {
     var payJailFeeCalled = false
-    var updatePlayerCalledWith: Option[Player] = None
+    var updatePlayerCalledWith: Option[IPlayer] = None
 
     override val dice: Dice = mockDice
 
-    override def updatePlayer(player: Player): Unit = updatePlayerCalledWith = Some(player)
+    override def updatePlayer(player: IPlayer): Unit = updatePlayerCalledWith = Some(player)
   }
 
   // Test Stub für den nächsten Handler

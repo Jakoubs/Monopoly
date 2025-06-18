@@ -27,17 +27,17 @@ case class Player(
     this.copy(isInJail = false)
   }
 
-  override def changeBalance(amount: Int): Try[IPlayer] = {
-    Success(this.copy(balance = balance + amount))
+  override def changeBalance(amount: Int): IPlayer = {
+    this.copy(balance = balance + amount)
   }
 
   override def goToJail: IPlayer = {
     this.copy(position = 11, isInJail = true, consecutiveDoubles = 0)
   }
 
-  override def copyPlayer(balance: Int,
-                          position: Int = 1,
-                          isInJail: Boolean = false,
+  override def copyPlayer(balance: Int = this.balance,
+                          position: Int = this.position,
+                          isInJail: Boolean = this.isInJail,
                           consecutiveDoubles: Int = 0
                          ): IPlayer = {
     this.copy(name = this.name,balance,position,isInJail,consecutiveDoubles)
@@ -45,5 +45,5 @@ case class Player(
 }
 
 trait TurnStrategy {
-  def executeTurn(player: Player, dice: () => (Int, Int)): Player
+  def executeTurn(player: Player, dice: () => (Int, Int)): IPlayer
 }
