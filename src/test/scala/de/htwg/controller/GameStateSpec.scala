@@ -4,9 +4,11 @@ import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.controller.*
-import de.htwg.controller.OpEnum.{buy, enter, fieldSelected, n, pay, roll, y}
+import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, enter, fieldSelected, n, pay, roll, y}
+import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseCommand, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, JailTurnStrategy, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.*
-import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import org.scalatest.matchers.should.Matchers.shouldBe
 

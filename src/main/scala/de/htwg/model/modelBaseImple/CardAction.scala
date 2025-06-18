@@ -1,4 +1,6 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
+
+import de.htwg.model.{CardAction, Player}
 
 sealed trait CardAction
 

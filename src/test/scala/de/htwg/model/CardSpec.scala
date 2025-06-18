@@ -1,5 +1,6 @@
 package de.htwg.model
 
+import de.htwg.model.modelBaseImple.{CardMoveTo, CardToJail, GainMoney, JailCard, LoseMoney, MoneyCard, MoveCard, PenaltyCard}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 

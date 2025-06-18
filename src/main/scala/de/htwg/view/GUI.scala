@@ -6,17 +6,14 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ComboBox, Label, TextField}
 import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.scene.paint.Color
-import de.htwg.controller.Controller
 import de.htwg.util.util.Observer
 import de.htwg.Monopoly
 import scalafx.Includes.*
 import scalafx.application.Platform
-import de.htwg.model.BoardField
 import de.htwg.view.BoardPanel
-import de.htwg.model.{Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
-import de.htwg.controller.OpEnum
-import de.htwg.controller.OpEnum.{buy, end, enter, n, pay, y}
-import de.htwg.controller.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, PropertyDecisionState, RollingState, StartTurnState}
+import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y}
+import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
+import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import scalafx.collections.ObservableBuffer
 
 object GUI extends JFXApp3 with Observer {

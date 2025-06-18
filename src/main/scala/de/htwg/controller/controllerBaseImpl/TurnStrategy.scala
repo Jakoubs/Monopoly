@@ -1,5 +1,7 @@
-package de.htwg.controller
-import de.htwg.model.{Dice, Player}
+package de.htwg.controller.controllerBaseImpl
+
+import de.htwg.controller.TurnStrategy
+import de.htwg.model.modelBaseImple.{Dice, Player}
 
 trait TurnStrategy {
   def executeTurn(player: Player, dice: () => (Int, Int)): Player

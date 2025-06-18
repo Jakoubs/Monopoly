@@ -1,7 +1,9 @@
-package de.htwg.controller
+package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.model.{BuyableField, Player, PropertyField, TrainStationField, UtilityField}
-import scala.util.{Try, Success, Failure}
+import de.htwg.controller.{Command, Controller}
+import de.htwg.model.modelBaseImple.*
+
+import scala.util.{Failure, Success, Try}
 
 
 trait Command {

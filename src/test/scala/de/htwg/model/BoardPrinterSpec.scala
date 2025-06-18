@@ -3,8 +3,8 @@ package de.htwg.model
 import de.htwg.{Board, MonopolyGame}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
-import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Red, Yellow, Green, LightBlue, Orange, Pink}
-import de.htwg.model.BoardPrinter
+import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
+import de.htwg.model.modelBaseImple.{BoardPrinter, ChanceField, CommunityChestField, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 
 class BoardPrinterSpec extends AnyWordSpec {
   val player1 = Player("A", 1500, 12, isInJail = false, 0)

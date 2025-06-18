@@ -1,5 +1,6 @@
 package de.htwg.model
 
+import de.htwg.model.modelBaseImple.Player
 import org.scalatest.matchers.should.Matchers.{shouldEqual, *}
 import org.scalatest.wordspec.AnyWordSpec
 

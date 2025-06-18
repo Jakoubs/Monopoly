@@ -1,7 +1,9 @@
-package de.htwg.model
-import scala.io.StdIn.readLine
-import de.htwg.model.Dice
+package de.htwg.model.modelBaseImple
+
 import de.htwg.MonopolyGame
+import de.htwg.model.{Dice, Player}
+
+import scala.io.StdIn.readLine
 
 case class Player(name: String,
                   balance: Int,

@@ -1,16 +1,16 @@
 package de.htwg
 
-import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
-import de.htwg.model.PropertyField
-import de.htwg.model.SoundPlayer
-import de.htwg.model.PropertyField.calculateRent
+import de.htwg.controller.controllerBaseImpl.Controller
+import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
+import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 
 import scala.io.StdIn.readLine
 import scala.util.Random
-import de.htwg.controller.Controller
 import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
+import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, TaxField, TrainStationField, UtilityField}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future // Import Future for asynchronous execution
 

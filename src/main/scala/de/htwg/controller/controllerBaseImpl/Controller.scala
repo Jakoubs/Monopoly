@@ -1,10 +1,11 @@
-package de.htwg.controller
+package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.model.{BoardPrinter, Player, SoundPlayer, *}
-import de.htwg.model.PropertyField.calculateRent
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.controller.{GameState, OpEnum, TurnInfo}
+import de.htwg.model.*
+import de.htwg.model.modelBaseImple.PropertyField.calculateRent
+import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
-import de.htwg.controller.GameState
+import de.htwg.{Board, MonopolyGame}
 
 import java.awt.Choice
 import scala.collection.mutable

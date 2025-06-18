@@ -1,7 +1,6 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
 
 import scala.util.Random
-import de.htwg.model.SoundPlayer
 
 class Dice:
   print("rolling....")

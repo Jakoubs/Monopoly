@@ -1,4 +1,6 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
+
+import de.htwg.model.*
 
 sealed trait Card {
   def name: String

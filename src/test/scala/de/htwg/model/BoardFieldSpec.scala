@@ -1,14 +1,15 @@
 package de.htwg.model
-import de.htwg.controller.Controller
+
+import de.htwg.controller.controllerBaseImpl.Controller
 import de.htwg.{Board, MonopolyGame}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
-import de.htwg.model.BoardField
-import de.htwg.model.PropertyField.*
-import de.htwg.model.PropertyField.Color.*
-import de.htwg.model.PropertyField.{House, Mortgage}
+import de.htwg.model.modelBaseImple.PropertyField.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.PropertyField.{House, Mortgage}
+import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, LoseMoney, Player, PropertyField, RentVisitor, TaxField, TrainStationField, UtilityField}
 
-import scala.util.{Try,Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 class BoardFieldSpec extends AnyWordSpec {
 

@@ -1,9 +1,10 @@
-import de.htwg.controller.Controller
+import de.htwg.controller.controllerBaseImpl.Controller
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.{Board, Monopoly, MonopolyGame}
 import de.htwg.model.*
-import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.view.Tui
 
 class MonopolySpec extends AnyWordSpec {

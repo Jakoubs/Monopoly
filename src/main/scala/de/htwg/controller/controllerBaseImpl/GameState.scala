@@ -1,17 +1,9 @@
-package de.htwg.controller
+package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.model.*
-import de.htwg.controller.TurnInfo
-import de.htwg.util.util.Observable
 import de.htwg.controller.*
-import de.htwg.controller.OpEnum
-import de.htwg.controller.StartTurnState // Import des GameState-Traits
-import de.htwg.controller.RollingState // Import des RollingState (falls verwendet)
-import de.htwg.controller.JailState // Import des JailState (falls verwendet)
-import de.htwg.controller.MovingState // Import des MovingState (falls verwendet)
-import de.htwg.controller.PayJailHandler
-import de.htwg.controller.RollDoublesJailHandler
-import de.htwg.controller.InvalidJailInputHandler
+import de.htwg.model.*
+import de.htwg.model.modelBaseImple.*
+import de.htwg.util.util.Observable
 
 
 sealed trait GameState {

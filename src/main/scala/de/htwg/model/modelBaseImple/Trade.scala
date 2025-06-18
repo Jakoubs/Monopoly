@@ -1,4 +1,6 @@
-package de.htwg.model;
+package de.htwg.model.modelBaseImple
+
+import de.htwg.model.Player
 
 class Trade {
   def tradeCall(p1: Player, p2: Player, p1ToP2: Int, p2ToP1: Int): Option[(Player, Player)] = {

@@ -4,6 +4,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.*
 import de.htwg.Board
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, RentVisitor, TaxField, TrainStationField, UtilityField}
 
 class RentVisitorSpec extends AnyWordSpec with Matchers {
 

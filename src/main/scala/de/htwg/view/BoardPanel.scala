@@ -1,13 +1,13 @@
 // src/main/scala/de/htwg/view/BoardPanel.scala
 package de.htwg.view
 
+import de.htwg.controller.controllerBaseImpl.Controller
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, HBox, VBox}
 import scalafx.scene.paint.Color
-import de.htwg.controller.Controller
-import de.htwg.model.{BoardField, GoField, GoToJailField, JailField, PropertyField, TaxField, TrainStationField, UtilityField}
-import de.htwg.model.PropertyField.Color as PropertyColor
+import de.htwg.model.modelBaseImple.PropertyField.Color as PropertyColor
+import de.htwg.model.modelBaseImple.{BoardField, GoField, GoToJailField, JailField, PropertyField, TaxField, TrainStationField, UtilityField}
 
 class BoardPanel(controller: Controller) extends GridPane {
 

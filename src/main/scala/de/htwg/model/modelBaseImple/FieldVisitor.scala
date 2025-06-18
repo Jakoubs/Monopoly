@@ -1,6 +1,7 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
 
 import de.htwg.Board
+import de.htwg.model.{FieldVisitor, Player}
 
 trait FieldVisitor[T] {
   def visit(property: PropertyField): T

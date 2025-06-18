@@ -1,10 +1,8 @@
-package de.htwg.controller
+package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.controller.Controller
-import de.htwg.controller.PayJailFeeCommand
-import de.htwg.controller.JailTurnStrategy
-import de.htwg.controller.OpEnum.roll
-import de.htwg.model.Player
+import OpEnum.roll
+import de.htwg.controller.*
+import de.htwg.model.modelBaseImple.Player
 
 abstract class ActionHandler {
   val controller: Controller

@@ -1,4 +1,5 @@
 package de.htwg.model
+import de.htwg.model.modelBaseImple.Dice
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 class DiceTest extends AnyWordSpec {
