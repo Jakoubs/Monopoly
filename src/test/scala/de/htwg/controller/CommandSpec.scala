@@ -1,12 +1,12 @@
 package de.htwg.controller
 
 import de.htwg.controller.controllerBaseImpl.{BuyCommand, BuyHouseCommand, Controller, PayJailFeeCommand, RollDiceCommand}
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.{Board}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
-import de.htwg.model.modelBaseImple.{BoardField, BuyableField, ChanceField, CommunityChestField, Dice, GoField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{BoardField, BuyableField, ChanceField, CommunityChestField, Dice, GoField, JailField, MonopolyGame, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 
 class CommandSpec extends AnyWordSpec {
 
@@ -38,10 +38,10 @@ class CommandSpec extends AnyWordSpec {
     )
     val board = Board(fields)
     val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
-    val controller = new Controller(initialGame, dice)
+    val controller = new Controller(initialGame)
 
     // Hilfsfunktionen, um auf Spieler und Felder zuzugreifen
-    def findPlayer(name: String): Player = controller.game.players.find(_.name == name).get
+    def findPlayer(name: String): IPlayer = controller.game.players.find(_.name == name).get
     def getFieldAt(position: Int): BoardField = controller.game.board.fields(position - 1)
 
     "when BuyCommand is executed for a PropertyField" should {

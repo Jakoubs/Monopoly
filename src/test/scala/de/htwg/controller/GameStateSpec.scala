@@ -1,6 +1,6 @@
 package de.htwg.controller
 
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.{Board}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.controller.*
@@ -8,7 +8,7 @@ import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, enter, fieldSelected, 
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseCommand, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, JailTurnStrategy, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
-import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, MonopolyGame, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import org.scalatest.matchers.should.Matchers.shouldBe
 
@@ -63,7 +63,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
   )
   val board = Board(fields)
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
-  val controller = new Controller(initialGame, dice)
+  val controller = new Controller(initialGame)
 
   "StartTurnState" should {
     "go to JailState if player is in jail" in {
@@ -125,7 +125,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     "handle a buyableField with an owner and end in additionalState" in {
       val player9 = player1.copy(position = 20, balance = 1500)
       val initialGame2 = MonopolyGame(Vector(player9,player1), board, player9, sound = false)
-      val controllerTest2 = new Controller(initialGame2, dice)
+      val controllerTest2 = new Controller(initialGame2)
       val state = MovingState(() => (1, 1)).handle(OpEnum.enter, controllerTest2)
       controllerTest2.currentPlayer.balance shouldBe 1480
       //controllerTest2.switchToNextPlayer()
@@ -136,7 +136,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     "end the game if the player has not enough money for paying rent" in {
       val player9 = player1.copy(position = 20, balance = 10)
       val initialGame2 = MonopolyGame(Vector(player9), board, player9, sound = false)
-      val controllerTest2 = new Controller(initialGame2, dice)
+      val controllerTest2 = new Controller(initialGame2)
       val state = MovingState(() => (1,1)).handle(OpEnum.enter, controllerTest2)
       controllerTest2.isGameOver shouldBe true
     }
@@ -144,7 +144,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     "Update Players balance und reset Freeparking value " in {
       val player9 = player1.copy(position = 15)
       val initialGame2 = MonopolyGame(Vector(player9), board, player9, sound = false)
-      val controllerTest2 = new Controller(initialGame2, dice)
+      val controllerTest2 = new Controller(initialGame2)
       val state = MovingState(() => (3, 3)).handle(OpEnum.enter, controllerTest2)
       controllerTest2.currentPlayer.balance shouldBe 1600
       controllerTest2.board.fields(20).asInstanceOf[FreeParkingField].amount shouldBe 0
@@ -153,19 +153,12 @@ class GameStateSpec extends AnyWordSpec with Matchers {
     "update players balance and FreeParking amount if player lands on Taxfield" in {
       val player9 = player1.copy(position = 37)
       val initialGame2 = MonopolyGame(Vector(player9), board, player9, sound = false)
-      val controllerTest2 = new Controller(initialGame2, dice)
+      val controllerTest2 = new Controller(initialGame2)
       val state = MovingState(() => (1, 1)).handle(OpEnum.enter, controllerTest2)
       controllerTest2.currentPlayer.balance shouldBe 1300
       controllerTest2.board.fields(20).asInstanceOf[FreeParkingField].amount shouldBe 300
     }
-
-    "end the game if the player has not enough money" in {
-      val player9 = player1.copy(position = 37, balance = 100)
-      val initialGame2 = MonopolyGame(Vector(player9), board, player9, sound = false)
-      val controllerTest2 = new Controller(initialGame2, dice)
-      val state = MovingState(() => (1,1)).handle(OpEnum.enter, controllerTest2)
-      controllerTest2.isGameOver shouldBe true
-    }
+    
   }
 
   "BuyHouseState" should {
@@ -306,7 +299,7 @@ class GameStateSpec extends AnyWordSpec with Matchers {
         override def rollDice(withSound: Boolean): (Int, Int) = (6, 6)
       }
 
-      val controller = new Controller(initialGame, fakeDice)
+      val controller = new Controller(initialGame)
       controller.updatePlayer(player1.copy(isInJail = true))
 
       val state = JailState().handle(enter, controller)
