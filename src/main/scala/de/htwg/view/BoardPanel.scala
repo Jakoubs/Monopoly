@@ -1,7 +1,7 @@
 // src/main/scala/de/htwg/view/BoardPanel.scala
 package de.htwg.view
 
-import de.htwg.controller.controllerBaseImpl.Controller
+import de.htwg.controller.IController
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, HBox, VBox}
@@ -9,7 +9,7 @@ import scalafx.scene.paint.Color
 import de.htwg.model.modelBaseImple.PropertyField.Color as PropertyColor
 import de.htwg.model.modelBaseImple.{BoardField, GoField, GoToJailField, JailField, PropertyField, TaxField, TrainStationField, UtilityField}
 
-class BoardPanel(controller: Controller) extends GridPane {
+class BoardPanel(controller: IController) extends GridPane {
 
   private val numRows = 11
   private val numCols = 11
@@ -38,16 +38,16 @@ class BoardPanel(controller: Controller) extends GridPane {
   buildBoard()
 
   private def getFieldName(idx: Int): String = {
-    if (idx >= 0 && idx < controller.game.board.fields.length) {
-      controller.game.board.fields(idx).name
+    if (idx >= 0 && idx < controller.board.fields.length) {
+      controller.board.fields(idx).name
     } else {
       s"Invalid Index ($idx)"
     }
   }
 
   private def getExtra(idx: Int): String = {
-    if (idx >= 0 && idx < controller.game.board.fields.length) {
-      val field = controller.game.board.fields(idx)
+    if (idx >= 0 && idx < controller.board.fields.length) {
+      val field = controller.board.fields(idx)
       field match {
         case pf: PropertyField =>
           pf.owner match {
@@ -72,8 +72,8 @@ class BoardPanel(controller: Controller) extends GridPane {
   }
 
   private def getExtraSide(idx: Int): String = {
-    if (idx >= 0 && idx < controller.game.board.fields.length) {
-      val field = controller.game.board.fields(idx)
+    if (idx >= 0 && idx < controller.board.fields.length) {
+      val field = controller.board.fields(idx)
       field match {
         case pf: PropertyField =>
           pf.owner match {
@@ -98,7 +98,7 @@ class BoardPanel(controller: Controller) extends GridPane {
   }
 
   private def getPlayerOnField(idx: Int): String = {
-    val playersOnField = controller.game.players.filter(_.position == idx + 1)
+    val playersOnField = controller.players.filter(_.position == idx + 1)
     if (playersOnField.nonEmpty) {
       playersOnField.map(_.name).mkString(" ")
     } else {
@@ -107,8 +107,8 @@ class BoardPanel(controller: Controller) extends GridPane {
   }
 
   private def getColor(idx: Int): String = {
-    if (idx >= 0 && idx < controller.game.board.fields.length) {
-      val field = controller.game.board.fields(idx)
+    if (idx >= 0 && idx < controller.board.fields.length) {
+      val field = controller.board.fields(idx)
       field match {
         case pf: PropertyField =>
           pf.color match {

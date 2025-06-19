@@ -6,18 +6,19 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ComboBox, Label, TextField}
 import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.scene.paint.Color
-import de.htwg.util.util.Observer
+import de.htwg.util.util.{Observable, Observer}
 import de.htwg.Monopoly
+import de.htwg.controller.IController
 import scalafx.Includes.*
 import scalafx.application.Platform
 import de.htwg.view.BoardPanel
 import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y}
-import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
+import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import scalafx.collections.ObservableBuffer
 
 object GUI extends JFXApp3 with Observer {
-  private var gameController: Option[Controller] = None
+  private var gameController: Option[IController] = None
   private var boardPanel: Option[BoardPanel] = None
 
   private lazy val rollDiceButton = new Button("Würfeln")
@@ -97,7 +98,7 @@ object GUI extends JFXApp3 with Observer {
 
   private def updatePlayersInfo(): Unit = {
     gameController.foreach { ctrl =>
-      val players = ctrl.game.players
+      val players = ctrl.players
       val currentPlayer = ctrl.currentPlayer
 
       val playersInfoBuilder = new StringBuilder()
@@ -261,10 +262,12 @@ object GUI extends JFXApp3 with Observer {
     }
   }
 
-  def setController(ctrl: Controller): Unit = {
+  def setController(ctrl: IController): Unit = {
     gameController = Some(ctrl)
-    ctrl.add(this)
-  }
+    ctrl match {
+      case observable: Observable => observable.add(this)
+      case _ => println("Warning: Controller ist keine Observable-Implementierung.")
+    }  }
 
   override def update(): Unit = {
     Platform.runLater {

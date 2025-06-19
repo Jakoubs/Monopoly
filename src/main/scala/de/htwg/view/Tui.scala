@@ -1,14 +1,17 @@
 package de.htwg.view
 
-import de.htwg.util.util.Observer
-import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, Controller, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
+import de.htwg.controller.IController
+import de.htwg.util.util.{Observable, Observer}
+import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
 
 import scala.io.StdIn.readLine
 
-class Tui(controller: Controller) extends Observer {
+class Tui(controller: IController) extends Observer {
 
-  controller.add(this)
-
+  controller match {
+    case observable: Observable => observable.add(this)
+    case _ => println("Warning: Controller ist keine Observable-Implementierung.")
+  }
   def run(): Unit = {
     println(controller.getBoardString)
 
@@ -120,7 +123,7 @@ class Tui(controller: Controller) extends Observer {
           }      }
     }
 
-    val winner = controller.game.players.find(_.balance > 0).getOrElse(controller.game.players.head)
+    val winner = controller.players.find(_.balance > 0).getOrElse(controller.players.head)
     println(s"\n${winner.name} wins the game!")
   }
 
