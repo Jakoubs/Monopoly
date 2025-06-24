@@ -44,7 +44,7 @@ object Monopoly:
     val soundBool = soundInput == "y" || soundInput == "yT"
 
     if (soundBool) {
-      SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
+      SoundPlayer().playBackground("src/main/resources/sound/MonopolyJazz.wav")
     }
 
     var playerVector = Vector[IPlayer]()

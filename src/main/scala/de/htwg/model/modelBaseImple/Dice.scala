@@ -3,10 +3,9 @@ package de.htwg.model.modelBaseImple
 import scala.util.Random
 
 class Dice:
-  print("rolling....")
   def rollDice(valid: Boolean): (Int, Int) = {
     if(valid) {
-      val waitFuture = SoundPlayer().playAndWait("src/main/resources/RollDice.wav")
+      val waitFuture = SoundPlayer().playAndWait("src/main/resources/sound/RollDice.wav")
       scala.concurrent.Await.result(waitFuture, scala.concurrent.duration.Duration.Inf)
     }
     val a = Random.nextInt(6) + 1

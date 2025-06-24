@@ -15,7 +15,12 @@ import de.htwg.view.BoardPanel
 import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y}
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import javafx.animation.Timeline
+import scalafx.animation.KeyFrame
 import scalafx.collections.ObservableBuffer
+import scalafx.scene.image.{Image, ImageView}
+
+import scala.concurrent.duration.Duration
 
 object GUI extends JFXApp3 with Observer {
   private var gameController: Option[IController] = None
@@ -36,6 +41,19 @@ object GUI extends JFXApp3 with Observer {
     style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
     wrapText = true
     maxWidth = Double.MaxValue
+  }
+  val diceImages = (1 to 6).map(i =>
+    new Image(getClass.getResourceAsStream(s"/dice-$i.png"))
+  ).toArray
+  private lazy val diceImageView1 = new ImageView {
+    fitWidth = 48
+    fitHeight = 48
+    image = diceImages(0)
+  }
+  private lazy val diceImageView2 = new ImageView {
+    fitWidth = 48
+    fitHeight = 48
+    image = diceImages(0)
   }
 
   override def start(): Unit = {
@@ -127,8 +145,38 @@ object GUI extends JFXApp3 with Observer {
       rollDiceButton.minWidth = 100
       rollDiceButton.minHeight = 40
       rollDiceButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
-      rollDiceButton.onAction = _ => {
+      /*rollDiceButton.onAction = _ => {
         gameController.foreach(_.handleInput(enter))
+      }*/
+      rollDiceButton.onAction = _ => {
+        val timeline = new Timeline {
+          var count = 0
+          val maxRolls = 19
+          keyFrames = KeyFrame(Duration(60), onFinished = _ => {
+            val value1 = Random.nextInt(6)
+            val value2 = Random.nextInt(6)
+            diceImageView1.image = diceImages(value1)
+            diceImageView2.image = diceImages(value2)
+            count += 1
+            if (count >= maxRolls) {
+              stop()
+              gameController.foreach { ctrl =>
+                ctrl.handleInput(enter)
+                ctrl.handleInput(enter)
+                ctrl.handleInput(enter)
+
+                // Im Observer-Update (update()):
+                val turnInfo = gameController.get.getTurnInfo
+                if (turnInfo.diceRoll1 > 0 && turnInfo.diceRoll2 > 0) {
+                  diceImageView1.image = diceImages(turnInfo.diceRoll1 - 1)
+                  diceImageView2.image = diceImages(turnInfo.diceRoll2 - 1)
+                }
+              }
+            }
+          })
+          cycleCount = maxRolls
+        }
+        timeline.playFromStart()
       }
 
       buyPropertyButton.minWidth = 100
