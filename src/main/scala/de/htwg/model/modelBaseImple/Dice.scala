@@ -5,8 +5,7 @@ import scala.util.Random
 class Dice:
   def rollDice(valid: Boolean): (Int, Int) = {
     if(valid) {
-      val waitFuture = SoundPlayer().playAndWait("src/main/resources/sound/RollDice.wav")
-      scala.concurrent.Await.result(waitFuture, scala.concurrent.duration.Duration.Inf)
+      val waitFuture = SoundPlayer().playBackground("src/main/resources/sound/RollDice.wav")
     }
     val a = Random.nextInt(6) + 1
     val b = Random.nextInt(6) + 1

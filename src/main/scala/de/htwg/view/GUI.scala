@@ -44,8 +44,7 @@ package de.htwg.view
                 maxWidth = Double.MaxValue
               }
               val diceImages = (1 to 6).map(i =>
-                new Image(getClass.getResourceAsStream(s"/dice-$i.png"))
-              ).toArray
+                new Image(getClass.getResourceAsStream(s"/image/dice-$i.png"))).toArray
               private lazy val diceImageView1 = new ImageView {
                 fitWidth = 48
                 fitHeight = 48
@@ -211,7 +210,7 @@ package de.htwg.view
                   }
 
                   children = Seq(
-                    rollDiceButton, buyPropertyButton, endTurnButton,
+                    diceImageView1, diceImageView2,rollDiceButton, buyPropertyButton, endTurnButton,
                     payJailFineButton
                   )
                 }
