@@ -145,6 +145,7 @@ case class PropertyDecisionState(isDouble: Boolean = false) extends GameState {
     input match {
       case OpEnum.y => // ✅ Nur bei 'y' kaufen
         BuyPropertyState(isDouble)
+        SoundPlayer().playBackground("src/main/resources/sound/Money.wav")
       case OpEnum.n => // ✅ Bei 'n' nicht kaufen
         AdditionalActionsState(isDouble)
       case _ =>

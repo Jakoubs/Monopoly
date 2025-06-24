@@ -5,6 +5,7 @@ import de.htwg.model._
 import de.htwg.model.IPlayer
 import de.htwg.model.IMonopolyGame
 import scala.util.{Failure, Success, Try}
+import de.htwg.model.modelBaseImple.SoundPlayer
 
 trait BuyableField extends BoardField {
   val price: Int
@@ -81,6 +82,9 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
                 // If all checks pass, proceed with the purchase
                 val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
                 val updatedPlayer = player.copyPlayer(balance = player.balance - housePrice)
+                if(game.sound){
+                  SoundPlayer().playBackground("src/main/resources/sound/house.wav")
+                }
                 (updatedField, updatedPlayer)
               }
             }
