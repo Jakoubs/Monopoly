@@ -34,4 +34,5 @@ trait IController {
   def getOwnedProperties(): Map[IPlayer, List[PropertyField]]
   def getOwnedTrainStations(): Map[IPlayer, Int]
   def getOwnedUtilities(): Map[IPlayer, Int]
+  def setState(newState: GameState): Unit
 }

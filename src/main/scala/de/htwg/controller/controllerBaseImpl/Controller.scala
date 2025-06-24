@@ -97,6 +97,11 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     }
   }
 
+  def setState(newState: GameState): Unit = {
+    state = newState
+    notifyObservers()
+  }
+
   def redo(): Unit = {
     if (redoStack.nonEmpty) {
       val cmd = redoStack.pop()
