@@ -20,13 +20,16 @@ package de.htwg.view
             import scalafx.collections.ObservableBuffer
             import scalafx.scene.image.{Image, ImageView}
             import scalafx.util.Duration
-
+            import scalafx.scene.control.{Button, TextInputDialog}
+            import scalafx.geometry.Insets
+            import scalafx.stage.Modality
             import scala.util.Random
 
             object GUI extends JFXApp3 with Observer {
               private var gameController: Option[IController] = None
               private var boardPanel: Option[BoardPanel] = None
 
+              private lazy val buyHouseButton = new Button("Haus")
               private lazy val rollDiceButton = new Button("Würfeln")
               private lazy val buyPropertyButton = new Button("Kaufen")
               private lazy val endTurnButton = new Button("Zug beenden")
@@ -106,6 +109,7 @@ package de.htwg.view
                   scene = new Scene {
                     fill = Color.rgb(38, 38, 38)
                     content = mainLayout
+                    stylesheets.add(getClass.getResource("/style/dark_mode.css").toExternalForm)
                   }
                 }
                 updatePlayersInfo()
@@ -172,8 +176,67 @@ package de.htwg.view
                     }
                     timeline.playFromStart()
                   }
+                  buyHouseButton.minWidth = 100
+                  buyHouseButton.minHeight = 40
+                  buyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+                  buyHouseButton.onAction = _ => {
+                    val dialog = new TextInputDialog() {
+                      initOwner(stage)
+                      title = "Haus kaufen"
+                      headerText = "Bitte geben Sie eine ganze Zahl (1-40) ein."
+                      contentText = "Ihre Zahl:"
+                    }
+                  val dialogIconPath = "/image/icon.png"
+                          val iconStream = getClass.getResourceAsStream(dialogIconPath)
+                          if (iconStream != null) {
+                            dialog.getDialogPane.getScene.getWindow match {
+                              case s: javafx.stage.Stage =>
+                                try {
+                                  s.getIcons.add(new Image(iconStream))
+                                  println("Icon erfolgreich geladen")
+                                } catch {
+                                  case e: Exception =>
+                                    println(s"Fehler beim Laden des Dialog-Icons von $dialogIconPath: ${e.getMessage}")
+                                }
+                              case _ =>
+                            }
+                          } else {
+                            println(s"Warnung: Dialog-Icon-Datei konnte nicht gefunden werden: $dialogIconPath")
+                          }
 
-                  buyPropertyButton.minWidth = 100
+                    // 2. Den Dialog anzeigen und auf das Ergebnis warten
+                    val result = dialog.showAndWait()
+
+                    // 3. Das Ergebnis verarbeiten
+                    result match {
+                      case Some(inputText) =>
+                        try {
+                          val intValue = inputText.toInt
+                          if (intValue < 1 || intValue > 40) {
+                            throw new NumberFormatException("Zahl außerhalb des gültigen Bereichs (1-40).")
+                          }
+                          println(s"Eingegebene Ganzzahl: $intValue")
+                          // Hier könntest du die intValue weiterverwenden, z.B. in einem Label anzeigen
+                        } catch {
+                          case _: NumberFormatException =>
+                            println(s"Fehler: '$inputText' ist keine gültige Ganzzahl.")
+                            // Optional: Fehlermeldung dem Benutzer anzeigen, z.B. mit Alert
+                            import scalafx.scene.control.Alert
+                            import scalafx.scene.control.Alert.AlertType
+                            new Alert(AlertType.Error) {
+                              initOwner(stage)
+                              title = "Eingabefehler"
+                              headerText = "Ungültige Eingabe"
+                              contentText = s"Bitte geben Sie eine gültige Ganzzahl ein. '$inputText' ist keine Zahl."
+                            }.showAndWait()
+                        }
+                      case None =>
+                        println("Eingabe abgebrochen.")
+                    }
+                  }
+
+
+                    buyPropertyButton.minWidth = 100
                   buyPropertyButton.minHeight = 40
                   buyPropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #f0ad4e; -fx-text-fill: white;"
                   buyPropertyButton.onAction = _ => {
@@ -210,8 +273,7 @@ package de.htwg.view
                   }
 
                   children = Seq(
-                    diceImageView1, diceImageView2,rollDiceButton, buyPropertyButton, endTurnButton,
-                    payJailFineButton
+                    diceImageView1, diceImageView2,rollDiceButton, buyPropertyButton, endTurnButton, buyHouseButton, payJailFineButton
                   )
                 }
               }
