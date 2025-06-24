@@ -19,8 +19,9 @@ package de.htwg.view
             import scalafx.animation.{KeyFrame, Timeline}
             import scalafx.collections.ObservableBuffer
             import scalafx.scene.image.{Image, ImageView}
+            import scalafx.util.Duration
 
-            import scala.concurrent.duration.Duration
+            import scala.util.Random
 
             object GUI extends JFXApp3 with Observer {
               private var gameController: Option[IController] = None
