@@ -13,7 +13,7 @@ import de.htwg.model.IPlayer
 import scalafx.Includes.*
 import scalafx.application.Platform
 import de.htwg.view.BoardPanel
-import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y}
+import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y, save, load}
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import scalafx.animation.{KeyFrame, Timeline}
@@ -29,7 +29,14 @@ import scalafx.scene.control.Alert.AlertType
 
 object GUI extends JFXApp3 with Observer {
   private var gameController: Option[IController] = None
-  private var boardPanel: Option[BoardPanel] = None
+  private lazy val boardPanel: BoardPanel = gameController.map(new BoardPanel(_)).getOrElse(throw new IllegalStateException("Controller not set"))
+  private lazy val tradePanel: TradePanel = gameController.map(new TradePanel(_)).getOrElse(throw new IllegalStateException("Controller not set"))
+  private lazy val contentContainer: VBox = new VBox {
+    alignment = Pos.Center
+    children += boardPanel
+    VBox.setVgrow(boardPanel, Priority.Always)
+  }
+  private var isShowingTradePanel: Boolean = false // Zustandsverfolgung
 
   private lazy val buyHouseButton = new Button("Haus")
   private lazy val rollDiceButton = new Button("Würfeln")
@@ -41,7 +48,7 @@ object GUI extends JFXApp3 with Observer {
   private lazy val declineBuyHouseButton = new Button("Abbrechen")
   private lazy val saveButton = new Button("save")
   private lazy val loadButton = new Button("load")
-  private lazy val tradeButton = new Button("trade")
+  private lazy val tradeButton = new Button("Handeln")
 
   private lazy val propertyDecisionButtons = new HBox {
     spacing = 0
@@ -59,18 +66,22 @@ object GUI extends JFXApp3 with Observer {
     wrapText = true
     maxWidth = Double.MaxValue
   }
+
   private lazy val playersInfoLabel = new Label {
     style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
     wrapText = true
     maxWidth = Double.MaxValue
   }
+
   val diceImages = (1 to 6).map(i =>
     new Image(getClass.getResourceAsStream(s"/image/dice-$i.png"))).toArray
+
   private lazy val diceImageView1 = new ImageView {
     fitWidth = 48
     fitHeight = 48
     image = diceImages(0)
   }
+
   private lazy val diceImageView2 = new ImageView {
     fitWidth = 48
     fitHeight = 48
@@ -79,86 +90,6 @@ object GUI extends JFXApp3 with Observer {
 
   // Pfad zum Haus-Icon für den Dialog
   val houseIconPath = "/image/Haus.png"
-
-  override def start(): Unit = {
-    Monopoly.gameController match {
-      case Some(ctrl) =>
-        gameController = Some(ctrl)
-        ctrl.add(this)
-        boardPanel = Some(new BoardPanel(ctrl))
-      case None =>
-        println("Error: Controller not set in Monopoly.main before GUI launch. Exiting.")
-        Platform.exit()
-        return
-    }
-    val mainLayout = new HBox {
-      spacing = 20
-      padding = Insets(10)
-
-      val leftColumn = new VBox {
-        alignment = Pos.Center
-        spacing = 20
-
-        boardPanel.foreach(panel => {
-          children += panel
-          VBox.setVgrow(panel, Priority.Always)
-        })
-
-        children += turnInfoLabel
-        children += createButtonPanel()
-      }
-
-      val rightColumn = new VBox {
-        alignment = Pos.TopRight
-        spacing = 10
-        minWidth = 250
-
-        children += new Label {
-          text = "SPIELER ÜBERSICHT"
-          style = "-fx-font: bold 18pt sans-serif; -fx-text-fill: white;"
-        }
-        saveButton.minWidth = 100
-        saveButton.minHeight = 40
-        saveButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
-        saveButton.onAction = _ => {}
-
-        loadButton.minWidth = 100
-        loadButton.minHeight = 40
-        loadButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
-        loadButton.onAction = _ => {}
-
-        tradeButton.minWidth = 100
-        tradeButton.minHeight = 40
-        tradeButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
-        tradeButton.onAction = _ => {
-          new Alert(AlertType.Error) {
-          initOwner(stage)
-          title = "Fehler"
-          headerText = "Aktion nicht möglich"
-          contentText = "Der Handel ist noch nicht implementiert."
-        }.showAndWait()}
-
-        children += playersInfoLabel
-        children += saveButton
-        children += loadButton
-        children += tradeButton
-      }
-
-      children = Seq(leftColumn, rightColumn)
-      HBox.setHgrow(leftColumn, Priority.Always)
-    }
-
-    stage = new JFXApp3.PrimaryStage {
-      title = "Monopoly"
-      scene = new Scene {
-        fill = Color.rgb(38, 38, 38)
-        content = mainLayout
-        stylesheets.add(getClass.getResource("/style/dark_mode.css").toExternalForm)
-      }
-    }
-    updatePlayersInfo()
-    updateButtonStates()
-  }
 
   private def updatePlayersInfo(): Unit = {
     gameController.foreach { ctrl =>
@@ -324,6 +255,38 @@ object GUI extends JFXApp3 with Observer {
     }
   }
 
+  private def updateTurnInfo(): Unit = {
+    gameController.foreach { ctrl =>
+      val turnInfo = ctrl.getTurnInfo
+      val infoBuilder = new StringBuilder()
+
+      turnInfo.diceRoll1 match {
+        case 0 =>
+        case _ => infoBuilder.append(s"Würfelergebnis: ${turnInfo.diceRoll1} und ${turnInfo.diceRoll2} (Summe: ${turnInfo.diceRoll1 + turnInfo.diceRoll2})\n")
+      }
+
+      turnInfo.landedField.foreach(field =>
+        infoBuilder.append(s"Gelandet auf: ${field.name}\n")
+      )
+
+      turnInfo.boughtProperty.foreach(property =>
+        infoBuilder.append(s"Gekaufte Immobilie: ${property.name}\n")
+      )
+
+      turnInfo.builtHouse.foreach(property =>
+        infoBuilder.append(s"Haus gebaut auf: ${property.name}\n")
+      )
+
+      (turnInfo.paidRent, turnInfo.rentPaidTo) match {
+        case (Some(rent), Some(owner: IPlayer)) =>
+          infoBuilder.append(s"Miete bezahlt: ${rent}€ an ${owner.name}\n")
+        case _ =>
+      }
+
+      turnInfoLabel.text = infoBuilder.toString()
+    }
+  }
+
   private def updateButtonStates(): Unit = {
     gameController.foreach { ctrl =>
       val currentState = ctrl.state
@@ -384,42 +347,13 @@ object GUI extends JFXApp3 with Observer {
       }
     }
   }
-  private def updateTurnInfo(): Unit = {
-    gameController.foreach { ctrl =>
-      val turnInfo = ctrl.getTurnInfo
-      val infoBuilder = new StringBuilder()
-
-      turnInfo.diceRoll1 match {
-        case 0 =>
-        case _ => infoBuilder.append(s"Würfelergebnis: ${turnInfo.diceRoll1} und ${turnInfo.diceRoll2} (Summe: ${turnInfo.diceRoll1 + turnInfo.diceRoll2})\n")
-      }
-
-      turnInfo.landedField.foreach(field =>
-        infoBuilder.append(s"Gelandet auf: ${field.name}\n")
-      )
-
-      turnInfo.boughtProperty.foreach(property =>
-        infoBuilder.append(s"Gekaufte Immobilie: ${property.name}\n")
-      )
-
-      turnInfo.builtHouse.foreach(property =>
-        infoBuilder.append(s"Haus gebaut auf: ${property.name}\n")
-      )
-
-      (turnInfo.paidRent, turnInfo.rentPaidTo) match {
-        case (Some(rent), Some(owner: IPlayer)) =>
-          infoBuilder.append(s"Miete bezahlt: ${rent}€ an ${owner.name}\n")
-        case _ =>
-      }
-
-      turnInfoLabel.text = infoBuilder.toString()
-    }
-  }
 
   def updateBoard(): Unit = {
     Platform.runLater {
-      boardPanel.foreach(_.buildBoard())
-      updateButtonStates()
+      if (gameController.isDefined) {
+        boardPanel.buildBoard()
+        updateButtonStates()
+      }
     }
   }
 
@@ -427,16 +361,141 @@ object GUI extends JFXApp3 with Observer {
     gameController = Some(ctrl)
     ctrl match {
       case observable: Observable => observable.add(this)
-      case _ => println("Warning: Controller ist keine Observable-Implementierung.")
+      case _ =>
     }
   }
 
   override def update(): Unit = {
     Platform.runLater {
-      boardPanel.foreach(_.buildBoard())
-      updateTurnInfo()
-      updateButtonStates()
-      updatePlayersInfo()
+      if (gameController.isDefined) {
+        boardPanel.buildBoard()
+        updateTurnInfo()
+        updateButtonStates()
+        updatePlayersInfo()
+      }
     }
+  }
+
+  // Hilfsmethode zum Wechseln zwischen Board und Trade Panel
+  private def switchToPanel(showTradePanel: Boolean): Unit = {
+    Platform.runLater {
+      // Container leeren
+      contentContainer.children.clear()
+
+      if (showTradePanel) {
+        // Trade Panel hinzufügen und konfigurieren
+        tradePanel.refresh()
+        contentContainer.children += tradePanel
+        VBox.setVgrow(tradePanel, Priority.Always)
+        tradePanel.visible = true
+        tradePanel.managed = true
+        tradeButton.text = "Zurück zum Spiel"
+        isShowingTradePanel = true
+      } else {
+        // Board Panel hinzufügen und konfigurieren
+        contentContainer.children += boardPanel
+        VBox.setVgrow(boardPanel, Priority.Always)
+        boardPanel.visible = true
+        boardPanel.managed = true
+        tradeButton.text = "Handeln"
+        isShowingTradePanel = false
+      }
+
+      // Layout aktualisieren
+      contentContainer.requestLayout()
+    }
+  }
+
+  override def start(): Unit = {
+    Monopoly.gameController match {
+      case Some(ctrl) =>
+        gameController = Some(ctrl)
+        ctrl.add(this)
+      case None =>
+        Platform.exit()
+        return
+    }
+
+    // Content Container erstellen und als Instanzvariable speichern
+    // Initial state setzen
+    isShowingTradePanel = false
+
+    val mainLayout: HBox = new HBox {
+      spacing = 20
+      padding = Insets(10)
+
+      val leftColumn = new VBox {
+        alignment = Pos.Center
+        spacing = 20
+
+        children += contentContainer
+        VBox.setVgrow(contentContainer, Priority.Always)
+
+        // Button-Panel unten, damit die Buttons immer sichtbar bleiben
+        children += createButtonPanel()
+      }
+
+      val rightColumn = new VBox {
+        alignment = Pos.TopRight
+        spacing = 10
+        minWidth = 250
+
+        children += new Label {
+          text = "SPIELER ÜBERSICHT"
+          style = "-fx-font: bold 18pt sans-serif; -fx-text-fill: white;"
+        }
+
+        saveButton.minWidth = 100
+        saveButton.minHeight = 40
+        saveButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+        saveButton.onAction = _ => {
+          gameController.get.handleInput(save)
+        }
+
+        loadButton.minWidth = 100
+        loadButton.minHeight = 40
+        loadButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+        loadButton.onAction = _ => {
+          gameController.get.handleInput(load)
+        }
+
+        tradeButton.minWidth = 100
+        tradeButton.minHeight = 40
+        tradeButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+
+        children += playersInfoLabel
+        children += saveButton
+        children += loadButton
+        children += tradeButton
+      }
+
+      children = Seq(leftColumn, rightColumn)
+      HBox.setHgrow(leftColumn, Priority.Always)
+    }
+
+    // Trade Button Action korrekt implementieren
+    tradeButton.onAction = _ => {
+      println(s"Current state: isShowingTradePanel = $isShowingTradePanel") // Debug
+
+      if (isShowingTradePanel) {
+        // Wechsel zurück zu Board Panel
+        switchToPanel(false)
+      } else {
+        // Wechsel zu Trade Panel
+        switchToPanel(true)
+      }
+    }
+
+    stage = new JFXApp3.PrimaryStage {
+      title = "Monopoly"
+      scene = new Scene {
+        fill = Color.rgb(38, 38, 38)
+        content = mainLayout
+        stylesheets.add(getClass.getResource("/style/dark_mode.css").toExternalForm)
+      }
+    }
+
+    updatePlayersInfo()
+    updateButtonStates()
   }
 }

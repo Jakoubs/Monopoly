@@ -28,6 +28,8 @@ enum OpEnum:
   case fieldSelected(id: Int)
   case undo
   case redo
+  case save
+  case load
 
 case class TurnInfo(
                      diceRoll1: Int = 0,
@@ -51,7 +53,6 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     currentTurnInfo = newInfo
   }
 
-
   var state: GameState = StartTurnState()
   def currentPlayer: IPlayer = game.currentPlayer
   def board: Board = game.board
@@ -63,6 +64,10 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     input match {
       case OpEnum.undo => undo()
       case OpEnum.redo => redo()
+      case OpEnum.save =>
+        saveGame("MonopolyGame","xml")
+      case OpEnum.load =>
+        loadGame("MonopolyGame","xml")
       case _ =>
         state = state.handle(input)
         println(state)
@@ -70,7 +75,9 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     notifyObservers()
 
   }
-
+  def updatePlayers(players: Vector[IPlayer]): Unit = {
+    game = game.withUpdatedPlayers(players)
+  }
   def updatePlayer(newPlayer: IPlayer): Unit = {
     game = game.withUpdatedPlayer(newPlayer)
   }

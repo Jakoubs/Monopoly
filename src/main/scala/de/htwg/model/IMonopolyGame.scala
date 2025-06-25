@@ -20,9 +20,9 @@ trait IMonopolyGame {
   def toggleSound(): IMonopolyGame
 
   def withUpdatedPlayer(newPlayer: IPlayer): IMonopolyGame
+  def withUpdatedPlayers(newPlayers: Vector[IPlayer]): IMonopolyGame
   def withUpdatedBoardAndPlayer(field: BoardField, player: IPlayer): IMonopolyGame
   def withNextPlayer: IMonopolyGame
-
 
   def buyHouse(field: PropertyField, player: IPlayer): Try[IMonopolyGame]
 }

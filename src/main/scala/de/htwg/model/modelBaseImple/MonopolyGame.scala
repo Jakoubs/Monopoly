@@ -28,6 +28,10 @@ case class MonopolyGame(
     this.copy(players = ps, currentPlayer = newPlayer)
   }
 
+  override def withUpdatedPlayers(newPlayers: Vector[IPlayer]): IMonopolyGame = {
+    this.copy(players = newPlayers)
+  }
+
   override def withUpdatedBoardAndPlayer(field: BoardField, player: IPlayer): IMonopolyGame = {
     val updatedFields = board.fields.updated(field.index - 1, field)
     val b = board.copy(fields = updatedFields)

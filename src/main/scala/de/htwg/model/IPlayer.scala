@@ -2,8 +2,9 @@ package de.htwg.model
 
 import de.htwg.model.IPlayer
 import de.htwg.model.modelBaseImple.Player
-
 import scala.util.Try
+import de.htwg.model.modelBaseImple.BoardField // Importieren, falls BoardField benötigt wird
+import de.htwg.model.modelBaseImple.BuyableField // Importieren, falls BuyableField benötigt wird
 
 trait IPlayer {
   def name: String
@@ -22,7 +23,7 @@ trait IPlayer {
                  position: Int = this.position,
                  isInJail: Boolean = this.isInJail,
                  consecutiveDoubles: Int = 0): IPlayer
-
+  def getProperties(boardFields: Vector[BoardField]): Vector[BuyableField]
 }
 object IPlayer {
   def create(

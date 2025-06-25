@@ -42,6 +42,12 @@ case class Player(
                          ): IPlayer = {
     this.copy(name = this.name,balance,position,isInJail,consecutiveDoubles)
   }
+
+  override def getProperties(boardFields: Vector[BoardField]): Vector[BuyableField] = {
+    boardFields.collect {
+      case bf: BuyableField if bf.owner.exists(_.name == this.name) => bf
+    }
+  }
 }
 
 trait TurnStrategy {
