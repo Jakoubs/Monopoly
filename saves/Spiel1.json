@@ -1,32 +1,32 @@
 {
   "sound": true,
-  "currentPlayerIndex": 3,
+  "currentPlayerIndex": 0,
   "players": [
     {
-      "name": "🐲",
-      "balance": 980,
-      "position": 24,
-      "isInJail": false,
-      "consecutiveDoubles": 0
-    },
-    {
-      "name": "🦑",
-      "balance": 1380,
-      "position": 18,
-      "isInJail": false,
-      "consecutiveDoubles": 0
-    },
-    {
-      "name": "🦖",
-      "balance": 1200,
-      "position": 15,
-      "isInJail": false,
-      "consecutiveDoubles": 0
-    },
-    {
-      "name": "🦋",
+      "name": "🧙",
       "balance": 1500,
-      "position": 17,
+      "position": 1,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    },
+    {
+      "name": "🐺",
+      "balance": 1500,
+      "position": 1,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    },
+    {
+      "name": "🧟",
+      "balance": 1500,
+      "position": 1,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    },
+    {
+      "name": "🥷",
+      "balance": 1500,
+      "position": 1,
       "isInJail": false,
       "consecutiveDoubles": 0
     }
@@ -34,12 +34,12 @@
   "properties": [
     {
       "index": 2,
-      "owner": "🐲",
+      "owner": "🧙",
       "houses": 5
     },
     {
       "index": 4,
-      "owner": "🐲",
+      "owner": "🧙",
       "houses": 0
     },
     {
@@ -59,12 +59,12 @@
     },
     {
       "index": 10,
-      "owner": "🦑",
+      "owner": null,
       "houses": 0
     },
     {
       "index": 12,
-      "owner": "🦖",
+      "owner": null,
       "houses": 0
     },
     {
@@ -79,12 +79,12 @@
     },
     {
       "index": 15,
-      "owner": "🦖",
+      "owner": null,
       "houses": 0
     },
     {
       "index": 16,
-      "owner": "🐲",
+      "owner": null,
       "houses": 0
     },
     {
@@ -109,7 +109,7 @@
     },
     {
       "index": 24,
-      "owner": "🐲",
+      "owner": null,
       "houses": 0
     },
     {
