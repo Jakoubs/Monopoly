@@ -4,7 +4,7 @@ import de.htwg.model.FileIOComponent.JSONFileIO.{FileIO => JSONFileIO}
 import de.htwg.model.FileIOComponent.XMLFileIO.{FileIO => XMLFileIO}
 
 object FileIOFactory {
-  def createFileIO(format: String): FileIO = {
+  def createFileIO(format: String): IFileIO = {
     format.toLowerCase match {
       case "json" => new JSONFileIO()
       case "xml" => new XMLFileIO()
