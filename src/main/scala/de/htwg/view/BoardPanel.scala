@@ -2,12 +2,13 @@
 package de.htwg.view
 
 import de.htwg.controller.IController
-import scalafx.geometry.{Insets, Pos}
+import scalafx.geometry.{HPos, Insets, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, HBox, VBox}
 import scalafx.scene.paint.Color
 import de.htwg.model.modelBaseImple.PropertyField.Color as PropertyColor
 import de.htwg.model.modelBaseImple.{BoardField, GoField, GoToJailField, JailField, PropertyField, TaxField, TrainStationField, UtilityField}
+import scalafx.scene.image.{Image, ImageView}
 
 class BoardPanel(controller: IController) extends GridPane {
 
@@ -133,7 +134,18 @@ class BoardPanel(controller: IController) extends GridPane {
 
   def buildBoard(): Unit = {
     children.clear()
-
+    try {
+      val monopolyLogo = new Image(getClass.getResourceAsStream("/image/center2.png"))
+      val logoView = new ImageView(monopolyLogo) {
+        fitWidth = 500
+        fitHeight = 500
+        preserveRatio = true
+      }
+      add(logoView, 1, 1, numCols - 2, numRows - 2)
+      GridPane.setHalignment(logoView, HPos.Center)
+    } catch {
+      case e: Exception => println("Could not load monopoly.png: " + e.getMessage)
+    }
     add(new Label {
       text = s"1\n${getFieldName(0)}\n${getPlayerOnField(0)}"
       prefWidth = edges

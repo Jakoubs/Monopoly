@@ -156,6 +156,11 @@ object GUI extends JFXApp3 with Observer {
         val timeline = new Timeline {
           var count = 0
           val maxRolls = 19
+          gameController.foreach { ctrl =>
+            ctrl.handleInput(enter)
+            ctrl.handleInput(enter)
+            ctrl.handleInput(enter)
+          }
           keyFrames = KeyFrame(Duration(60), onFinished = _ => {
             val value1 = Random.nextInt(6)
             val value2 = Random.nextInt(6)
@@ -164,17 +169,11 @@ object GUI extends JFXApp3 with Observer {
             count += 1
             if (count >= maxRolls) {
               stop()
-              gameController.foreach { ctrl =>
-                ctrl.handleInput(enter)
-                ctrl.handleInput(enter)
-                ctrl.handleInput(enter)
-
                 val turnInfo = gameController.get.getTurnInfo
                 if (turnInfo.diceRoll1 > 0 && turnInfo.diceRoll2 > 0) {
                   diceImageView1.image = diceImages(turnInfo.diceRoll1 - 1)
                   diceImageView2.image = diceImages(turnInfo.diceRoll2 - 1)
                 }
-              }
             }
           })
           cycleCount = maxRolls
@@ -290,7 +289,6 @@ object GUI extends JFXApp3 with Observer {
       val currentState = ctrl.state
 
       rollDiceButton.disable = true
-      buyPropertyButton.disable = true
       endTurnButton.disable = true
       payJailFineButton.disable = true
       confirmBuyHouseButton.disable = true
@@ -301,6 +299,7 @@ object GUI extends JFXApp3 with Observer {
           gameController.foreach(_.handleInput(enter))
           rollDiceButton.disable = false
           endTurnButton.disable = true
+          buyPropertyButton.disable = true
 
         case RollingState(_) =>
           rollDiceButton.disable = false
@@ -322,9 +321,11 @@ object GUI extends JFXApp3 with Observer {
 
         case AdditionalActionsState(_) =>
           endTurnButton.disable = false
+          buyHouseButton.disable = false
 
         case BuyHouseState(_) =>
-        // buyHouseButton.disable = false // Evtl. hier den BuyHouse-Button aktivieren, je nach Logik
+          buyHouseButton.disable = false
+
 
         case ConfirmBuyHouseState(_, _) =>
           confirmBuyHouseButton.disable = false

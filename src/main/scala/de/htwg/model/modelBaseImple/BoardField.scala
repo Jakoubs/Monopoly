@@ -18,6 +18,7 @@ trait BuyableField extends BoardField {
       case None if player.balance > price =>
         val updatedField = withNewOwner(player)
         val updatedPlayer = player.copyPlayer(balance = player.balance - price)
+        SoundPlayer().playBackground("src/main/resources/sound/Money.wav")
         (updatedField, updatedPlayer)
       case _ =>
         (this, player)
