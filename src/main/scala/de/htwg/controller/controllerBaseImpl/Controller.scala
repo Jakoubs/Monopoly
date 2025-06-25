@@ -91,12 +91,12 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     redoStack.clear()
   }
 
-  def saveGame(filename: String, format: String = "json"): Try[Unit] = {
+  def saveGame(filename: String, format: String = "xml"): Try[Unit] = {
     val fileIO = FileIOFactory.createFileIO(format)
     fileIO.save(game, filename)
   }
 
-  def loadGame(filename: String, format: String = "json"): Try[Unit] = {
+  def loadGame(filename: String, format: String = "xml"): Try[Unit] = {
     val fileIO = FileIOFactory.createFileIO(format)
     fileIO.load(filename) match {
       case Success(loadedGame) =>

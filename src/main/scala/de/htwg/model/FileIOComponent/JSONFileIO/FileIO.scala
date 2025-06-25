@@ -10,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 import java.io.{BufferedReader, File, FileInputStream, FileReader, PrintWriter}
 import scala.io.Source
 
-class JSONFileIO extends IFileIO {
+class FileIO extends IFileIO {
 
   override def save(game: IMonopolyGame, filename: String): Try[Unit] = Try {
     val snapshot = createSnapshot(game)
