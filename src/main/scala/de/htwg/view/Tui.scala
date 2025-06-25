@@ -5,6 +5,7 @@ import de.htwg.util.util.{Observable, Observer}
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
 
 import scala.io.StdIn.readLine
+import scala.util.Try
 
 class Tui(controller: IController) extends Observer {
 
@@ -42,16 +43,35 @@ class Tui(controller: IController) extends Observer {
             case _ => controller.handleInput(OpEnum.n)
           }
         case _: AdditionalActionsState =>
-          println("Additional actions:")
-          println("1. Buy house")
-          println("2. End turn")
+          println("Zusätzliche Aktionen (Enter zum Beenden):")
+          println("1. Haus kaufen")
+          println("2. Zug beenden")
           val input = readLine()
           input match {
             case "1" => controller.handleInput(OpEnum.buy)
-            case "2" => controller.handleInput(OpEnum.end)
+            case "2" | "" => controller.handleInput(OpEnum.end)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
             case _ => controller.handleInput(OpEnum.end)
+          }
+        case _: BuyHouseState =>
+          println("Geben Sie die ID des Grundstücks ein, auf dem Sie bauen möchten ('cancel' zum Abbrechen):")
+          val input = readLine()
+          input match {
+            case "cancel" => controller.handleInput(OpEnum.end)
+            case _ =>
+              Try(input.toInt).toOption match {
+                case Some(id) => controller.handleInput(OpEnum.fieldSelected(id))
+                case None => println("Ungültige Eingabe.")
+              }
+          }
+        case _: ConfirmBuyHouseState =>
+          println("Kauf bestätigen? (y/n)")
+          val input = readLine()
+          input match {
+            case "y" => controller.handleInput(OpEnum.buy)
+            case "n" => controller.handleInput(OpEnum.end)
+            case _ => println("Ungültige Eingabe. Aktion wird abgebrochen."); controller.handleInput(OpEnum.end)
           }
         case _: RollingState =>
           println("Press enter to roll a dice")
@@ -88,32 +108,6 @@ class Tui(controller: IController) extends Observer {
             case "" => controller.handleInput(OpEnum.enter)
             case _ => controller.handleInput(OpEnum.enter)
           }
-        case _: BuyHouseState =>
-          println("Which House do you want to buy? (1-40)")
-          val input = readLine()
-          input match {
-            case "u" => controller.handleInput(OpEnum.undo)
-            case "r" => controller.handleInput(OpEnum.redo)
-            case _ =>
-              val houseNumber: Int = input.toIntOption match {
-                case Some(num) if num >= 1 && num <= 40 => num
-                case _ =>
-                  println("Invalid input. Defaulting to house 1.")
-                  1
-              }
-              controller.handleInput(OpEnum.fieldSelected(houseNumber))
-          }
-        case _: ConfirmBuyHouseState =>
-          println("Do you want to Undo the House purchase? (y/n)")
-          val input = readLine()
-          input match {
-            case "y" => controller.handleInput(OpEnum.y)
-            case "n" => controller.handleInput(OpEnum.n)
-            case "u" => controller.handleInput(OpEnum.undo)
-            case "r" => controller.handleInput(OpEnum.redo)
-            case _ => controller.handleInput(OpEnum.n)
-          }
-
         case _ =>
           println("Press enter to continue...")
           val input = readLine()

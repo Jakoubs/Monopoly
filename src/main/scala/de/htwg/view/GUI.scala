@@ -34,10 +34,23 @@ object GUI extends JFXApp3 with Observer {
   private lazy val buyHouseButton = new Button("Haus")
   private lazy val rollDiceButton = new Button("Würfeln")
   private lazy val buyPropertyButton = new Button("Kaufen")
+  private lazy val refusePropertyButton = new Button("Passen")
   private lazy val endTurnButton = new Button("Zug beenden")
   private lazy val payJailFineButton = new Button("Kaution zahlen")
   private lazy val confirmBuyHouseButton = new Button("Bestätigen")
   private lazy val declineBuyHouseButton = new Button("Abbrechen")
+
+  private lazy val propertyDecisionButtons = new HBox {
+    spacing = 0
+    children = Seq(buyPropertyButton, refusePropertyButton)
+  }
+
+  private lazy val houseConfirmationButtons = new HBox {
+    spacing = 15
+    alignment = Pos.Center
+    children = Seq(confirmBuyHouseButton, declineBuyHouseButton)
+  }
+
   private lazy val turnInfoLabel = new Label {
     style = "-fx-font: normal 14pt sans-serif; -fx-text-fill: white; -fx-background-color: #333333; -fx-padding: 10px;"
     wrapText = true
@@ -146,21 +159,17 @@ object GUI extends JFXApp3 with Observer {
   def createButtonPanel(): HBox = {
     new HBox {
       alignment = Pos.Center
-      spacing = 15
+      spacing = 15 // General spacing for other buttons
       padding = Insets(10)
 
       rollDiceButton.minWidth = 100
       rollDiceButton.minHeight = 40
       rollDiceButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
       rollDiceButton.onAction = _ => {
+        gameController.foreach(_.handleInput(enter)) // Keep this single call
         val timeline = new Timeline {
           var count = 0
           val maxRolls = 19
-          gameController.foreach { ctrl =>
-            ctrl.handleInput(enter)
-            ctrl.handleInput(enter)
-            ctrl.handleInput(enter)
-          }
           keyFrames = KeyFrame(Duration(60), onFinished = _ => {
             val value1 = Random.nextInt(6)
             val value2 = Random.nextInt(6)
@@ -169,17 +178,18 @@ object GUI extends JFXApp3 with Observer {
             count += 1
             if (count >= maxRolls) {
               stop()
-                val turnInfo = gameController.get.getTurnInfo
-                if (turnInfo.diceRoll1 > 0 && turnInfo.diceRoll2 > 0) {
-                  diceImageView1.image = diceImages(turnInfo.diceRoll1 - 1)
-                  diceImageView2.image = diceImages(turnInfo.diceRoll2 - 1)
-                }
+              val turnInfo = gameController.get.getTurnInfo
+              if (turnInfo.diceRoll1 > 0 && turnInfo.diceRoll2 > 0) {
+                diceImageView1.image = diceImages(turnInfo.diceRoll1 - 1)
+                diceImageView2.image = diceImages(turnInfo.diceRoll2 - 1)
+              }
             }
           })
           cycleCount = maxRolls
         }
         timeline.playFromStart()
       }
+
       buyHouseButton.minWidth = 100
       buyHouseButton.minHeight = 40
       buyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
@@ -198,7 +208,7 @@ object GUI extends JFXApp3 with Observer {
                 ctrl.board.fields(intValue - 1) match {
                   case propertyField: PropertyField =>
                     val maxHouses = 5
-                    val housePrice = propertyField.price / 2 // Annahme für Hauspreis
+                    val housePrice = propertyField.price / 2
 
                     val validationResult = for {
                       _ <- Try(if (!propertyField.owner.exists(_.name == player.name)) throw new Exception(s"Sie besitzen ${propertyField.name} nicht."))
@@ -213,7 +223,6 @@ object GUI extends JFXApp3 with Observer {
 
                     validationResult match {
                       case scala.util.Success(_) =>
-                        ctrl.setState(BuyHouseState(false))
                         ctrl.handleInput(OpEnum.fieldSelected(intValue))
                       case scala.util.Failure(e) =>
                         new Alert(AlertType.Error) {
@@ -241,19 +250,24 @@ object GUI extends JFXApp3 with Observer {
         }
       }
 
-
-      buyPropertyButton.minWidth = 100
+      buyPropertyButton.minWidth = 50
       buyPropertyButton.minHeight = 40
       buyPropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #f0ad4e; -fx-text-fill: white;"
       buyPropertyButton.onAction = _ => {
         gameController.foreach(_.handleInput(y))
       }
 
+      refusePropertyButton.minWidth = 50
+      refusePropertyButton.minHeight = 40
+      refusePropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #d9534f; -fx-text-fill: yellow;"
+      refusePropertyButton.onAction = _ => {
+        gameController.foreach(_.handleInput(n))
+      }
+
       endTurnButton.minWidth = 120
       endTurnButton.minHeight = 40
       endTurnButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #d9534f; -fx-text-fill: white;"
       endTurnButton.onAction = _ => {
-        gameController.foreach(_.handleInput(n))
         gameController.foreach(_.handleInput(end))
       }
 
@@ -279,7 +293,7 @@ object GUI extends JFXApp3 with Observer {
       }
 
       children = Seq(
-        diceImageView1, diceImageView2, rollDiceButton, buyPropertyButton, endTurnButton, buyHouseButton, payJailFineButton
+        diceImageView1, diceImageView2, rollDiceButton, propertyDecisionButtons, endTurnButton, buyHouseButton, payJailFineButton, houseConfirmationButtons
       )
     }
   }
@@ -288,55 +302,62 @@ object GUI extends JFXApp3 with Observer {
     gameController.foreach { ctrl =>
       val currentState = ctrl.state
 
-      rollDiceButton.disable = true
-      endTurnButton.disable = true
-      payJailFineButton.disable = true
-      confirmBuyHouseButton.disable = true
-      declineBuyHouseButton.disable = true
+      // Helper to set visibility and managed state
+      def setVisible(node: javafx.scene.Node, isVisible: Boolean): Unit = {
+        node.setVisible(isVisible)
+        node.setManaged(isVisible)
+      }
 
+      // Default state: hide all action buttons/groups
+      setVisible(rollDiceButton, false)
+      setVisible(propertyDecisionButtons, false)
+      setVisible(endTurnButton, false)
+      setVisible(buyHouseButton, false)
+      setVisible(payJailFineButton, false)
+      setVisible(houseConfirmationButtons, false)
+
+      // Enable buttons based on the current state
       currentState match {
         case StartTurnState() =>
           gameController.foreach(_.handleInput(enter))
-          rollDiceButton.disable = false
-          endTurnButton.disable = true
-          buyPropertyButton.disable = true
+          setVisible(rollDiceButton, true)
 
         case RollingState(_) =>
-          rollDiceButton.disable = false
+          setVisible(rollDiceButton, true)
 
         case JailState() =>
-          rollDiceButton.disable = false
-          payJailFineButton.disable = false
-          endTurnButton.disable = true
+          setVisible(rollDiceButton, true)
+          setVisible(payJailFineButton, true)
 
         case MovingState(_) =>
+          // Transient state, no buttons needed
           gameController.foreach(_.handleInput(enter))
 
         case PropertyDecisionState(_) =>
-          buyPropertyButton.disable = false
-          endTurnButton.disable = false
+          setVisible(propertyDecisionButtons, true)
 
         case BuyPropertyState(_) =>
+          // Transient state
           gameController.foreach(_.handleInput(enter))
 
         case AdditionalActionsState(_) =>
-          endTurnButton.disable = false
-          buyHouseButton.disable = false
+          setVisible(endTurnButton, true)
+          setVisible(buyHouseButton, true)
 
         case BuyHouseState(_) =>
-          buyHouseButton.disable = false
-
+          // Modal dialog is open, but we keep the buttons for context
+          setVisible(endTurnButton, true)
+          setVisible(buyHouseButton, true)
 
         case ConfirmBuyHouseState(_, _) =>
-          confirmBuyHouseButton.disable = false
-          declineBuyHouseButton.disable = false
+          setVisible(houseConfirmationButtons, true)
 
         case EndTurnState() =>
+          // Transient state, triggers next turn
           gameController.foreach(_.handleInput(enter))
       }
     }
   }
-
   private def updateTurnInfo(): Unit = {
     gameController.foreach { ctrl =>
       val turnInfo = ctrl.getTurnInfo
