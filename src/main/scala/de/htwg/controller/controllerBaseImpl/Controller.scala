@@ -63,6 +63,7 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
       case OpEnum.redo => redo()
       case _ =>
         state = state.handle(input)
+        println(state)
     }
     notifyObservers()
 
