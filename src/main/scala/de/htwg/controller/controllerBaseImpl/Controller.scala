@@ -10,7 +10,7 @@ import de.htwg.Board
 import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.IPlayer
 import de.htwg.controller.IController
-import de.htwg.model.FileIOComponent.{IFileIO, SaveManager}
+import de.htwg.model.FileIOComponent.FileIOFactory
 
 import java.awt.Choice
 import scala.collection.mutable
@@ -77,7 +77,9 @@ class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IContro
     notifyObservers()
 
   }
-
+  def updatePlayers(players: Vector[IPlayer]): Unit = {
+    game = game.withUpdatedPlayers(players)
+  }
   def updatePlayer(newPlayer: IPlayer): Unit = {
     game = game.withUpdatedPlayer(newPlayer)
   }

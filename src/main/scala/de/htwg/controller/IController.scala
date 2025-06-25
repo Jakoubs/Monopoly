@@ -20,6 +20,8 @@ trait IController {
   def handleInput(input: OpEnum): Unit
 
   def updatePlayer(player: IPlayer): Unit
+  def updatePlayers(player: Vector[IPlayer]): Unit
+
   def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit
   def switchToNextPlayer(): Unit
 
