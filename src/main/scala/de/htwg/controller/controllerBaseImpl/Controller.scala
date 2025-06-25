@@ -10,7 +10,10 @@ import de.htwg.Board
 import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.IPlayer
 import de.htwg.controller.IController
-import de.htwg.model.FileIOComponent.FileIOFactory
+import de.htwg.model.FileIOComponent.IFileIO
+import de.htwg.model.FileIOComponent.JSONFileIO
+import de.htwg.model.FileIOComponent.XMLFileIO
+import de.htwg.model.FileIOComponent.{SaveManager}
 
 import java.awt.Choice
 import scala.collection.mutable

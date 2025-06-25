@@ -13,7 +13,7 @@ import de.htwg.model.IPlayer
 import scalafx.Includes.*
 import scalafx.application.Platform
 import de.htwg.view.BoardPanel
-import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y, save, load}
+import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y, SaveWithName, LoadWithName}
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import scalafx.animation.{KeyFrame, Timeline}
@@ -449,14 +449,14 @@ object GUI extends JFXApp3 with Observer {
         saveButton.minHeight = 40
         saveButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
         saveButton.onAction = _ => {
-          gameController.get.handleInput(save)
+          gameController.get.handleInput(OpEnum.SaveWithName("hallo"))
         }
 
         loadButton.minWidth = 100
         loadButton.minHeight = 40
         loadButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
         loadButton.onAction = _ => {
-          gameController.get.handleInput(load)
+          gameController.get.handleInput(OpEnum.LoadWithName("hallo"))
         }
 
         tradeButton.minWidth = 100
