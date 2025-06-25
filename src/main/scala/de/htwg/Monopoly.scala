@@ -25,8 +25,7 @@ object Monopoly:
 
   def main(args: Array[String]): Unit = {
     // 1) Format aus args (Default "xml")
-    println(Some(args(0)))
-    val format = args.headOption.getOrElse("xml")
+    val format = args.headOption.getOrElse("json")
 
     given IFileIO = FileIOModule.select(format)
 
