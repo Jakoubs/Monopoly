@@ -10,10 +10,12 @@ import de.htwg.Board
 import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.IPlayer
 import de.htwg.controller.IController
+import de.htwg.model.FileIOComponent.FileIOFactory
 
 import java.awt.Choice
 import scala.collection.mutable
 import scala.io.StdIn.readLine
+import scala.util.{Failure, Success, Try}
 
 enum OpEnum:
   case roll
@@ -86,6 +88,24 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     cmd.nextGameStates = Some(state)       // Zustand nach Ausführung
     undoStack.push(cmd)
     redoStack.clear()
+  }
+
+  def saveGame(filename: String, format: String = "json"): Try[Unit] = {
+    val fileIO = FileIOFactory.createFileIO(format)
+    fileIO.save(game, filename)
+  }
+
+  def loadGame(filename: String, format: String = "json"): Try[Unit] = {
+    val fileIO = FileIOFactory.createFileIO(format)
+    fileIO.load(filename) match {
+      case Success(loadedGame) =>
+        game = loadedGame
+        state = StartTurnState()
+        notifyObservers()
+        Success(())
+      case Failure(exception) =>
+        Failure(exception)
+    }
   }
 
   def undo(): Unit = {
