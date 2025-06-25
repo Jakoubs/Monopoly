@@ -10,7 +10,7 @@ import de.htwg.Board
 import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.IPlayer
 import de.htwg.controller.IController
-import de.htwg.model.FileIOComponent.FileIOFactory
+import de.htwg.model.FileIOComponent.{IFileIO, SaveManager}
 
 import java.awt.Choice
 import scala.collection.mutable
@@ -28,8 +28,8 @@ enum OpEnum:
   case fieldSelected(id: Int)
   case undo
   case redo
-  case save
-  case load
+  case SaveWithName(name: String)
+  case LoadWithName(name: String)
 
 case class TurnInfo(
                      diceRoll1: Int = 0,
@@ -41,7 +41,7 @@ case class TurnInfo(
                      rentPaidTo: Option[IPlayer] = None
                    )
 
-class Controller(var game: IMonopolyGame) extends IController with Observable{
+class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IController with Observable{
   given controller: Controller = this
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
@@ -65,8 +65,11 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     input match {
       case OpEnum.undo => undo()
       case OpEnum.redo => redo()
-      case OpEnum.save => saveGame("monopoly_game")
-      case OpEnum.load => loadGame("monopoly_game")
+      case OpEnum.SaveWithName(name) =>
+        saveSlot(name)
+      case OpEnum.LoadWithName(name) =>
+        loadSlot(name)
+
       case _ =>
         state = state.handle(input)
         println(state)
@@ -95,23 +98,26 @@ class Controller(var game: IMonopolyGame) extends IController with Observable{
     redoStack.clear()
   }
 
-  def saveGame(filename: String, format: String = "xml"): Try[Unit] = {
-    val fileIO = FileIOFactory.createFileIO(format)
-    fileIO.save(game, filename)
+  def saveSlot(slotName: String): Try[Unit] = {
+    val path = SaveManager.slotPath(slotName)
+    fileIO.save(game, path)
   }
 
-  def loadGame(filename: String, format: String = "xml"): Try[Unit] = {
-    val fileIO = FileIOFactory.createFileIO(format)
-    fileIO.load(filename) match {
-      case Success(loadedGame) =>
-        game = loadedGame
-        state = StartTurnState()
+  def loadSlot(slotName: String): Try[Unit] = {
+    val path = SaveManager.slotPath(slotName)
+    println(path)
+    fileIO.load(path) match {
+      case Success(loaded) =>
+        game = loaded
         notifyObservers()
         Success(())
-      case Failure(exception) =>
-        Failure(exception)
+      case Failure(err) =>
+        println(s"❌ Fehler beim Laden: ${err.getMessage}")
+        Failure(err)
     }
   }
+
+  def availableSlots: Vector[String] = SaveManager.listSlots
 
   def undo(): Unit = {
     if (undoStack.nonEmpty) {

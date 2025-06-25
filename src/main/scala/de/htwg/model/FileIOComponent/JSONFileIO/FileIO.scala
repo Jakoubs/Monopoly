@@ -28,7 +28,8 @@ class FileIO extends IFileIO {
     val source = Source.fromFile(s"$filename.json")
     val json = try source.mkString finally source.close()
     val snapshot = jsonToGame(json)
-    reconstructGame(snapshot)
+    val game = reconstructGame(snapshot)
+    game
   }
 
   private def createSnapshot(game: IMonopolyGame): GameSnapshot = {
@@ -170,7 +171,7 @@ $propertiesJson
     )
 
     // Get the original board from your defineGame method
-    val originalGame = de.htwg.Monopoly.defineGame()
+    val originalGame = de.htwg.Monopoly.createEmptyBaseGame()
     var updatedBoard = originalGame.board
 
     // Update board with ownership and houses

@@ -5,6 +5,8 @@ import de.htwg.model.IPlayer
 import de.htwg.model.modelBaseImple.{BoardField, PropertyField, TrainStationField, UtilityField}
 import de.htwg.controller.controllerBaseImpl.{Command, GameState, OpEnum, TurnInfo}
 
+import scala.util.Try
+
 trait IController {
   def state: GameState
   def currentPlayer: IPlayer
@@ -26,6 +28,10 @@ trait IController {
   def redo(): Unit
 
   def isGameOver: Boolean
+
+  def saveSlot(slotName: String): Try[Unit]
+  def loadSlot(slotName: String): Try[Unit]
+  def availableSlots: Vector[String]
 
   def getBoardString: String
   def getInventory: String

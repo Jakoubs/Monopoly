@@ -1,6 +1,7 @@
 package de.htwg.view
 
 import de.htwg.controller.IController
+import de.htwg.controller.controllerBaseImpl.OpEnum.roll
 import de.htwg.util.util.{Observable, Observer}
 import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
 
@@ -28,6 +29,18 @@ class Tui(controller: IController) extends Observer {
             case "3" => controller.handleInput(OpEnum.roll)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
+
             case _ => controller.handleInput(OpEnum.pay)
           }
 
@@ -40,6 +53,18 @@ class Tui(controller: IController) extends Observer {
             case "n" => controller.handleInput(OpEnum.n)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
+
             case _ => controller.handleInput(OpEnum.n)
           }
         case _: AdditionalActionsState =>
@@ -52,6 +77,17 @@ class Tui(controller: IController) extends Observer {
             case "2" | "" => controller.handleInput(OpEnum.end)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ => controller.handleInput(OpEnum.end)
           }
         case _: BuyHouseState =>
@@ -59,6 +95,17 @@ class Tui(controller: IController) extends Observer {
           val input = readLine()
           input match {
             case "cancel" => controller.handleInput(OpEnum.end)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ =>
               Try(input.toInt).toOption match {
                 case Some(id) => controller.handleInput(OpEnum.fieldSelected(id))
@@ -71,6 +118,17 @@ class Tui(controller: IController) extends Observer {
           input match {
             case "y" => controller.handleInput(OpEnum.buy)
             case "n" => controller.handleInput(OpEnum.end)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ => println("Ungültige Eingabe. Aktion wird abgebrochen."); controller.handleInput(OpEnum.end)
           }
         case _: RollingState =>
@@ -80,6 +138,17 @@ class Tui(controller: IController) extends Observer {
             case "" => controller.handleInput(OpEnum.enter)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _: MovingState =>
@@ -90,6 +159,17 @@ class Tui(controller: IController) extends Observer {
             case "" => controller.handleInput(OpEnum.enter)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _: BuyPropertyState =>
@@ -99,6 +179,17 @@ class Tui(controller: IController) extends Observer {
             case "" => controller.handleInput(OpEnum.enter)
             case "u" => controller.handleInput(OpEnum.undo)
             case "r" => controller.handleInput(OpEnum.redo)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _: EndTurnState =>
@@ -106,6 +197,17 @@ class Tui(controller: IController) extends Observer {
           val input = readLine()
           input match {
             case "" => controller.handleInput(OpEnum.enter)
+            case "s" =>
+              print("Speichern unter Namen: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.SaveWithName(name))
+
+            case "l" =>
+              println("Verfügbare Speicherstände:")
+              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
+              print("Name des Slots zum Laden: ")
+              val name = readLine().trim
+              controller.handleInput(OpEnum.LoadWithName(name))
             case _ => controller.handleInput(OpEnum.enter)
           }
         case _ =>

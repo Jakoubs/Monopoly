@@ -4,13 +4,10 @@ import de.htwg.model.FileIOComponent.JSONFileIO.FileIO as JSONFileIO
 import de.htwg.model.FileIOComponent.XMLFileIO.FileIO as XMLFileIO
 import de.htwg.model.FileIOComponent.IFileIO
 
-object FileIOFactory {
-  def createFileIO(format: String): IFileIO = {
-    format.toLowerCase match {
-      case "json" => new JSONFileIO()
+object FileIOModule:
+  def select(format: String): IFileIO =
+    format.toLowerCase match
       case "xml" => new XMLFileIO()
-      case other => throw new IllegalArgumentException(s"Unsupported format: $other")
-    }
-  }
-}
+      case _      => new JSONFileIO()     // deine XML-Impl
+
 

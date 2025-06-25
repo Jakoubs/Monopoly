@@ -1,0 +1,176 @@
+{
+  "sound": true,
+  "currentPlayerIndex": 3,
+  "players": [
+    {
+      "name": "🐲",
+      "balance": 980,
+      "position": 24,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    },
+    {
+      "name": "🦑",
+      "balance": 1380,
+      "position": 18,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    },
+    {
+      "name": "🦖",
+      "balance": 1200,
+      "position": 15,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    },
+    {
+      "name": "🦋",
+      "balance": 1500,
+      "position": 17,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    }
+  ],
+  "properties": [
+    {
+      "index": 2,
+      "owner": "🐲",
+      "houses": 5
+    },
+    {
+      "index": 4,
+      "owner": "🐲",
+      "houses": 0
+    },
+    {
+      "index": 6,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 7,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 9,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 10,
+      "owner": "🦑",
+      "houses": 0
+    },
+    {
+      "index": 12,
+      "owner": "🦖",
+      "houses": 0
+    },
+    {
+      "index": 13,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 14,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 15,
+      "owner": "🦖",
+      "houses": 0
+    },
+    {
+      "index": 16,
+      "owner": "🐲",
+      "houses": 0
+    },
+    {
+      "index": 17,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 19,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 20,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 22,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 24,
+      "owner": "🐲",
+      "houses": 0
+    },
+    {
+      "index": 25,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 26,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 27,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 28,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 29,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 30,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 32,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 33,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 35,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 36,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 38,
+      "owner": null,
+      "houses": 0
+    },
+    {
+      "index": 40,
+      "owner": null,
+      "houses": 0
+    }
+  ]
+}

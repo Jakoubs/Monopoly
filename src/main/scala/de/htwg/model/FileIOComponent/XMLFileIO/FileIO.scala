@@ -26,7 +26,8 @@ class FileIO extends IFileIO {
   override def load(filename: String): Try[IMonopolyGame] = Try {
     val xml = XML.loadFile(s"$filename.xml")
     val snapshot = xmlToGame(xml)
-    reconstructGame(snapshot)
+    val game = reconstructGame(snapshot)
+    game
   }
 
   private def createSnapshot(game: IMonopolyGame): GameSnapshot = {
@@ -112,7 +113,7 @@ class FileIO extends IFileIO {
     )
 
     // Get the original board from your defineGame method
-    val originalGame = de.htwg.Monopoly.defineGame()
+    val originalGame = de.htwg.Monopoly.createEmptyBaseGame()
     var updatedBoard = originalGame.board
 
     // Update board with ownership and houses

@@ -4,11 +4,13 @@ import de.htwg.controller.controllerBaseImpl.Controller
 import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 import de.htwg.model.modelBaseImple.MonopolyGame
+
 import scala.io.StdIn.readLine
 import scala.util.Random
 import de.htwg.view.Tui
 import de.htwg.view.GUI
 import de.htwg.model.*
+import de.htwg.model.FileIOComponent.{FileIOModule, IFileIO}
 import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, SoundPlayer, TaxField, TrainStationField, UtilityField}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,8 +24,13 @@ object Monopoly:
   var gameController: Option[Controller] = None // Option to hold the controller
 
   def main(args: Array[String]): Unit = {
+    // 1) Format aus args (Default "xml")
+    println(Some(args(0)))
+    val format = args.headOption.getOrElse("xml")
+
+    given IFileIO = FileIOModule.select(format)
+
     val game = defineGame()
-    val dice = Dice()
     val controller = Controller(game)
     gameController = Some(controller) // Store the controller
 
@@ -115,4 +122,53 @@ object Monopoly:
       "🦸", "🧚", "🥷")
     val availableEmojis = emojis.filterNot(e => vektor.exists(_.name == e))
     Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
+  }
+
+  def createEmptyBaseGame(): IMonopolyGame = {
+    val board = Board(
+      Vector(
+        GoField,
+        PropertyField("brown1", 2, 60, 2, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(5)),
+        CommunityChestField(3),
+        PropertyField("brown2", 4, 60, 4, None, color = PropertyField.Color.Brown, PropertyField.Mortgage(30, false), PropertyField.House(0)),
+        TaxField(100, 5),
+        TrainStationField("Marklylebone Station", 6,200, None),
+        PropertyField("lightBlue1", 7, 100, 6, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(50, false), PropertyField.House(0)),
+        ChanceField(8),
+        PropertyField("lightBlue2", 9, 100, 6, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(50, false), PropertyField.House(0)),
+        PropertyField("lightBlue3", 10, 120, 8, None, color = PropertyField.Color.LightBlue, PropertyField.Mortgage(60, false), PropertyField.House(0)),
+        JailField,
+        PropertyField("Pink1", 12, 140, 10, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(70, false), PropertyField.House(0)),
+        UtilityField("Electric Company", 13,150,UtilityField.UtilityCheck.utility,None),
+        PropertyField("Pink2", 14, 140, 10, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(70, false), PropertyField.House(0)),
+        PropertyField("Pink3", 15, 160, 12, None, color = PropertyField.Color.Pink, PropertyField.Mortgage(80, false), PropertyField.House(0)),
+        TrainStationField("Fenchurch ST Station", 16,200, None),
+        PropertyField("Orange1", 17, 180, 14, None, color = PropertyField.Color.Orange, PropertyField.Mortgage(90, false), PropertyField.House(0)),
+        CommunityChestField(18),
+        PropertyField("Orange2", 19, 180, 14, None, color = PropertyField.Color.Orange, PropertyField.Mortgage(90, false), PropertyField.House(0)),
+        PropertyField("Orange3", 20, 200, 16, None, color = PropertyField.Color.Orange, PropertyField.Mortgage(100, false), PropertyField.House(0)),
+        FreeParkingField(0),
+        PropertyField("Red1", 22, 220, 18, None, color = PropertyField.Color.Red, PropertyField.Mortgage(110, false), PropertyField.House(0)),
+        ChanceField(23),
+        PropertyField("Red2", 24, 220, 18, None, color = PropertyField.Color.Red, PropertyField.Mortgage(110, false), PropertyField.House(0)),
+        PropertyField("Red3", 25, 240, 20, None, color = PropertyField.Color.Red, PropertyField.Mortgage(120, false), PropertyField.House(0)),
+        TrainStationField("King's Cross Station", 26,200, None),
+        PropertyField("Yellow1", 27, 260, 22, None, color = PropertyField.Color.Yellow, PropertyField.Mortgage(130, false), PropertyField.House(0)),
+        UtilityField("Water Works", 28,150,UtilityField.UtilityCheck.utility, None),
+        PropertyField("Yellow2", 29, 260, 22, None, color = PropertyField.Color.Yellow, PropertyField.Mortgage(130, false), PropertyField.House(0)),
+        PropertyField("Yellow3", 30, 280, 24, None, color = PropertyField.Color.Yellow, PropertyField.Mortgage(140, false), PropertyField.House(0)),
+        GoToJailField(),
+        PropertyField("Green1", 32, 300, 26, None, color = PropertyField.Color.Green, PropertyField.Mortgage(150, false), PropertyField.House(0)),
+        PropertyField("Green2", 33, 300, 26, None, color = PropertyField.Color.Green, PropertyField.Mortgage(150, false), PropertyField.House(0)),
+        CommunityChestField(34),
+        PropertyField("Green3", 35, 320, 28, None, color = PropertyField.Color.Green, PropertyField.Mortgage(160, false), PropertyField.House(0)),
+        TrainStationField("Liverpool ST Station", 36,200, None),
+        ChanceField(37),
+        PropertyField("DarkBlue1", 38, 350, 35, None, color = PropertyField.Color.DarkBlue, PropertyField.Mortgage(175, false), PropertyField.House(0)),
+        TaxField(200, 39),
+        PropertyField("DarkBlue2", 40, 400, 50, None, color = PropertyField.Color.DarkBlue, PropertyField.Mortgage(200, false), PropertyField.House(0))
+      )
+    )
+    val emptyPlayers = Vector.empty[IPlayer]
+    MonopolyGame(emptyPlayers, board, Player("Placeholder", 0, 1, false, 0), sound = false)
   }
