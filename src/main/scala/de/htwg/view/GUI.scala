@@ -39,6 +39,9 @@ object GUI extends JFXApp3 with Observer {
   private lazy val payJailFineButton = new Button("Kaution zahlen")
   private lazy val confirmBuyHouseButton = new Button("Bestätigen")
   private lazy val declineBuyHouseButton = new Button("Abbrechen")
+  private lazy val saveButton = new Button("save")
+  private lazy val loadButton = new Button("load")
+  private lazy val tradeButton = new Button("trade")
 
   private lazy val propertyDecisionButtons = new HBox {
     spacing = 0
@@ -114,8 +117,31 @@ object GUI extends JFXApp3 with Observer {
           text = "SPIELER ÜBERSICHT"
           style = "-fx-font: bold 18pt sans-serif; -fx-text-fill: white;"
         }
+        saveButton.minWidth = 100
+        saveButton.minHeight = 40
+        saveButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+        saveButton.onAction = _ => {}
+
+        loadButton.minWidth = 100
+        loadButton.minHeight = 40
+        loadButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+        loadButton.onAction = _ => {}
+
+        tradeButton.minWidth = 100
+        tradeButton.minHeight = 40
+        tradeButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
+        tradeButton.onAction = _ => {
+          new Alert(AlertType.Error) {
+          initOwner(stage)
+          title = "Fehler"
+          headerText = "Aktion nicht möglich"
+          contentText = "Der Handel ist noch nicht implementiert."
+        }.showAndWait()}
 
         children += playersInfoLabel
+        children += saveButton
+        children += loadButton
+        children += tradeButton
       }
 
       children = Seq(leftColumn, rightColumn)
