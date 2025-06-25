@@ -449,14 +449,65 @@ object GUI extends JFXApp3 with Observer {
         saveButton.minHeight = 40
         saveButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
         saveButton.onAction = _ => {
-          gameController.get.handleInput(OpEnum.SaveWithName("hallo"))
+          new TextInputDialog() {
+            initOwner(stage)
+            title = "Spielstand speichern"
+            headerText = "Geben Sie einen Namen für den Spielstand ein."
+            contentText = "Name:"
+          }.showAndWait().foreach { inputText =>
+            if (inputText.nonEmpty) {
+              gameController.get.handleInput(OpEnum.SaveWithName(inputText))
+            } else {
+              new Alert(AlertType.Error) {
+                initOwner(stage)
+                title = "Fehler"
+                headerText = "Der Name darf nicht leer sein."
+              }.showAndWait()
+            }
+          }
         }
 
         loadButton.minWidth = 100
         loadButton.minHeight = 40
         loadButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
         loadButton.onAction = _ => {
-          gameController.get.handleInput(OpEnum.LoadWithName("hallo"))
+          val slots = gameController.get.availableSlots
+          if (slots.isEmpty) {
+            new Alert(AlertType.Information) {
+              initOwner(stage)
+              title = "Keine Spielstände"
+              headerText = "Es sind keine gespeicherten Spielstände vorhanden."
+            }.showAndWait()
+          } else {
+            val dialog = new javafx.scene.control.Dialog[String]()
+            dialog.initOwner(stage)
+            dialog.setTitle("Spielstand laden")
+            dialog.setHeaderText("Wähle einen Spielstand zum Laden:")
+
+            val vbox = new VBox(10)
+            vbox.setPadding(Insets(20))
+            slots.foreach { slot =>
+              val btn = new Button(slot) {
+                minWidth = 200
+                style = "-fx-font: normal bold 14pt sans-serif;"
+                onAction = _ => {
+                  dialog.setResult(slot)
+                  dialog.close()
+                }
+              }
+              vbox.getChildren.add(btn)
+            }
+            dialog.getDialogPane.setContent(vbox)
+            dialog.getDialogPane.getButtonTypes.add(javafx.scene.control.ButtonType.CANCEL)
+            dialog.getDialogPane.getStylesheets.add(getClass.getResource("/style/dark_mode.css").toExternalForm)
+            dialog.getDialogPane.getStyleClass.add("dark-dialog-pane")
+
+            val result = dialog.showAndWait()
+            if (result.isPresent && result.get() != null) {
+              val resultJasonless = result.get().replace(".json", "").replace(".xml", "")
+              gameController.get.handleInput(OpEnum.LoadWithName(resultJasonless))
+            }
+          }
         }
 
         tradeButton.minWidth = 100

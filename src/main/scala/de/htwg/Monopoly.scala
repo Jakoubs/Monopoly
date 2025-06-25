@@ -24,9 +24,8 @@ object Monopoly:
   var gameController: Option[Controller] = None // Option to hold the controller
 
   def main(args: Array[String]): Unit = {
-    // 1) Format aus args (Default "xml")
-    println(Some(args(0)))
-    val format = args.headOption.getOrElse("xml")
+    // 1) Format aus args (Default "xml"
+    val format = args.headOption.getOrElse("json")
 
     given IFileIO = FileIOModule.select(format)
 
