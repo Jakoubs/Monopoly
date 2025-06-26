@@ -58,7 +58,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
     moneyFieldOffer = new TextField {
       promptText = "Betrag eingeben"
       prefWidth = 150
-      text = "0" 
+      text = "0"
     }
 
     offerBox = new VBox {
@@ -92,7 +92,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
     moneyFieldDemand = new TextField {
       promptText = "Betrag eingeben"
       prefWidth = 150
-      text = "0" 
+      text = "0"
     }
 
     demandBox = new VBox {
@@ -202,7 +202,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
                 selectedPlayer.getProperties(controller.board.fields)
                   .find(_.name == propName)
               }
-              
+
               val confirmButtonType = new ButtonType("Bestätigen", ButtonData.OKDone)
               val cancelButtonType = new ButtonType("Ablehnen", ButtonData.CancelClose)
               val dialog = new Dialog[Boolean]() {
