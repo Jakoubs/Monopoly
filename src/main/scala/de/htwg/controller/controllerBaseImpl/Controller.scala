@@ -87,6 +87,9 @@ class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IContro
     game = game.withUpdatedPlayer(newPlayer)
   }
 
+  def setBoard(board: Board): Unit = {
+    game = game.withUpdatedBoard(board)
+  }
   def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit = {
     game = game.withUpdatedBoardAndPlayer(field, player)
   }

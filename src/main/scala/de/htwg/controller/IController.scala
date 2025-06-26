@@ -22,6 +22,7 @@ trait IController {
   def updatePlayer(player: IPlayer): Unit
   def updatePlayers(player: Vector[IPlayer]): Unit
 
+  def setBoard(board: Board): Unit
   def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit
   def switchToNextPlayer(): Unit
 
