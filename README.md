@@ -18,6 +18,7 @@
 
 <div align="center">
     <img src="src/main/resources/image/GUIPreView.png" alt="Monopoly Game Terminal Demo" width="800"/>
+    <img src="src/main/resources/image/trade.png" alt="Monopoly Game Terminal Demo" width="800"/>
 </div>
 
 </div>
