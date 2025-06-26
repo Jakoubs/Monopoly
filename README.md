@@ -129,8 +129,10 @@ We welcome contributions! Here's how you can help:
 - [x] Property management
 - [x] Player turns
 - [x] Dice rolling system
-- [ ] Code patterns
-- [ ] GUI implementation
+- [x] Code patterns
+- [x] GUI implementation
+- [x] Save game status
+- [ ] Docker
 - [ ] AI opponents
 
 ## 🧪 Testing
