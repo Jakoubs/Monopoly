@@ -265,8 +265,9 @@ class TradePanel(controller: IController) extends VBox with Observable {
                   val demandDisplay = if (demandAmount > 0) s"${demandAmount}€" else "0€"
                   val offerPropsText = if (listOffer.nonEmpty) s" + ${listOffer.map(_.name).mkString(", ")}" else ""
                   val demandPropsText = if (listDemand.nonEmpty) s" + ${listDemand.map(_.name).mkString(", ")}" else ""
-
-                  contentText = s"Handel mit $selectedPlayerName:\nDu bietest: ${offerDisplay}${offerPropsText}\nDu verlangst: ${demandDisplay}${demandPropsText}"
+                  val offerProp = if (listOffer.nonEmpty) s" (${listOffer.map(_.name).mkString(", ")})" else ""
+                  val demandProp = if (listDemand.nonEmpty) s" (${listDemand.map(_.name).mkString(", ")})" else ""
+                  contentText = s"Handel mit $selectedPlayerName:\nDu bietest: ${offerDisplay}${offerPropsText}, ${offerProp}\nDu verlangst: ${demandDisplay}${demandPropsText}${demandProp}"
                   dialogPane().buttonTypes = Seq(confirmButtonType, cancelButtonType)
                 }
 

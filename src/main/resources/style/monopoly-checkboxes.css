@@ -4,7 +4,7 @@
   -fx-border-width: 2;
   -fx-border-radius: 12;
   -fx-background-radius: 12;
-  -fx-padding: 16 12 16 12;
+  -fx-padding: 16 18 16 18;
   -fx-effect: dropshadow(gaussian, #000, 8, 0.2, 0, 2);
   -fx-spacing: 8;
   -fx-alignment: center;
@@ -53,5 +53,5 @@
 
 .monopoly-checkbox.selected .field-title,
 .monopoly-checkbox.selected .field-value {
-  -fx-text-fill: #222;
+  -fx-text-fill: #c1e0b4;
 }
