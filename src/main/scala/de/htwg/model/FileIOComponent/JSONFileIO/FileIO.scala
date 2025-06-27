@@ -87,17 +87,14 @@ $propertiesJson
   }
 
   private def jsonToGame(json: String): GameSnapshot = {
-    // Simple JSON parsing (in a real project, you'd use a JSON library like Play JSON)
     val lines = json.split('\n').map(_.trim)
 
     val sound = extractValue(lines, "sound").toBoolean
     val currentPlayerIndex = extractValue(lines, "currentPlayerIndex").toInt
 
-    // Extract players (simplified parsing)
     val playersSection = extractSection(json, "players")
     val players = parsePlayersFromJSON(playersSection)
 
-    // Extract properties
     val propertiesSection = extractSection(json, "properties")
     val properties = parsePropertiesFromJSON(propertiesSection)
 
@@ -165,16 +162,13 @@ $propertiesJson
   }
 
   private def reconstructGame(snapshot: GameSnapshot): IMonopolyGame = {
-    // Create players from snapshot
     val players = snapshot.players.map(ps =>
       Player(ps.name, ps.balance, ps.position, ps.isInJail, ps.consecutiveDoubles)
     )
 
-    // Get the original board from your defineGame method
     val originalGame = de.htwg.Monopoly.createEmptyBaseGame()
     var updatedBoard = originalGame.board
 
-    // Update board with ownership and houses
     snapshot.boardProperties.foreach { propSnapshot =>
       val fieldIndex = propSnapshot.index - 1
       if (fieldIndex >= 0 && fieldIndex < updatedBoard.fields.length) {

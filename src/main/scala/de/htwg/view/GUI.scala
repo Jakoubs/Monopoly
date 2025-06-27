@@ -152,7 +152,6 @@ object GUI extends JFXApp3 with Observer {
       buyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
       buyHouseButton.onAction = _ => {
         gameController.foreach { ctrl =>
-          // Setze explizit den State auf BuyHouseState, falls nötig
           ctrl.handleInput(OpEnum.buy)
           val dialog = new TextInputDialog() {
             initOwner(stage)
@@ -165,7 +164,6 @@ object GUI extends JFXApp3 with Observer {
               case Some(intValue) if intValue >= 1 && intValue <= 40 =>
                 val beforeState = ctrl.state
                 ctrl.handleInput(OpEnum.fieldSelected(intValue))
-                // Prüfe, ob der State sich geändert hat (d.h. Hauskauf erfolgreich)
                 if (ctrl.state == beforeState) {
                   new Alert(AlertType.Error) {
                     initOwner(stage)

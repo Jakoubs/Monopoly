@@ -145,7 +145,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
         hgap = 8
         vgap = 8
         alignment = Pos.TopLeft
-        prefWrapLength = 320 // Breite, nach der umgebrochen wird
+        prefWrapLength = 320 
         children = controller.currentPlayer.getProperties(controller.board.fields).map { property =>
           createMonopolyCheckbox(property)
         }
