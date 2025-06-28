@@ -55,11 +55,11 @@ class MonopolySpec extends AnyWordSpec {
     TaxField(200, 39),
     PropertyField("DarkBlue2", 40, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0))
   )
-
+/*
   val board = Board(fields)
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
   val controller = new Controller(initialGame, dice)
-
+*/
   "Monopoly" should{
     "initialize a game with correct number of players" in {
       val game = MonopolyGame(

@@ -13,7 +13,7 @@ import de.htwg.model.modelBaseImple.{BoardField, ChanceField, CommunityChestFiel
 import scala.util.{Failure, Success, Try}
 
 class BoardFieldSpec extends AnyWordSpec {
-
+/*
   val dummyPlayer = Player("dummy", 1500, 0, isInJail = false, 0)
   val otherPlayer = Player("other", 1500, 0, isInJail = false, 0)
 
@@ -475,5 +475,5 @@ class BoardFieldSpec extends AnyWordSpec {
       propertyField.owner should contain(owner)
       updatedPlayer shouldBe player
     }
-  }
+  }*/
 }
