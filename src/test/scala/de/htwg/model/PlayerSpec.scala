@@ -25,7 +25,7 @@ class PlayerSpec extends AnyWordSpec {
 
     "increase consecutiveDoubles when incrementDoubles" in {
       val player = Player("TestPlayer", 100, 5)
-      val updatedPlayer = player.incrementDoubles()
+      val updatedPlayer = player.incrementDoubles
       updatedPlayer.consecutiveDoubles shouldEqual 1
     }
 
@@ -38,13 +38,13 @@ class PlayerSpec extends AnyWordSpec {
 
     "be released from Jail" in {
       val player = Player("TestPlayer", 100, 5, true, 0)
-      val updatedPlayer = player.releaseFromJail()
+      val updatedPlayer = player.releaseFromJail
       updatedPlayer.isInJail should be(false)
     }
 
     "go to Jail" in {
       val player = Player("TestPlayer", 100, 11, true, 0)
-      val updatedPlayer = player.goToJail()
+      val updatedPlayer = player.goToJail
       updatedPlayer.position shouldEqual 11
       updatedPlayer.isInJail should be(true)
     }
