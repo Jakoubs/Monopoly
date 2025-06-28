@@ -10,7 +10,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Scala Version](https://img.shields.io/badge/scala-3.3-red.svg)](https://www.scala-lang.org/download/)
 
-[Features](#-features) •
 [Installation](#-installation) •
 [Usage](#-usage) •
 [Contributing](#-contributing) •
@@ -28,9 +27,9 @@
 - 🏠 Property management system
 - 💰 Trading and auction mechanics
 - 🎲 Interactive dice rolling
-- 📊 Player statistics tracking
 - 🎯 State-based game progression
 - 🖥️ Text-based user interface (TUI)
+- 🖼️ Graphical user interface (GUI)
 
 ## 🚀 Installation
 
@@ -62,17 +61,6 @@ sbt clean coverage test
 
 ```bash
 sbt run
-```
-
-### Basic Commands
-
-```
-start   - Start a new game
-roll    - Roll the dice
-buy     - Purchase property
-pay     - Pay rent
-end     - End turn
-quit    - Exit game
 ```
 
 ### Game Flow
