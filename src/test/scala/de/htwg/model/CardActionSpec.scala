@@ -1,5 +1,6 @@
 package de.htwg.model
 
+import de.htwg.model.modelBaseImple.{CardMoveTo, CardToJail, FreeParkingField, GainMoney, LoseMoney, Player}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -7,7 +8,7 @@ class CardActionSpec extends AnyWordSpec {
 
   "GainMoney" should {
     "increase the player's balance by the given amount" in {
-      val player = Player("TestPlayer", 1000, 5)
+      val player = Player("TestPlayer", 1000, 5, isInJail = false, 0)
       val action = GainMoney(200)
       val updatedPlayer = action.apply(player)
       updatedPlayer.balance shouldEqual 1200
@@ -16,7 +17,7 @@ class CardActionSpec extends AnyWordSpec {
 
   "LoseMoney" should {
     "decrease the player's balance by the given amount" in {
-      val player = Player("TestPlayer", 1000, 5)
+      val player = Player("TestPlayer", 1000, 5, isInJail = false, 0)
       val action = LoseMoney(200)
       val freeParkingField = FreeParkingField(0)
       val (updatedPlayer, updatedField) = action.apply(player,freeParkingField)
@@ -26,7 +27,7 @@ class CardActionSpec extends AnyWordSpec {
 
   "CardToJail" should {
     "send the player to jail" in {
-      val player = Player("TestPlayer", 1000, 5)
+      val player = Player("TestPlayer", 1000, 5, isInJail = false, 0)
       val action = CardToJail
       val updatedPlayer = action.apply(player)
       updatedPlayer.isInJail shouldBe true
@@ -36,27 +37,27 @@ class CardActionSpec extends AnyWordSpec {
 
   "CardMoveTo" should {
     "move the player to the specified index" in {
-      val player = Player("TestPlayer", 1000, 5)
+      val player = Player("TestPlayer", 1000, 5, isInJail = false, 0)
       val action = CardMoveTo(10,false)
       val updatedPlayer = action.apply(player)
       updatedPlayer.position shouldEqual 10
     }
     "if collectMoney -> true collect money on Go" in{
-      val player = Player("TestPlayer", 1000, 30)
+      val player = Player("TestPlayer", 1000, 30, isInJail = false, 0)
       val action = CardMoveTo(1,true)
       val updatedPlayer = action.apply(player)
       updatedPlayer.position should be(1)
       updatedPlayer.balance should be(1200)
     }
     "if collectMoney -> false collect no money" in {
-      val player = Player("TestPlayer", 1000, 30)
+      val player = Player("TestPlayer", 1000, 30, isInJail = false, 0)
       val action = CardMoveTo(1, false)
       val updatedPlayer = action.apply(player)
       updatedPlayer.position should be(1)
       updatedPlayer.balance should be(1000)
     }
     "if collectMoney -> true and no move over GO collect no money" in {
-      val player = Player("TestPlayer", 1000, 30)
+      val player = Player("TestPlayer", 1000, 30, isInJail = false, 0)
       val action = CardMoveTo(35, true)
       val updatedPlayer = action.apply(player)
       updatedPlayer.position should be(35)

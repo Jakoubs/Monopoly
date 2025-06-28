@@ -1,19 +1,24 @@
-package de.htwg.model
-import de.htwg.MonopolyGame
-import de.htwg.model.PropertyField.*
-import scala.util.{Try, Success, Failure}
+package de.htwg.model.modelBaseImple
+
+import de.htwg.model.modelBaseImple.PropertyField
+import de.htwg.model._
+import de.htwg.model.IPlayer
+import de.htwg.model.IMonopolyGame
+import scala.util.{Failure, Success, Try}
+import de.htwg.model.modelBaseImple.SoundPlayer
 
 trait BuyableField extends BoardField {
   val price: Int
-  val owner: Option[Player]
+  val owner: Option[IPlayer]
 
-  def withNewOwner(player: Player): BoardField
+  def withNewOwner(player: IPlayer): BoardField
 
-  def buy(player: Player): (BoardField, Player) = {
+  def buy(player: IPlayer): (BoardField, IPlayer) = {
     owner match {
       case None if player.balance > price =>
         val updatedField = withNewOwner(player)
-        val updatedPlayer = player.copy(balance = player.balance - price)
+        val updatedPlayer = player.copyPlayer(balance = player.balance - price)
+        SoundPlayer().playBackground("src/main/resources/sound/Money.wav")
         (updatedField, updatedPlayer)
       case _ =>
         (this, player)
@@ -26,11 +31,11 @@ trait BoardField {
   val name: String
   val index: Int
 }
-case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner: Option[Player] = None,
+case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner: Option[IPlayer] = None,
                          color: PropertyField.Color, mortgage: PropertyField.Mortgage = PropertyField.Mortgage(),
                          house:PropertyField.House = PropertyField.House()) extends BoardField with BuyableField
                          {
-                           override def withNewOwner(player: Player): PropertyField = this.copy(owner = Some(player))
+                           override def withNewOwner(player: IPlayer): PropertyField = this.copy(owner = Some(player))
                            override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
                          }
   object PropertyField {
@@ -41,7 +46,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
         ((baseHousePrice + 9) / 10) * 10
       }
 
-      def buyHouse(player: Player, field: PropertyField, game: MonopolyGame): Try[(PropertyField, Player)] = {
+      def buyHouse(player: IPlayer, field: PropertyField, game: IMonopolyGame): Try[(PropertyField, IPlayer)] = {
         // Step 1: Check if the player owns the property.
         // We use flatMap on Try to chain operations. If the initial check fails, it immediately returns Failure.
         val checkOwnership: Try[Unit] = field.owner match {
@@ -77,7 +82,10 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
               checkColorGroup.map { _ =>
                 // If all checks pass, proceed with the purchase
                 val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
-                val updatedPlayer = player.copy(balance = player.balance - housePrice)
+                val updatedPlayer = player.copyPlayer(balance = player.balance - housePrice)
+                if(game.sound){
+                  SoundPlayer().playBackground("src/main/resources/sound/house.wav")
+                }
                 (updatedField, updatedPlayer)
               }
             }
@@ -103,8 +111,8 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
 case object GoField extends BoardField {
   override val index: Int = 1
   override val name: String = "GoField"
-  def addMoney(player: Player): Player = {
-    player.copy(balance = player.balance + 200)
+  def addMoney(player: IPlayer): IPlayer = {
+    player.copyPlayer(balance = player.balance + 200)
   }
 
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
@@ -118,8 +126,8 @@ case object JailField extends BoardField{
 case class GoToJailField() extends BoardField{
   override val index: Int = 31
   override val name: String = "GoToJail"
-  def goToJail(player: Player): Player = {
-    player.goToJail()
+  def goToJail(player: IPlayer): IPlayer = {
+    player.goToJail
   }
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
@@ -127,8 +135,8 @@ case class FreeParkingField(amount: Int) extends BoardField{
   override val index: Int = 21
   override val name: String = "FreeParking"
 
-  def apply(player: Player): Player = {
-    player.copy(balance = player.balance + amount)
+  def apply(player: IPlayer): IPlayer = {
+    player.copyPlayer(balance = player.balance + amount)
   }
 
   def resetAmount(): FreeParkingField = {
@@ -161,15 +169,15 @@ case class TaxField(amount: Int, index: Int) extends BoardField {
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 
 }
-case class TrainStationField(name: String ,index: Int, price: Int, owner: Option[Player]) extends BoardField with BuyableField
+case class TrainStationField(name: String ,index: Int, price: Int, owner: Option[IPlayer]) extends BoardField with BuyableField
 {
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
-  override def withNewOwner(player: Player): TrainStationField = this.copy(owner = Some(player))
+  override def withNewOwner(player: IPlayer): TrainStationField = this.copy(owner = Some(player))
 }
 
-case class UtilityField(name: String, index: Int, price: Int, utility: UtilityField.UtilityCheck,  owner: Option[Player]) extends BoardField with BuyableField
+case class UtilityField(name: String, index: Int, price: Int, utility: UtilityField.UtilityCheck,  owner: Option[IPlayer]) extends BoardField with BuyableField
 {
-  override def withNewOwner(player: Player): UtilityField = this.copy(owner = Some(player))
+  override def withNewOwner(player: IPlayer): UtilityField = this.copy(owner = Some(player))
   override def accept[T](visitor: FieldVisitor[T]): T = visitor.visit(this)
 }
   object UtilityField {

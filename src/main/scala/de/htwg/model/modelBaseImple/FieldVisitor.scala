@@ -1,6 +1,8 @@
-package de.htwg.model
+package de.htwg.model.modelBaseImple
 
 import de.htwg.Board
+import de.htwg.model.modelBaseImple.{Player}
+import de.htwg.model.IPlayer
 
 trait FieldVisitor[T] {
   def visit(property: PropertyField): T
@@ -14,7 +16,7 @@ trait FieldVisitor[T] {
   def visit(other: BoardField): T
 }
 
-class RentVisitor(currentPlayer: Player, allPlayers: Vector[Player], board: Board, diceResult: Int, ownedProperties: Map[Player, List[PropertyField]], ownedTrainStations: Map[Player, Int], ownedUtilities: Map[Player, Int]) extends FieldVisitor[Int] {
+class RentVisitor(currentPlayer: IPlayer, allPlayers: Vector[IPlayer], board: Board, diceResult: Int, ownedProperties: Map[IPlayer, List[PropertyField]], ownedTrainStations: Map[IPlayer, Int], ownedUtilities: Map[IPlayer, Int]) extends FieldVisitor[Int] {
   override def visit(field: PropertyField): Int = {
     if (field.owner.isEmpty || field.owner.get == currentPlayer) {
       0

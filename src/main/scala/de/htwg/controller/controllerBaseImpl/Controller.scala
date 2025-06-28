@@ -1,14 +1,24 @@
-package de.htwg.controller
+package de.htwg.controller.controllerBaseImpl
 
-import de.htwg.model.{BoardPrinter, Player, SoundPlayer, *}
-import de.htwg.model.PropertyField.calculateRent
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.controller.controllerBaseImpl.{GameState, OpEnum, TurnInfo}
+import de.htwg.model.*
+import de.htwg.model.modelBaseImple.PropertyField.calculateRent
+import de.htwg.model.modelBaseImple.*
 import de.htwg.util.util.Observable
-import de.htwg.controller.GameState
+import de.htwg.view.BoardPrinter
+import de.htwg.Board
+import de.htwg.model.modelBaseImple.MonopolyGame
+import de.htwg.model.IPlayer
+import de.htwg.controller.IController
+import de.htwg.model.FileIOComponent.IFileIO
+import de.htwg.model.FileIOComponent.JSONFileIO
+import de.htwg.model.FileIOComponent.XMLFileIO
+import de.htwg.model.FileIOComponent.{SaveManager}
 
 import java.awt.Choice
 import scala.collection.mutable
 import scala.io.StdIn.readLine
+import scala.util.{Failure, Success, Try}
 
 enum OpEnum:
   case roll
@@ -21,6 +31,8 @@ enum OpEnum:
   case fieldSelected(id: Int)
   case undo
   case redo
+  case SaveWithName(name: String)
+  case LoadWithName(name: String)
 
 case class TurnInfo(
                      diceRoll1: Int = 0,
@@ -29,54 +41,61 @@ case class TurnInfo(
                      boughtProperty: Option[BoardField] = None,
                      builtHouse: Option[PropertyField] = None,
                      paidRent: Option[Int] = None,
-                     rentPaidTo: Option[Player] = None
+                     rentPaidTo: Option[IPlayer] = None
                    )
 
-class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
+class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IController with Observable{
+  given controller: Controller = this
   var currentTurnInfo: TurnInfo = TurnInfo()
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()
 
   def getTurnInfo: TurnInfo = currentTurnInfo
-  def updateTurnInfo(newInfo: TurnInfo): Unit = { // Setter-Methode
+
+  def updateTurnInfo(newInfo: TurnInfo): Unit = {
     currentTurnInfo = newInfo
   }
 
 
   var state: GameState = StartTurnState()
-  def currentPlayer: Player = game.currentPlayer
+  def currentPlayer: IPlayer = game.currentPlayer
   def board: Board = game.board
-  def players: Vector[Player] = game.players
+  def players: Vector[IPlayer] = game.players
   def sound: Boolean = game.sound
 
   def handleInput(input: OpEnum): Unit = {
+    given Controller = this
     input match {
       case OpEnum.undo => undo()
       case OpEnum.redo => redo()
+      case OpEnum.SaveWithName(name) =>
+        saveSlot(name)
+      case OpEnum.LoadWithName(name) =>
+        loadSlot(name)
+
       case _ =>
-        state = state.handle(input, this)
+        state = state.handle(input)
+        println(state)
     }
     notifyObservers()
 
   }
-
-  def updatePlayer(player: Player): Unit = {
-    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.copy(players = updatedPlayers, currentPlayer = player)
+  def updatePlayers(players: Vector[IPlayer]): Unit = {
+    game = game.withUpdatedPlayers(players)
+  }
+  def updatePlayer(newPlayer: IPlayer): Unit = {
+    game = game.withUpdatedPlayer(newPlayer)
   }
 
-  def updateBoardAndPlayer(field: BoardField, player: Player): Unit = {
-    val updatedFields = game.board.fields.updated(field.index-1, field)
-    val updatedBoard = game.board.copy(fields = updatedFields)
-    val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), player)
-    game = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = player)
+  def setBoard(board: Board): Unit = {
+    game = game.withUpdatedBoard(board)
+  }
+  def updateBoardAndPlayer(field: BoardField, player: IPlayer): Unit = {
+    game = game.withUpdatedBoardAndPlayer(field, player)
   }
 
   def switchToNextPlayer(): Unit = {
-    val currentIndex = game.players.indexOf(game.currentPlayer)
-    val nextIndex = (currentIndex + 1) % game.players.size
-    val nextPlayer = game.players(nextIndex)
-    game = game.copy(currentPlayer = nextPlayer)
+    game = game.withNextPlayer
   }
 
   def executeCommand(cmd: Command): Unit = {
@@ -87,6 +106,27 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
     redoStack.clear()
   }
 
+  def saveSlot(slotName: String): Try[Unit] = {
+    val path = SaveManager.slotPath(slotName)
+    fileIO.save(game, path)
+  }
+
+  def loadSlot(slotName: String): Try[Unit] = {
+    val path = SaveManager.slotPath(slotName)
+    println(path)
+    fileIO.load(path) match {
+      case Success(loaded) =>
+        game = loaded
+        notifyObservers()
+        Success(())
+      case Failure(err) =>
+        println(s"❌ Fehler beim Laden: ${err.getMessage}")
+        Failure(err)
+    }
+  }
+
+  def availableSlots: Vector[String] = SaveManager.listSlots
+
   def undo(): Unit = {
     if (undoStack.nonEmpty) {
       val cmd = undoStack.pop()
@@ -94,6 +134,11 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       cmd.previousGameStates.foreach(state = _) 
       redoStack.push(cmd)
     }
+  }
+
+  def setState(newState: GameState): Unit = {
+    state = newState
+    notifyObservers()
   }
 
   def redo(): Unit = {
@@ -124,14 +169,14 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
         s"In Jail: ${if (p.isInJail) "Yes" else "No"}"
   }
 
-  def getOwnedProperties(): Map[Player, List[PropertyField]] = {
+  def getOwnedProperties(): Map[IPlayer, List[PropertyField]] = {
     board.fields.collect {
         case p: PropertyField if p.owner.isDefined => (p.owner.get, p)
       }.groupBy(_._1)
       .map { case (player, tuples) => player -> tuples.map(_._2).toList }
   }
 
-  def getOwnedTrainStations(): Map[Player, Int] = {
+  def getOwnedTrainStations(): Map[IPlayer, Int] = {
     board.fields.collect {
         case t: TrainStationField if t.owner.isDefined => (t.owner.get, 1)
       }.groupBy(_._1)
@@ -140,7 +185,7 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       .toMap
   }
 
-  def getOwnedUtilities(): Map[Player, Int] = {
+  def getOwnedUtilities(): Map[IPlayer, Int] = {
     board.fields.collect {
         case u: UtilityField if u.owner.isDefined => (u.owner.get, 1)
       }.groupBy(_._1)
@@ -148,7 +193,5 @@ class Controller(var game: MonopolyGame, val dice: Dice) extends Observable{
       .mapValues(_.size)
       .toMap
   }
-
-
 }
 

@@ -1,0 +1,73 @@
+/* dark_mode.css */
+
+/* Allgemeine Dark Mode Einstellungen für die Szene (optional, aber empfohlen für Konsistenz) */
+.root {
+    -fx-base: #303030;
+    -fx-background: #212121;
+    -fx-control-inner-background: #424242;
+    -fx-background-color: #212121;
+    -fx-text-fill: #E0E0E0;
+    -fx-text-box-border: #616161;
+    -fx-border-color: #616161;
+    -fx-body-color: #424242;
+}
+
+.button {
+    -fx-background-color: #555555;
+    -fx-text-fill: #E0E0E0;
+    -fx-border-color: #757575;
+    -fx-border-radius: 3;
+}
+
+.button:hover {
+    -fx-background-color: #616161;
+}
+
+.button:pressed {
+    -fx-background-color: #424242;
+}
+
+.label {
+    -fx-text-fill: #E0E0E0;
+}
+
+.text-input {
+    -fx-control-inner-background: #424242;
+    -fx-text-fill: #E0E0E0;
+    -fx-highlight-fill: #4CAF50;
+    -fx-highlight-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #B0B0B0;
+    -fx-border-color: #616161;
+}
+
+/* --- Speziell für den Dialog-Hintergrund --- */
+.dark-dialog-pane {
+    -fx-background-color: #000000; /* Reines Schwarz für den Hintergrund */
+    -fx-control-inner-background: #212121; /* Dunkler für Eingabefelder im Dialog */
+    -fx-text-fill: #E0E0E0; /* Helle Textfarbe für alle Labels im Dialog */
+}
+
+/* Spezifische Anpassungen für Buttons im Dialog (z.B. OK/Cancel) */
+.dark-dialog-pane .button {
+    -fx-background-color: #424242;
+    -fx-text-fill: #E0E0E0;
+    -fx-border-color: #616161;
+}
+
+.dark-dialog-pane .button:hover {
+    -fx-background-color: #555555;
+}
+
+.dark-dialog-pane .label {
+    -fx-text-fill: #E0E0E0;
+}
+
+/* Header-Bereich im Dialog */
+.dark-dialog-pane .header-panel {
+    -fx-background-color: #1a1a1a; /* Etwas heller als der Hintergrund, aber immer noch dunkel */
+}
+
+/* Inhaltsteil des Dialogs */
+.dark-dialog-pane .content {
+    -fx-background-color: #000000;
+}

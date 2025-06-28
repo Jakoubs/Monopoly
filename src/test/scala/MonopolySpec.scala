@@ -1,9 +1,11 @@
-import de.htwg.controller.Controller
+import de.htwg.controller.controllerBaseImpl.Controller
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
-import de.htwg.{Board, Monopoly, MonopolyGame}
+import de.htwg.{Board, Monopoly}
+import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.*
-import de.htwg.model.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.PropertyField.Color.*
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.view.Tui
 
 class MonopolySpec extends AnyWordSpec {
@@ -53,11 +55,11 @@ class MonopolySpec extends AnyWordSpec {
     TaxField(200, 39),
     PropertyField("DarkBlue2", 40, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0))
   )
-
+/*
   val board = Board(fields)
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
   val controller = new Controller(initialGame, dice)
-
+*/
   "Monopoly" should{
     "initialize a game with correct number of players" in {
       val game = MonopolyGame(
@@ -77,16 +79,16 @@ class MonopolySpec extends AnyWordSpec {
     }
 
     "not generate duplicate emojis" in {
-      val existingPlayers = Vector(Player("🐶", 1500, 1))
+      val existingPlayers = Vector(Player("🐶", 1500, 1, false, 0))
       val emoji = Monopoly.randomEmoji(existingPlayers)
       emoji should not be "🐶"
     }
 
     "initialize board with correct fields" in {
       val game = MonopolyGame(
-        Vector(Player("🐶", 1500, 1)),
+        Vector(Player("🐶", 1500, 1, false, 0)),
         Board(Vector(GoField)),
-        Player("🐶", 1500, 1),
+        Player("🐶", 1500, 1, false, 0),
         false
       )
       game.board.fields.size should be >= 1

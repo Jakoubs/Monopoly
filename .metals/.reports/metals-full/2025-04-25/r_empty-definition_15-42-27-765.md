@@ -13,12 +13,14 @@ non-local guesses:
 offset: 11444
 uri: file://<WORKSPACE>/src/main/scala/de/htwg/Monopoly.scala
 text:
+
 ```scala
 package de.htwg.model
-import de.htwg.model.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
+
+import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
 import de.htwg.model.PropertyField
 import de.htwg.model.SoundPlayer
-import de.htwg.model.PropertyField.calculateRent
+import de.htwg.model.modelBaseImple.PropertyField.calculateRent
 import scala.io.StdIn.readLine
 import scala.util.Random
 
@@ -41,7 +43,7 @@ object Monopoly:
 
       val nextPlayer = updatedPlayers((updatedPlayers.indexOf(updatedPlayer) + 1) % updatedPlayers.size)
 
-      game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer,board = updatedBoard)
+      game = game.copy(players = updatedPlayers, currentPlayer = nextPlayer, board = updatedBoard)
 
       printBoard(game)
     }
@@ -68,10 +70,11 @@ object Monopoly:
     val updatedPlayer = player.copy(position = newPosition)
     val updatedPlayers = game.players.updated(game.players.indexOf(game.currentPlayer), updatedPlayer)
     val updatedGame = game.copy(players = updatedPlayers, currentPlayer = updatedPlayer)
-    val gameRolled =  handleFieldAction(updatedGame, newPosition)
+    val gameRolled = handleFieldAction(updatedGame, newPosition)
     val finalGame = handleOptionalActions(gameRolled)
     finalGame
   }
+
   def handleOptionalActions(currentGame: MonopolyGame): MonopolyGame = {
     println("Do you want to do anything else? |1. Buy House|2.Trade|3.Mortage| => (1/2/3/x)")
     val input = readLine()
@@ -94,7 +97,7 @@ object Monopoly:
   }
 
 
-  def caseDiceJail(game: MonopolyGame):MonopolyGame = {
+  def caseDiceJail(game: MonopolyGame): MonopolyGame = {
     val (dice1, dice2) = Dice().rollDice(game.sound)
     val isDoubles = dice1 == dice2
     println(s"You rolled $dice1 and $dice2")
@@ -151,6 +154,7 @@ object Monopoly:
       }
     }
   }
+
   def handleJailTurn(game: MonopolyGame): MonopolyGame = {
     println(s"${game.currentPlayer.name}, you are in jail!")
     println("Options to get out of jail:")
@@ -191,19 +195,20 @@ object Monopoly:
       case _ => caseDiceJail(game)
     }
   }
+
 def handleFieldAction(game: MonopolyGame, position: Int): MonopolyGame = {
   val field = game.board.fields.find(_.index == position).getOrElse(throw new Exception(s"Field at position $position not found"))
   val updatedGame = field match {
     case goToJail: GoToJailField => handleGoToJailField(game)
     case taxF: TaxField => handleTaxField(game, taxF.amount)
     case freeP: FreeParkingField => handleFreeParkingField(game, freeP)
-    case pf: PropertyField => handlePropertyField(game, pf)
+    case pf: modelBaseImple.PropertyField => handlePropertyField(game, pf)
     //case tf: TrainStationField => handlePropertyField(game, tf)
     case _ => game
   }
   updatedGame
 }
-def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGame = {
+def handlePropertyField(game: MonopolyGame, property: modelBaseImple.PropertyField): MonopolyGame = {
   property.owner match {
     case None =>
       println(s"Property (${property.name}) is available for ${property.price}$$")
@@ -211,7 +216,7 @@ def handlePropertyField(game: MonopolyGame, property: PropertyField): MonopolyGa
       val response = readLine().trim.toLowerCase
       if (response == "y") {
         val (updatedGame) = buyProperty(game, property.index, game.currentPlayer)
-        if(game.sound) {
+        if (game.sound) {
           SoundPlayer().playAndWait("src/main/resources/Money.wav")
         }
         updatedGame
@@ -293,7 +298,7 @@ def handleFreeParkingField(game: MonopolyGame, freeP: FreeParkingField): Monopol
     val collectedAmount = freeP.amount
     val updatedPlayer = game.currentPlayer.copy(balance = game.currentPlayer.balance + collectedAmount)
     val updatedPlayers = game.players.updated(playerIndex, updatedPlayer)
-    val updatedBoard = game.board.copy(fields = game.board.fields.updated(freeP.index-1, freeP.copy(amount = 0)))
+    val updatedBoard = game.board.copy(fields = game.board.fields.updated(freeP.index - 1, freeP.copy(amount = 0)))
     game.copy(players = updatedPlayers, board = updatedBoard)
   } else {
     println(s"Fehler: Spieler ${game.currentPlayer.name} nicht gefunden!")
@@ -304,162 +309,162 @@ def handleFreeParkingField(game: MonopolyGame, freeP: FreeParkingField): Monopol
 def randomEmoji(vektor: Vector[Player]): String = {
   val emojis = List(
     "🐶", "🐱", "🐯", "🦁")
-  val availableEmojis = emojis.filte@@rNot(e => vektor.exists(_.name == e))
+  val availableEmojis = emojis.filte @@ rNot(e => vektor.exists(_.name == e))
   Random.shuffle(availableEmojis).headOption.getOrElse("🐾")
 }
 
-  def defineGame(): MonopolyGame = {
-    println("play with sound? (y/n)")
-    val soundInput = readLine()
-    val isTestBoard = soundInput == "yT" || soundInput == "nT"
-    val soundBool = soundInput == "y" || soundInput == "yT"
-    
-    if(soundBool){
+def defineGame(): MonopolyGame = {
+  println("play with sound? (y/n)")
+  val soundInput = readLine()
+  val isTestBoard = soundInput == "yT" || soundInput == "nT"
+  val soundBool = soundInput == "y" || soundInput == "yT"
+
+  if (soundBool) {
     SoundPlayer().playBackground("src/main/resources/MonopolyJazz.wav")
-    }
-    //if(!isTestBoard) {
-
-    var playerVector = Vector[Player]()
-
-    def askForPlayerCount(): Int = {
-      println("How many Player? (2-4):")
-      val input = scala.io.StdIn.readLine()
-      try {
-        val playerCount = input.toInt
-        if (playerCount >= 2 && playerCount <= 4) {
-          playerCount
-        } else {
-          println("Invalid player count. Please enter a number between 2 and 4.")
-          askForPlayerCount()
-        }
-      } catch {
-        case _: NumberFormatException =>
-          println("Invalid input. Please enter a number.")
-          askForPlayerCount()
-      }
-    }
-
-    val playerAnz = askForPlayerCount()
-
-      for (i <- 1 to playerAnz) {
-        val playerName = randomEmoji(playerVector)
-        playerVector = playerVector.appended(Player(playerName, 1500, 1))
-        println(s"Spieler $playerName hinzugefügt.")
-      }
-
-
-      val board = Board(
-        Vector(
-          GoField,
-          PropertyField("brown1",2,100,10,Some("🐶"),color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          CommunityChestField(3),
-          PropertyField("brown2",4,100,10,Some("🐶"),color = Brown,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          TaxField(100,5),
-          TrainStationField("Marklylebone Station",6,None),
-          PropertyField("lightBlue1",7,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          ChanceField(8),
-          PropertyField("lightBlue2",9,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          PropertyField("lightBlue3",10,100,10,None,color = LightBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          JailField,
-          PropertyField("Pink1",12,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          UtilityField("Electric Company", 13, None),
-          PropertyField("Pink2",14,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          PropertyField("Pink3",15,100,10,None,color = Pink,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          TrainStationField("Fenchurch ST Station",16,None),
-          PropertyField("Orange1",17,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          CommunityChestField(18),
-          PropertyField("Orange2",19,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          PropertyField("Orange3",20,100,10,None,color = Orange,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          FreeParkingField(0),
-          PropertyField("Red1",22,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          ChanceField(23),
-          PropertyField("Red2",24,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          PropertyField("Red3",25,100,10,None,color = Red,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          TrainStationField("Kings Cross Station",26,None),
-          PropertyField("Yellow1",27,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          PropertyField("Yellow2",28,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          UtilityField("Water Works",29,None),
-          PropertyField("Yellow3",30,100,10,None,color = Yellow,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          GoToJailField(),
-          PropertyField("Green1",32,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          PropertyField("Green2",33,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          ChanceField(34),
-          PropertyField("Green3",35,100,10,None,color = Green,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          TrainStationField("Liverpool ST Station",36,None),
-          ChanceField(37),
-          PropertyField("Blue1",38,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-          TaxField(200,39),
-          PropertyField("Blue2",40,100,10,None,color = DarkBlue,PropertyField.Mortgage(10,false),PropertyField.House(0)),
-        )
-      )
-      val game = MonopolyGame(playerVector, board, playerVector.head, soundBool)
-      println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
-      game
-    //} else {}
   }
-  def colorize(text: String, field: BoardField): String={
-    field match
-      case pf: Propertyfield => pf.color match
-        case Red: Color => "\u001B[31m" + pf.index + "\u001B[37m"
-        case _ => text
+  //if(!isTestBoard) {
+
+  var playerVector = Vector[Player]()
+
+  def askForPlayerCount(): Int = {
+    println("How many Player? (2-4):")
+    val input = scala.io.StdIn.readLine()
+    try {
+      val playerCount = input.toInt
+      if (playerCount >= 2 && playerCount <= 4) {
+        playerCount
+      } else {
+        println("Invalid player count. Please enter a number between 2 and 4.")
+        askForPlayerCount()
+      }
+    } catch {
+      case _: NumberFormatException =>
+        println("Invalid input. Please enter a number.")
+        askForPlayerCount()
+    }
+  }
+
+  val playerAnz = askForPlayerCount()
+
+  for (i <- 1 to playerAnz) {
+    val playerName = randomEmoji(playerVector)
+    playerVector = playerVector.appended(Player(playerName, 1500, 1))
+    println(s"Spieler $playerName hinzugefügt.")
+  }
+
+
+  val board = Board(
+    Vector(
+      GoField,
+      PropertyField("brown1", 2, 100, 10, Some("🐶"), color = Brown, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      CommunityChestField(3),
+      PropertyField("brown2", 4, 100, 10, Some("🐶"), color = Brown, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      TaxField(100, 5),
+      TrainStationField("Marklylebone Station", 6, None),
+      PropertyField("lightBlue1", 7, 100, 10, None, color = LightBlue, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      ChanceField(8),
+      PropertyField("lightBlue2", 9, 100, 10, None, color = LightBlue, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      PropertyField("lightBlue3", 10, 100, 10, None, color = LightBlue, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      JailField,
+      PropertyField("Pink1", 12, 100, 10, None, color = Pink, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      UtilityField("Electric Company", 13, None),
+      PropertyField("Pink2", 14, 100, 10, None, color = Pink, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      PropertyField("Pink3", 15, 100, 10, None, color = Pink, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      TrainStationField("Fenchurch ST Station", 16, None),
+      PropertyField("Orange1", 17, 100, 10, None, color = Orange, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      CommunityChestField(18),
+      PropertyField("Orange2", 19, 100, 10, None, color = Orange, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      PropertyField("Orange3", 20, 100, 10, None, color = Orange, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      FreeParkingField(0),
+      PropertyField("Red1", 22, 100, 10, None, color = Red, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      ChanceField(23),
+      PropertyField("Red2", 24, 100, 10, None, color = Red, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      PropertyField("Red3", 25, 100, 10, None, color = Red, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      TrainStationField("Kings Cross Station", 26, None),
+      PropertyField("Yellow1", 27, 100, 10, None, color = Yellow, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      PropertyField("Yellow2", 28, 100, 10, None, color = Yellow, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      UtilityField("Water Works", 29, None),
+      PropertyField("Yellow3", 30, 100, 10, None, color = Yellow, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      GoToJailField(),
+      PropertyField("Green1", 32, 100, 10, None, color = Green, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      PropertyField("Green2", 33, 100, 10, None, color = Green, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      ChanceField(34),
+      PropertyField("Green3", 35, 100, 10, None, color = Green, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      TrainStationField("Liverpool ST Station", 36, None),
+      ChanceField(37),
+      PropertyField("Blue1", 38, 100, 10, None, color = DarkBlue, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+      TaxField(200, 39),
+      PropertyField("Blue2", 40, 100, 10, None, color = DarkBlue, modelBaseImple.PropertyField.Mortgage(10, false), modelBaseImple.PropertyField.House(0)),
+    )
+  )
+  val game = MonopolyGame(playerVector, board, playerVector.head, soundBool)
+  println(s"Spiel gestartet mit ${playerVector.size} Spielern.")
+  game
+  //} else {}
+}
+def colorize(text: String, field: BoardField): String = {
+  field match
+    case pf: Propertyfield => pf.color match
+      case Red: Color => "\u001B[31m" + pf.index + "\u001B[37m"
       case _ => text
-  }
+    case _ => text
+}
 
-  def printBoard(game: MonopolyGame): Unit = {
-    printTop(game)
-    printSides(game)
-    printBottom(game)
-  }
+def printBoard(game: MonopolyGame): Unit = {
+  printTop(game)
+  printSides(game)
+  printBottom(game)
+}
 
-  def printTop(game: MonopolyGame): Unit = {
-    val fieldNames = game.board.fields.slice(0, 4)
+def printTop(game: MonopolyGame): Unit = {
+  val fieldNames = game.board.fields.slice(0, 4)
 
-      val fieldData1 = formatField(fieldNames.lift(0))
-      val fieldData2 = formatField(fieldNames.lift(1))
-      val fieldData3 = formatField(fieldNames.lift(2))
-      val fieldData4 = formatField(fieldNames.lift(3))
+  val fieldData1 = formatField(fieldNames.lift(0))
+  val fieldData2 = formatField(fieldNames.lift(1))
+  val fieldData3 = formatField(fieldNames.lift(2))
+  val fieldData4 = formatField(fieldNames.lift(3))
 
-    
-    val (stats1, stats2, stats3, stats4) = getStats(game)
 
-    val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+" 
+  val (stats1, stats2, stats3, stats4) = getStats(game)
 
-    val baseLines = List(
-      "|  ______  _____  |",
-      "| |  ____ |     | |",
-      "| |_____| |_____| |"
-    )
+  val line1 = "+-----------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+-----------------+"
 
-    val fields2To10 = game.board.fields.filter(field => field.index > 1 && field.index < 11)
+  val baseLines = List(
+    "|  ______  _____  |",
+    "| |  ____ |     | |",
+    "| |_____| |_____| |"
+  )
 
-    val line2 = fields2To10.foldLeft(baseLines(0))((line, field) =>
-      line + fillSpace(("Nr" + colorize(field.index.toString, field) + getExtra(field)), 8) + "|") + "                 |"
+  val fields2To10 = game.board.fields.filter(field => field.index > 1 && field.index < 11)
 
-    val line3 = fields2To10.foldLeft(baseLines(1))((line, field) =>
-      line + fillSpace(getPrice(field), 8) + '|') + "__________       |"
+  val line2 = fields2To10.foldLeft(baseLines(0))((line, field) =>
+    line + fillSpace(("Nr" + colorize(field.index.toString, field) + getExtra(field)), 8) + "|") + "                 |"
 
-    val line4 = fields2To10.foldLeft(baseLines(2))((line, field) =>
-      line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |" + " " * 18 + "ALL FIELDS:"
+  val line3 = fields2To10.foldLeft(baseLines(1))((line, field) =>
+    line + fillSpace(getPrice(field), 8) + '|') + "__________       |"
 
-    val additionalLines = List(
-      "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |" + " " * 20 + "Index: 2, GoField",
-      "|  ssssssssSSSS   |  " + fillSpace(stats1, 76) + "  |          |      |" + " " * 20 + fieldData1,
-      "|          ;:`    |  " + fillSpace(stats2, 76) + "  |          |      |" + " " * 20 + fieldData2,
-      "|" + fillSpace(playersOnIndex(1, game, false), 17) + "|  " + fillSpace(stats3, 76) + "  |" + fillSpace(playersOnIndex(11, game, true), 10) + "|" + fillSpace(playersOnIndex(11, game, false), 6) + "|" + " " * 20 + fieldData3,
-      "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+" + " " * 20 + fieldData4 
-    )
+  val line4 = fields2To10.foldLeft(baseLines(2))((line, field) =>
+    line + fillSpace(playersOnIndex(field.index, game, false), 8) + '|') + "  JAIL    |      |" + " " * 18 + "ALL FIELDS:"
 
-    println(line1)
-    println(line2)
-    println(line3)
-    println(line4)
-    additionalLines.foreach(println)
-  }
+  val additionalLines = List(
+    "|          Ss.    |--------+--------+--------+--------+--------+--------+--------+--------+--------+          |      |" + " " * 20 + "Index: 2, GoField",
+    "|  ssssssssSSSS   |  " + fillSpace(stats1, 76) + "  |          |      |" + " " * 20 + fieldData1,
+    "|          ;:`    |  " + fillSpace(stats2, 76) + "  |          |      |" + " " * 20 + fieldData2,
+    "|" + fillSpace(playersOnIndex(1, game, false), 17) + "|  " + fillSpace(stats3, 76) + "  |" + fillSpace(playersOnIndex(11, game, true), 10) + "|" + fillSpace(playersOnIndex(11, game, false), 6) + "|" + " " * 20 + fieldData3,
+    "+--------+--------+  " + fillSpace(stats4, 76) + "  +--------+-+------+" + " " * 20 + fieldData4
+  )
+
+  println(line1)
+  println(line2)
+  println(line3)
+  println(line4)
+  additionalLines.foreach(println)
+}
 
 def printFieldsData(game: MonopolyGame, x: Int): (String, String, String, String) = {
   val batchIndex = x - 12
   val startIdx = batchIndex * 4 + 5
-  
+
   val fieldNames = game.board.fields.slice(startIdx, startIdx + 4)
 
   (
@@ -480,25 +485,24 @@ def formatField(optField: Option[BoardField]): String = {
 }
 
 
+def printSides(game: MonopolyGame): Unit = {
+  (12 to 20).foreach { a =>
+    val fieldA = game.board.fields.find(_.index == 52 - a).get
+    val fieldB = game.board.fields.find(_.index == a).get
 
-  def printSides(game: MonopolyGame): Unit = {
-    (12 to 20).foreach { a =>
-      val fieldA = game.board.fields.find(_.index == 52 - a).get
-      val fieldB = game.board.fields.find(_.index == a).get
+    val (fieldData1, fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
 
-      val (fieldData1,fieldData2, fieldData3, fieldData4) = printFieldsData(game, a)
+    val lines = List(
+      '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1,
+      '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2,
+      '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3,
+      if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
+      else "+--------+--------+                                                                                +--------+--------+"
+    )
 
-      val lines = List(
-        '|' + fillSpace(fillSpace(fieldA.index.toString + getExtra(fieldA), 8) + '|', 107) + '|' + fillSpace(fieldB.index.toString + getExtra(fieldB), 8) + '|' + " " * 20 + fieldData1,
-        '|' + fillSpace(fillSpace(getPrice(fieldA), 8) + '|', 107) + '|' + fillSpace(getPrice(fieldB), 8) + '|' + " " * 20 + fieldData2, 
-        '|' + fillSpace(fillSpace(playersOnIndex(52 - a, game, false), 8) + '|', 107) + '|' + fillSpace(playersOnIndex(a, game, false), 8) + '|' + " " * 20 + fieldData3,
-        if (a != 20) "+--------+                                                                                                  +--------+" + " " * 20 + fieldData4
-        else "+--------+--------+                                                                                +--------+--------+"
-      )
-
-      lines.foreach(println)
-    }
+    lines.foreach(println)
   }
+}
 
 def printBottom(game: MonopolyGame): Unit = {
   val fixedLines = List(
@@ -541,31 +545,31 @@ def printBottom(game: MonopolyGame): Unit = {
   println(line9)
 }
 
-  def fillSpace(input: String, maxChar: Int): String = {
-    input.padTo(maxChar, ' ')
-  }
+def fillSpace(input: String, maxChar: Int): String = {
+  input.padTo(maxChar, ' ')
+}
 
-  def getPrice(field: BoardField): String = {
-    field match {
-      case pf: PropertyField => pf.price.toString + '$'
-      case tf: TrainStationField => "200$"
-      case fp: FreeParkingField => fp.amount.toString + '$'
-      case _ => ""
-    }
+def getPrice(field: BoardField): String = {
+  field match {
+    case pf: modelBaseImple.PropertyField => pf.price.toString + '$'
+    case tf: TrainStationField => "200$"
+    case fp: FreeParkingField => fp.amount.toString + '$'
+    case _ => ""
   }
-  def getName(field: BoardField): String = {
-    field match {
-      case pf: PropertyField => pf.name.toString
-      case tf: TrainStationField => tf.name
-      case fp: FreeParkingField => "FreeParking"
-      case cf: CommunityChestField => "CommunityChest"
-      case _ => ""
-    }
+}
+def getName(field: BoardField): String = {
+  field match {
+    case pf: modelBaseImple.PropertyField => pf.name.toString
+    case tf: TrainStationField => tf.name
+    case fp: FreeParkingField => "FreeParking"
+    case cf: CommunityChestField => "CommunityChest"
+    case _ => ""
   }
+}
 
 def getExtra(field: BoardField): String = {
   field match {
-    case pf: PropertyField =>
+    case pf: modelBaseImple.PropertyField =>
       pf.owner match {
         case Some(ownerName) => s" $ownerName${pf.house.amount}"
         case None => ""
@@ -584,35 +588,35 @@ def getExtra(field: BoardField): String = {
   }
 }
 
-  def playersOnIndex(idx: Int, game: MonopolyGame, inJail: Boolean): String = {
-    game.players
-      .filter(p => p.position == idx && p.isInJail == inJail)
-      .map(_.name + " ")
-      .mkString
+def playersOnIndex(idx: Int, game: MonopolyGame, inJail: Boolean): String = {
+  game.players
+    .filter(p => p.position == idx && p.isInJail == inJail)
+    .map(_.name + " ")
+    .mkString
+}
+
+def getStats(game: MonopolyGame): (String, String, String, String) = {
+  val playerInfos = game.players.map(p =>
+    p.name + " pos[" + p.position + "], balance[" + p.balance + "], isInJail[" + p.isInJail + "]    "
+  )
+
+  playerInfos.foldLeft(("", "", "", "")) {
+    case ((s1, s2, s3, s4), info) =>
+      if (s1.length < 20) (s1 + info, s2, s3, s4)
+      else if (s2.length < 20) (s1, s2 + info, s3, s4)
+      else if (s3.length < 20) (s1, s2, s3 + info, s4)
+      else (s1, s2, s3, s4 + info)
   }
-
-  def getStats(game: MonopolyGame): (String, String, String, String) = {
-    val playerInfos = game.players.map(p =>
-      p.name + " pos[" + p.position + "], balance[" + p.balance + "], isInJail[" + p.isInJail + "]    "
-    )
-
-    playerInfos.foldLeft(("", "", "", "")) {
-      case ((s1, s2, s3, s4), info) =>
-        if (s1.length < 20) (s1 + info, s2, s3, s4)
-        else if (s2.length < 20) (s1, s2 + info, s3, s4)
-        else if (s3.length < 20) (s1, s2, s3 + info, s4)
-        else (s1, s2, s3, s4 + info)
-    }
-  }
+}
 
 
-  def getInventory(game: MonopolyGame): String = {
+def getInventory(game: MonopolyGame): String = {
   val header = s"INVENTORY Player: ${game.currentPlayer.name}| "
   val inventoryItems = StringBuilder(header)
 
   for (field <- game.board.fields) {
     field match {
-      case pf: PropertyField if pf.owner.contains(game.currentPlayer.name) =>
+      case pf: modelBaseImple.PropertyField if pf.owner.contains(game.currentPlayer.name) =>
         inventoryItems.append(s"idx:${pf.index}[${pf.house.amount}], ")
       case ts: TrainStationField if ts.owner.contains(game.currentPlayer.name) =>
         inventoryItems.append(s"idx:${ts.index}, ")
@@ -630,156 +634,156 @@ def getExtra(field: BoardField): String = {
 }
 
 
-  def buyHouse(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame) = {
-    val fieldOption = game.board.fields.find(_.index == propertyIndex)
+def buyHouse(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame) = {
+  val fieldOption = game.board.fields.find(_.index == propertyIndex)
 
-    fieldOption match {
-      case Some(field: PropertyField) =>
-        field.owner match {
-          case Some(owner) if owner == player.name =>
+  fieldOption match {
+    case Some(field: modelBaseImple.PropertyField) =>
+      field.owner match {
+        case Some(owner) if owner == player.name =>
 
-            val colorProperties = game.board.fields.collect {
-              case pf: PropertyField if pf.color == field.color => pf
+          val colorProperties = game.board.fields.collect {
+            case pf: modelBaseImple.PropertyField if pf.color == field.color => pf
+          }
+
+          val playerStreets = colorProperties.forall(_.owner.contains(player.name))
+
+          if (!playerStreets) {
+            println(s"${player.name} besitzt nicht alle Straßen der Farbe ${field.color}.")
+            return game
+          }
+
+          val houseCost = 50
+          if (player.balance >= houseCost) {
+            val updatedField = field.copy(
+              house = modelBaseImple.PropertyField.House(field.house.amount + 1)
+            )
+
+            val updatedFields = game.board.fields.map { f =>
+              if (f.index == propertyIndex) updatedField else f
             }
-
-            val playerStreets = colorProperties.forall(_.owner.contains(player.name))
-
-            if (!playerStreets) {
-              println(s"${player.name} besitzt nicht alle Straßen der Farbe ${field.color}.")
-              return game
-            }
-
-            val houseCost = 50
-            if (player.balance >= houseCost) {
-              val updatedField = field.copy(
-                house = PropertyField.House(field.house.amount + 1)
-              )
-
-              val updatedFields = game.board.fields.map { f =>
-                if (f.index == propertyIndex) updatedField else f
-              }
-              val updatedBoard = game.board.copy(fields = updatedFields)
-              val updatedPlayer = player.copy(
-                balance = player.balance - houseCost,
-                position = game.currentPlayer.position
-              )
-              val updatedPlayers = game.players.map(p =>
-                if (p.name == updatedPlayer.name) updatedPlayer else p
-            )    
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
-              println(s"${player.name} hat ein Haus auf ${field.name} gebaut.")
-              (updatedGame)
-            } else {
-              println(s"Nicht genug Geld! Ein Haus kostet $houseCost, aber ${player.name} hat nur ${player.balance}.")
-              (game)
-            }
-          case _ =>
-            println(s"${player.name} ist nicht der Eigentümer dieser Immobilie.")
+            val updatedBoard = game.board.copy(fields = updatedFields)
+            val updatedPlayer = player.copy(
+              balance = player.balance - houseCost,
+              position = game.currentPlayer.position
+            )
+            val updatedPlayers = game.players.map(p =>
+              if (p.name == updatedPlayer.name) updatedPlayer else p
+            )
+            val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers, currentPlayer = updatedPlayer)
+            println(s"${player.name} hat ein Haus auf ${field.name} gebaut.")
+            (updatedGame)
+          } else {
+            println(s"Nicht genug Geld! Ein Haus kostet $houseCost, aber ${player.name} hat nur ${player.balance}.")
             (game)
-        }
-      case Some(_) =>
-        println(s"Auf dem Feld mit Index $propertyIndex kann kein Haus gebaut werden.")
-        (game)
-      case None =>
-        println(s"Feld mit Index $propertyIndex nicht gefunden.")
-        (game)
-    }
+          }
+        case _ =>
+          println(s"${player.name} ist nicht der Eigentümer dieser Immobilie.")
+          (game)
+      }
+    case Some(_) =>
+      println(s"Auf dem Feld mit Index $propertyIndex kann kein Haus gebaut werden.")
+      (game)
+    case None =>
+      println(s"Feld mit Index $propertyIndex nicht gefunden.")
+      (game)
   }
+}
 
-  def buyProperty(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame) = {
-    val fieldOption = game.board.fields.find(_.index == propertyIndex)
+def buyProperty(game: MonopolyGame, propertyIndex: Int, player: Player): (MonopolyGame) = {
+  val fieldOption = game.board.fields.find(_.index == propertyIndex)
 
-    fieldOption match {
-      case Some(field: PropertyField) =>
-        field.owner match {
-          case None =>
-            if (player.balance >= field.price) {
-              val updatedField = field.copy(
-                owner = Some(player.name)
-              )
+  fieldOption match {
+    case Some(field: modelBaseImple.PropertyField) =>
+      field.owner match {
+        case None =>
+          if (player.balance >= field.price) {
+            val updatedField = field.copy(
+              owner = Some(player.name)
+            )
 
-              val updatedFields = game.board.fields.map { f =>
-                if (f.index == propertyIndex) updatedField else f
-              }
-              val updatedBoard = game.board.copy(fields = updatedFields)
-              val updatedPlayer = player.copy(balance = player.balance - field.price, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
-              if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
-              println(s"${player.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
-              (updatedGame)
-            } else {
-              println(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${player.name} hat nur ${player.balance}.")
-              (game)
+            val updatedFields = game.board.fields.map { f =>
+              if (f.index == propertyIndex) updatedField else f
             }
-          case Some(owner) =>
-            println(s"Diese Immobilie gehört bereits ${owner}.")
-            (game)
-        }
-      case Some(field: TrainStationField) =>
-        field.owner match {
-          case None =>
-            val stationPrice = 200 // Typischer Preis für Bahnhöfe
-            if (player.balance >= stationPrice) {
-              val updatedField = field.copy(owner = Some(player.name))
-              val updatedFields = game.board.fields.map { f =>
-                if (f.index == propertyIndex) updatedField else f
-              }
-              val updatedBoard = game.board.copy(fields = updatedFields)
-
-              val updatedPlayer = player.copy(balance = player.balance - stationPrice, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
+            val updatedBoard = game.board.copy(fields = updatedFields)
+            val updatedPlayer = player.copy(balance = player.balance - field.price, position = propertyIndex)
+            val updatedPlayers = game.players.map(p =>
               if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
-              println(s"${player.name} hat den Bahnhof ${field.name} für $stationPrice gekauft.")
-              (updatedGame)
-            } else {
-              println(s"Nicht genug Geld! Der Bahnhof kostet $stationPrice, aber ${player.name} hat nur ${player.balance}.")
-              (game)
-            }
-          case Some(owner) =>
-            println(s"Dieser Bahnhof gehört bereits ${owner}.")
+            )
+            val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
+            println(s"${player.name} hat die Immobilie ${field.name} für ${field.price} gekauft.")
+            (updatedGame)
+          } else {
+            println(s"Nicht genug Geld! Die Immobilie kostet ${field.price}, aber ${player.name} hat nur ${player.balance}.")
             (game)
-        }
-      case Some(field: UtilityField) =>
-        field.owner match {
-          case None =>
-            val utilityPrice = 150 // Typischer Preis für Versorgungswerke
-            if (player.balance >= utilityPrice) {
-              val updatedField = field.copy(
-                owner = Some(player.name)
-              )
+          }
+        case Some(owner) =>
+          println(s"Diese Immobilie gehört bereits ${owner}.")
+          (game)
+      }
+    case Some(field: TrainStationField) =>
+      field.owner match {
+        case None =>
+          val stationPrice = 200 // Typischer Preis für Bahnhöfe
+          if (player.balance >= stationPrice) {
+            val updatedField = field.copy(owner = Some(player.name))
+            val updatedFields = game.board.fields.map { f =>
+              if (f.index == propertyIndex) updatedField else f
+            }
+            val updatedBoard = game.board.copy(fields = updatedFields)
 
-              val updatedFields = game.board.fields.map { f =>
-                if (f.index == propertyIndex) updatedField else f
-              }
-              val updatedBoard = game.board.copy(fields = updatedFields)
-
-              val updatedPlayer = player.copy(balance = player.balance - utilityPrice, position = propertyIndex)
-              val updatedPlayers = game.players.map(p =>
+            val updatedPlayer = player.copy(balance = player.balance - stationPrice, position = propertyIndex)
+            val updatedPlayers = game.players.map(p =>
               if (p.name == updatedPlayer.name) updatedPlayer else p
-              )
-              val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
-              println(s"${player.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
-              (updatedGame)
-            } else {
-              println(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${player.name} hat nur ${player.balance}.")
-              (game)
-            }
-          case Some(owner) =>
-            println(s"Dieses Versorgungswerk gehört bereits ${owner}.")
+            )
+            val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
+            println(s"${player.name} hat den Bahnhof ${field.name} für $stationPrice gekauft.")
+            (updatedGame)
+          } else {
+            println(s"Nicht genug Geld! Der Bahnhof kostet $stationPrice, aber ${player.name} hat nur ${player.balance}.")
             (game)
-        }
-      case Some(_) =>
-        println(s"Das Feld mit Index $propertyIndex kann nicht gekauft werden.")
-        (game)
-      case None =>
-        println(s"Feld mit Index $propertyIndex nicht gefunden.")
-        (game)
-    }
+          }
+        case Some(owner) =>
+          println(s"Dieser Bahnhof gehört bereits ${owner}.")
+          (game)
+      }
+    case Some(field: UtilityField) =>
+      field.owner match {
+        case None =>
+          val utilityPrice = 150 // Typischer Preis für Versorgungswerke
+          if (player.balance >= utilityPrice) {
+            val updatedField = field.copy(
+              owner = Some(player.name)
+            )
+
+            val updatedFields = game.board.fields.map { f =>
+              if (f.index == propertyIndex) updatedField else f
+            }
+            val updatedBoard = game.board.copy(fields = updatedFields)
+
+            val updatedPlayer = player.copy(balance = player.balance - utilityPrice, position = propertyIndex)
+            val updatedPlayers = game.players.map(p =>
+              if (p.name == updatedPlayer.name) updatedPlayer else p
+            )
+            val updatedGame = game.copy(board = updatedBoard, players = updatedPlayers)
+            println(s"${player.name} hat das Versorgungswerk ${field.name} für $utilityPrice gekauft.")
+            (updatedGame)
+          } else {
+            println(s"Nicht genug Geld! Das Versorgungswerk kostet $utilityPrice, aber ${player.name} hat nur ${player.balance}.")
+            (game)
+          }
+        case Some(owner) =>
+          println(s"Dieses Versorgungswerk gehört bereits ${owner}.")
+          (game)
+      }
+    case Some(_) =>
+      println(s"Das Feld mit Index $propertyIndex kann nicht gekauft werden.")
+      (game)
+    case None =>
+      println(s"Feld mit Index $propertyIndex nicht gefunden.")
+      (game)
   }
+}
 
 case class MonopolyGame(
                          players: Vector[Player],

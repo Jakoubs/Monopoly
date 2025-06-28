@@ -1,6 +1,7 @@
 package de.htwg.controller
 
-import de.htwg.model.Player
+import de.htwg.controller.controllerBaseImpl.{JailTurnStrategy, RegularTurnStrategy}
+import de.htwg.model.modelBaseImple.Player
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -53,6 +54,7 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       updatedPlayer.isInJail should be(false)
       updatedPlayer.position should be(14)
       updatedPlayer.consecutiveDoubles should be(0)
+
     }
 
     "increment jail turns if no doubles are rolled" in {
@@ -62,6 +64,7 @@ class TurnStrategySpec extends AnyWordSpec with Matchers {
       val updatedPlayer = strategy.executeTurn(initialPlayer, mockDice)
       updatedPlayer.isInJail should be(true)
       updatedPlayer.consecutiveDoubles should be(2)
+
       updatedPlayer.position should be(10) // Position sollte sich nicht ändern
     }
 
