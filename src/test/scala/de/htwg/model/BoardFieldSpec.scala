@@ -1,7 +1,8 @@
 package de.htwg.model
 
 import de.htwg.controller.controllerBaseImpl.Controller
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.{Board}
+import de.htwg.model.modelBaseImple.MonopolyGame
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.modelBaseImple.PropertyField.*
@@ -65,7 +66,7 @@ class BoardFieldSpec extends AnyWordSpec {
 
   val board = Board(fields)
   val initialGame = MonopolyGame(Vector(player1, player2,player3), board, player1, sound = false)
-  val controller = new Controller(initialGame, dice)
+  val controller = new Controller(initialGame) 
 
   val ownedProperties: Map[Player, List[PropertyField]] =
     board.fields.collect { case p: PropertyField if p.owner.isDefined => (p.owner.get, p) }
@@ -113,7 +114,7 @@ class BoardFieldSpec extends AnyWordSpec {
     "not build house if player is not the owner" in {
       val initialField = fields(31).asInstanceOf[PropertyField]
 
-      val result: Try[(PropertyField, Player)] = PropertyField.House().buyHouse(player1, initialField, initialGame)
+      val result: Try[(PropertyField, Player)] = PropertyField.House().buyHouse(player1, initialField, initfialGame)
 
       result match {
         case Success((newf, newp)) =>
