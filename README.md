@@ -1,4 +1,4 @@
-# ⚠️ We're currently developing new tests. New tests are currently being developed and will be available there next Tuesday.
+# ⚠️ New tests are currently being developed and will be available there next Tuesday. To ensure comprehensive and effective test coverage, please use to the Lecture9 branch.
 <div align="center">
 
 # 🎲 Monopoly Game
