@@ -6,12 +6,13 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Button, CheckBox, ComboBox, Dialog, Label, TextField}
 import scalafx.scene.layout.{HBox, VBox}
-import de.htwg.model.modelBaseImple.{BoardField, BuyableField, Player, PropertyField, Trade, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{BoardField, BuyableField, Player, PropertyField, SoundPlayer, Trade, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import scalafx.scene.control.ButtonType
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.control.ControlIncludes.jfxDialogPane2sfx
-import scala.jdk.CollectionConverters._
+
+import scala.jdk.CollectionConverters.*
 import scalafx.scene.layout.FlowPane
 import scalafx.scene.Node as SFXNode
 
@@ -61,6 +62,9 @@ class TradePanel(controller: IController) extends VBox with Observable {
     val checkbox = new CheckBox(property.name) {
       styleClass += "check-box"
       style = "-fx-font: normal 12pt sans-serif; -fx-text-fill: white;"
+    }
+    checkbox.selected.onChange { (_, _, selected) =>
+      SoundPlayer().playBackground("src/main/resources/sound/select.wav")
     }
 
     val fieldTitle = new Label(property.name) {
@@ -183,6 +187,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
       }
 
       otherPlayerComboBox.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/select2.wav")
         propertiesBox.children.clear()
         val selectedPlayerName = Option(otherPlayerComboBox.value.value).filter(_.nonEmpty)
 
@@ -213,6 +218,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
         prefWidth = 200
         prefHeight = 40
         onAction = _ => {
+          SoundPlayer().playBackground("src/main/resources/sound/click.wav")
           val selectedPlayerOption = Option(otherPlayerComboBox.value.value).filter(_.nonEmpty)
 
           selectedPlayerOption match {
