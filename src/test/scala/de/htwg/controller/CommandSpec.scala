@@ -1,16 +1,16 @@
 package de.htwg.controller
 
 import de.htwg.controller.controllerBaseImpl.{BuyCommand, BuyHouseCommand, Controller, PayJailFeeCommand, RollDiceCommand}
-import de.htwg.{Board}
-import de.htwg.model.modelBaseImple.MonopolyGame
+import de.htwg.Board
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
-import de.htwg.model.modelBaseImple.{BoardField, BuyableField, ChanceField, CommunityChestField, Dice, GoField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{BoardField, BuyableField, ChanceField, CommunityChestField, Dice, GoField, JailField, MonopolyGame, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.FileIOComponent.JSONFileIO.FileIO as JSONFileIO
 
 class CommandSpec extends AnyWordSpec {
-/*
+
   "A Command" should {
     // Testumgebung einrichten
     val dice = new Dice()
@@ -37,17 +37,18 @@ class CommandSpec extends AnyWordSpec {
       PropertyField("Pink3", 15, 100, 10, Some(player1), color = Pink, PropertyField.Mortgage(10, false), PropertyField.House(0)),
 
     )
+    val fileIO = new JSONFileIO
     val board = Board(fields)
     val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
-    val controller = new Controller(initialGame, dice)
+    val controller = new Controller(initialGame)(using fileIO)
 
     // Hilfsfunktionen, um auf Spieler und Felder zuzugreifen
-    def findPlayer(name: String): Player = controller.game.players.find(_.name == name).get
+    def findPlayer(name: String): IPlayer = controller.game.players.find(_.name == name).get
     def getFieldAt(position: Int): BoardField = controller.game.board.fields(position - 1)
 
     "when BuyCommand is executed for a PropertyField" should {
       val propertyField = fields(1).asInstanceOf[BuyableField]
-      val buyCommand = BuyCommand(controller, player1)
+      val buyCommand = BuyCommand(propertyField, player1)(using controller)
 
       "buy the property and update player's money" in {
         val initialMoney = player1.balance
@@ -71,7 +72,7 @@ class CommandSpec extends AnyWordSpec {
 
     "when BuyCommand is executed for a TrainStationField" should {
       val trainStationField = fields(5).asInstanceOf[BuyableField]
-      val buyCommand = BuyCommand(controller, player1)
+      val buyCommand = BuyCommand(trainStationField, player1)(using controller)
 
       "buy the train station and update player's money" in {
         val initialMoney = player1.balance
@@ -95,7 +96,7 @@ class CommandSpec extends AnyWordSpec {
 
     "when BuyCommand is executed for a UtilityField" should {
       val utilityField = fields(12).asInstanceOf[BuyableField]
-      val buyCommand = BuyCommand(controller, player1)
+      val buyCommand = BuyCommand( utilityField, player1)(using controller)
 
       "buy the utility and update player's money" in {
         val initialMoney = player1.balance
@@ -120,7 +121,7 @@ class CommandSpec extends AnyWordSpec {
     
     "when BuyHouseCommand is executed" should {
       val propertyField = fields(11).asInstanceOf[PropertyField]
-      val buyHouseCommand = BuyHouseCommand(controller, propertyField, player1)
+      val buyHouseCommand = BuyHouseCommand()(using controller, propertyField, player1)
       
       "buy a house for the property and update player's money" in {
         val initialMoney = findPlayer(player1.name).balance
@@ -144,7 +145,7 @@ class CommandSpec extends AnyWordSpec {
     }
 
     "when RollDiceCommand is executed" should {
-      val rollDiceCommand = RollDiceCommand(controller)
+      val rollDiceCommand = RollDiceCommand()(using controller)
 
       "roll the dice and return a result" in {
         rollDiceCommand.execute()
@@ -172,30 +173,26 @@ class CommandSpec extends AnyWordSpec {
       val jailPlayer = player1.copy(isInJail = true)
       controller.updatePlayer(jailPlayer)
 
-      val payJailFeeCommand = PayJailFeeCommand(controller, jailPlayer)
+      val payJailFeeCommand = PayJailFeeCommand()(using controller, jailPlayer)
 
       "pay the fee and release player from jail" in {
         val initialMoney = findPlayer(jailPlayer.name).balance
         payJailFeeCommand.execute()
 
-        // Überprüfe, dass der Spieler nicht mehr im Gefängnis ist
         findPlayer(jailPlayer.name).isInJail shouldBe false
 
-        // Überprüfe, dass das Geld für die Kaution abgezogen wurde
         findPlayer(jailPlayer.name).balance should be < initialMoney
       }
 
       "restore previous state when undone" in {
         payJailFeeCommand.undo()
 
-        // Überprüfe, dass der Spieler wieder im Gefängnis ist
         findPlayer(jailPlayer.name).isInJail shouldBe true
 
-        // Überprüfe, dass das Geld wiederhergestellt wurde
         findPlayer(jailPlayer.name).balance shouldBe 1500
       }
     }
 
     
-  }*/
+  }
 }

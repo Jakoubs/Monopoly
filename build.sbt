@@ -10,7 +10,7 @@ lazy val root = (project in file("."))
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
-libraryDependencies += "org.scalafx" %% "scalafx" % "24.0.0-R35"
+libraryDependencies += "org.scalafx" %% "scalafx" % "20.0.0-R31"
 Compile/mainClass := Some("de.htwg.Monopoly")
 
 

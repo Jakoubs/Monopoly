@@ -19,27 +19,22 @@ import scala.concurrent.Future // Import Future for asynchronous execution
 case class Board(fields: Vector[BoardField])
 
 object Monopoly:
-  // Make the controller a global variable or pass it to GUI.main
-  // Option 1: Global var (less ideal for large apps, but simple for now)
-  var gameController: Option[Controller] = None // Option to hold the controller
+  var gameController: Option[Controller] = None 
 
   def main(args: Array[String]): Unit = {
-    // 1) Format aus args (Default "xml"
     val format = args.headOption.getOrElse("json")
 
     given IFileIO = FileIOModule.select(format)
 
     val game = defineGame()
     val controller = Controller(game)
-    gameController = Some(controller) // Store the controller
+    gameController = Some(controller)
 
-    // Launch the TUI in a separate Future (on a separate thread)
     Future {
       val tui = Tui(controller)
-      tui.run() // This will block this Future's thread, not the main thread.
+      tui.run()
     }
 
-    // Launch the GUI. The GUI's start() method will then retrieve the controller.
     GUI.main(args)
   }
 

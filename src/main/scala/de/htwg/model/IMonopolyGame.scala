@@ -1,7 +1,7 @@
 package de.htwg.model
 
 import de.htwg.Board
-import de.htwg.model.modelBaseImple.{BoardField, MonopolyGame, PropertyField}
+import de.htwg.model.modelBaseImple.{BoardField, PropertyField}
 
 import scala.util.Try
 
@@ -23,6 +23,6 @@ trait IMonopolyGame {
   def withUpdatedPlayers(newPlayers: Vector[IPlayer]): IMonopolyGame
   def withUpdatedBoardAndPlayer(field: BoardField, player: IPlayer): IMonopolyGame
   def withNextPlayer: IMonopolyGame
-  def withUpdatedBoard(newBoard: Board): MonopolyGame
+
   def buyHouse(field: PropertyField, player: IPlayer): Try[IMonopolyGame]
 }

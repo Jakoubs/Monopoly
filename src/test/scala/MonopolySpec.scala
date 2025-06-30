@@ -2,11 +2,12 @@ import de.htwg.controller.controllerBaseImpl.Controller
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.{Board, Monopoly}
-import de.htwg.model.modelBaseImple.MonopolyGame
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
-import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, Dice, FreeParkingField, GoField, GoToJailField, JailField, MonopolyGame, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.view.Tui
+import de.htwg.model.FileIOComponent.JSONFileIO.FileIO as JSONFileIO
+import de.htwg.model.FileIOComponent.IFileIO
 
 class MonopolySpec extends AnyWordSpec {
 
@@ -55,11 +56,12 @@ class MonopolySpec extends AnyWordSpec {
     TaxField(200, 39),
     PropertyField("DarkBlue2", 40, 100, 10, None, color = DarkBlue, PropertyField.Mortgage(10, false), PropertyField.House(0))
   )
-/*
+
   val board = Board(fields)
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
-  val controller = new Controller(initialGame, dice)
-*/
+  val fileIO = new JSONFileIO 
+  val controller = new Controller(initialGame)(using fileIO)
+
   "Monopoly" should{
     "initialize a game with correct number of players" in {
       val game = MonopolyGame(

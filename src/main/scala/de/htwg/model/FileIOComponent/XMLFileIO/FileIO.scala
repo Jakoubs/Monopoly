@@ -107,13 +107,16 @@ class FileIO extends IFileIO {
   }
 
   private def reconstructGame(snapshot: GameSnapshot): IMonopolyGame = {
+    // Create players from snapshot
     val players = snapshot.players.map(ps =>
       Player(ps.name, ps.balance, ps.position, ps.isInJail, ps.consecutiveDoubles)
     )
 
+    // Get the original board from your defineGame method
     val originalGame = de.htwg.Monopoly.createEmptyBaseGame()
     var updatedBoard = originalGame.board
 
+    // Update board with ownership and houses
     snapshot.boardProperties.foreach { propSnapshot =>
       val fieldIndex = propSnapshot.index - 1
       if (fieldIndex >= 0 && fieldIndex < updatedBoard.fields.length) {
