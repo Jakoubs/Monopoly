@@ -10,11 +10,16 @@ import de.htwg.model.modelBaseImple.Trade
 import de.htwg.model.modelBaseImple.Player
 import de.htwg.model.modelBaseImple.BoardField
 import de.htwg.model.modelBaseImple.BuyableField
+import de.htwg.model.modelBaseImple.{BoardField, BuyableField, Player, PropertyField, SoundPlayer, Trade, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import scalafx.scene.control.ButtonType
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.control.ControlIncludes.jfxDialogPane2sfx
 
+
+import scala.jdk.CollectionConverters.*
+import scalafx.scene.layout.FlowPane
+import scalafx.scene.Node as SFXNode
 
 class TradePanel(controller: IController) extends VBox with Observable {
   spacing = 20
@@ -39,6 +44,71 @@ class TradePanel(controller: IController) extends VBox with Observable {
     children.clear() // Clear existing children before rebuilding
     buildPanel()
   }
+
+  private def propertyColorClass(field: BoardField): String = field match {
+    case pf: PropertyField =>
+      pf.color.toString.toLowerCase match {
+        case "braun" | "brown"     => "brown"
+        case "hellblau" | "lightblue" => "lightblue"
+        case "pink" | "violett"    => "purple"
+        case "orange"              => "orange"
+        case "rot" | "red"         => "red"
+        case "gelb" | "yellow"     => "yellow"
+        case "grün" | "green"      => "green"
+        case "dunkelblau" | "darkblue" => "darkblue"
+        case _                     => "neutral"
+      }
+    case _: TrainStationField => "black"
+    case _: UtilityField      => "neutral"
+    case _                   => "neutral"
+  }
+
+  private def createMonopolyCheckbox(property: BuyableField): VBox = {
+    val checkbox = new CheckBox(property.name) {
+      styleClass += "check-box"
+      style = "-fx-font: normal 12pt sans-serif; -fx-text-fill: white;"
+    }
+    checkbox.selected.onChange { (_, _, selected) =>
+      SoundPlayer().playBackground("src/main/resources/sound/select.wav")
+    }
+
+    val fieldTitle = new Label(property.name) {
+      styleClass += "field-title"
+    }
+
+    val fieldValue = new Label(s"${property.price}€") {
+      styleClass += "field-value"
+    }
+
+    val hakenLabel = new Label("✔") {
+      styleClass += "haken-label"
+      visible = false
+    }
+
+    val customVisualContainer = new VBox {
+      alignment = Pos.Center
+      spacing = 5
+      children = Seq(fieldTitle, fieldValue, hakenLabel)
+    }
+
+    val container = new VBox {
+      styleClass ++= Seq("monopoly-checkbox", propertyColorClass(property))
+      alignment = Pos.Center
+      spacing = 5
+      children = Seq(customVisualContainer, checkbox)
+    }
+
+    container.onMouseClicked = _ => checkbox.selected.value = !checkbox.selected.value
+
+    checkbox.selected.onChange { (_, _, selected) =>
+      hakenLabel.visible = selected
+      if (selected) container.styleClass += "selected"
+      else container.styleClass -= "selected"
+    }
+
+    container
+  }
+
   private def buildPanel(): Unit = {
     // Re-initialize otherPlayerComboBox to ensure items are fresh
     otherPlayerComboBox = new ComboBox[String] {
@@ -124,6 +194,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
 
       // This is crucial: the ComboBox action updates the properties for the *selected* player
       otherPlayerComboBox.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/select2.wav")
         propertiesBox.children.clear()
         val selectedPlayerName = Option(otherPlayerComboBox.value.value).filter(_.nonEmpty)
 
@@ -169,6 +240,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
 
           val result = dialog.showAndWait()
 
+          SoundPlayer().playBackground("src/main/resources/sound/click.wav")
           val selectedPlayerOption = Option(otherPlayerComboBox.value.value).filter(_.nonEmpty)
 
           selectedPlayerOption match {
