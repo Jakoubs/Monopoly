@@ -26,11 +26,11 @@ class ChainOfRSpec extends AnyWordSpec with Matchers {
 
   // Test Stub für den nächsten Handler
   class NextHandlerStub(expectedInput: OpEnum, nextState: Option[GameState]) extends ActionHandler {
-    val controller: Controller = null // Nicht benötigt für Stub-Zweck
-    var nextHandler: Option[ActionHandler] = None
+    val controller: Controller = null
+    override var nextHandler: Option[ActionHandler] = None
     var handleCalledWith: Option[OpEnum] = None
 
-    override def handle(input: OpEnum): Option[GameState] = {
+    override def handle(input: OpEnum)(using Controller): Option[GameState] = {
       handleCalledWith = Some(input)
       if (input.equals(expectedInput)) nextState else None
     }
