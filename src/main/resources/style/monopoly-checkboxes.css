@@ -1,0 +1,57 @@
+.monopoly-checkbox {
+  -fx-background-color: #222;
+  -fx-border-color: #5cb85c;
+  -fx-border-width: 2;
+  -fx-border-radius: 12;
+  -fx-background-radius: 12;
+  -fx-padding: 16 18 16 18;
+  -fx-effect: dropshadow(gaussian, #000, 8, 0.2, 0, 2);
+  -fx-spacing: 8;
+  -fx-alignment: center;
+  -fx-cursor: hand;
+  -fx-min-width: 90;
+  -fx-max-width: 110;
+  -fx-min-height: 60;
+  -fx-max-height: 80;
+  -fx-transition: all 0.2s;
+}
+
+.monopoly-checkbox:hover {
+  -fx-background-color: #333;
+  -fx-border-color: #7ee87e;
+  -fx-effect: dropshadow(gaussian, #5cb85c, 16, 0.3, 0, 4);
+}
+
+.monopoly-checkbox .check-box {
+  -fx-opacity: 0;
+  -fx-max-width: 0;
+  -fx-max-height: 0;
+}
+
+.monopoly-checkbox .field-title {
+  -fx-font-size: 1.2em;
+  -fx-font-weight: bold;
+  -fx-text-fill: #fff;
+}
+
+.monopoly-checkbox .field-value {
+  -fx-font-size: 1em;
+  -fx-text-fill: #b5ffb5;
+}
+
+.monopoly-checkbox .haken-label {
+  -fx-font-size: 2.5em;
+  -fx-text-fill: #5cb85c;
+  -fx-font-weight: bold;
+  -fx-padding: 0 0 0 0;
+}
+
+.monopoly-checkbox.selected {
+  -fx-background-color: #2e4;
+  -fx-border-color: #fff;
+}
+
+.monopoly-checkbox.selected .field-title,
+.monopoly-checkbox.selected .field-value {
+  -fx-text-fill: #c1e0b4;
+}
