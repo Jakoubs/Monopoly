@@ -7,8 +7,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
-import de.htwg.model.modelBaseImple.{Dice, GoField, JailField, Player, PropertyField, TrainStationField, UtilityField}
-import de.htwg.{Board, MonopolyGame}
+import de.htwg.model.modelBaseImple.{Dice, GoField, JailField, MonopolyGame, Player, PropertyField, TrainStationField, UtilityField}
+import de.htwg.{Board}
+import de.htwg.model.FileIOComponent.JSONFileIO.FileIO as JSONFileIO
 
 class ControllerSpec extends AnyWordSpec with Matchers {
 
@@ -26,9 +27,10 @@ class ControllerSpec extends AnyWordSpec with Matchers {
   val dice = new Dice {
     override def rollDice(withSound: Boolean): (Int, Int) = (3, 4)
   }
+  val fileIO = new JSONFileIO
 
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
-  val controller = new Controller(initialGame, dice)
+  val controller = new Controller(initialGame)(using fileIO)
 
   "A Controller" should {
 
@@ -88,14 +90,14 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     "detect game over if only one player has money" in {
       val brokePlayer = player1.copy(balance = 0)
       val richPlayer = player2.copy(balance = 500)
-      val gameOverController = new Controller(MonopolyGame(Vector(brokePlayer, richPlayer), board, richPlayer, sound = false), dice)
+      val gameOverController = new Controller(MonopolyGame(Vector(brokePlayer, richPlayer), board, richPlayer, sound = false))(using fileIO)
       gameOverController.isGameOver shouldBe true
     }
 
     "return correct player status string" in {
       val player = player1.copy(isInJail = false)
       val game = initialGame.copy(players = Vector(player), currentPlayer = player)
-      val testController = new Controller(game, dice)
+      val testController = new Controller(game)(using fileIO)
       val status = testController.getCurrentPlayerStatus
       status should include("Player 1")
       status should include("Balance")
@@ -107,7 +109,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     "return correct player status string when in Jail" in {
       val player = player1.copy(isInJail = true)
       val game = initialGame.copy(players = Vector(player), currentPlayer = player)
-      val testController = new Controller(game, dice)
+      val testController = new Controller(game)(using fileIO)
       val status = testController.getCurrentPlayerStatus
       status should include("Player 1")
       status should include("Balance")
@@ -129,7 +131,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val testFields = Vector(GoField, prop1, prop2, prop3, JailField)
       val testBoard = Board(testFields)
       val testGame = MonopolyGame(Vector(player1, player2), testBoard, player1, sound = false)
-      val testController = new Controller(testGame, dice)
+      val testController = new Controller(testGame)(using fileIO)
 
       val ownedProps = testController.getOwnedProperties()
       ownedProps(player1) should contain allOf(prop1, prop3)
@@ -144,7 +146,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val testFields = Vector(GoField, ts1, ts2, ts3, JailField)
       val testBoard = Board(testFields)
       val testGame = MonopolyGame(Vector(player1, player2), testBoard, player1, sound = false)
-      val testController = new Controller(testGame, dice)
+      val testController = new Controller(testGame)(using fileIO)
 
       val ownedStations = testController.getOwnedTrainStations()
       ownedStations(player1) shouldBe 2
@@ -158,7 +160,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val testFields = Vector(GoField, util1, util2, JailField)
       val testBoard = Board(testFields)
       val testGame = MonopolyGame(Vector(player1, player2), testBoard, player1, sound = false)
-      val testController = new Controller(testGame, dice)
+      val testController = new Controller(testGame)(using fileIO)
 
       val ownedUtils = testController.getOwnedUtilities()
       ownedUtils(player1) shouldBe 1
