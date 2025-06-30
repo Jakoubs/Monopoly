@@ -38,19 +38,25 @@ case class PayJailHandler() extends ActionHandler {
   }
 }
 
-case class RollDoublesJailHandler() extends ActionHandler {
+class RollDoublesJailHandler extends ActionHandler {
   override def handle(input: OpEnum)(using controller: Controller): Option[GameState] = {
-    if (input == OpEnum.roll) {
-      val strategy = JailTurnStrategy()
-      val updatedPlayer = strategy.executeTurn(controller.currentPlayer, () => controller.game.rollDice(controller.sound))
-      controller.updatePlayer(updatedPlayer)
-      if (!updatedPlayer.isInJail) {
-        Some(MovingState(() => controller.game.rollDice(controller.sound)))
-      } else {
-        Some(JailState())
-      }
-    } else {
-      nextHandler.flatMap(_.handle(input))
+    input match {
+      case OpEnum.roll =>
+        val (d1, d2) = controller.game.rollDice(true)
+        val isDouble = d1 == d2
+        val player = controller.currentPlayer
+
+        if (isDouble) {
+          // Bei Pasch: Spieler aus dem Gefängnis entlassen
+          val updatedPlayer = player.goToJail
+          controller.updatePlayer(updatedPlayer)
+          Some(MovingState(()=>(d1,d2)))
+        } else {
+          // Kein Pasch: Spieler bleibt im Gefängnis
+          controller.updatePlayer(player)
+          Some(JailState())
+        }
+      case _ => nextHandler.flatMap(_.handle(input))
     }
   }
 }
