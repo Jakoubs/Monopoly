@@ -185,6 +185,7 @@ case class AdditionalActionsState(isDouble: Boolean = false) extends GameState {
   }
 }
 
+// State when buying a house
 case class BuyHouseState(isDouble: Boolean = false) extends GameState {
   def handle(input: OpEnum)(using controller: Controller): GameState = {
     input match {
@@ -209,15 +210,16 @@ case class BuyHouseState(isDouble: Boolean = false) extends GameState {
   }
 }
 
-case class ConfirmBuyHouseState(isDouble: Boolean = false, command: BuyHouseCommand) extends GameState {
-  override def handle(input: OpEnum)(using controller: Controller): GameState = {
+case class ConfirmBuyHouseState(isDouble: Boolean = false, command: Command) extends GameState {
+  def handle(input: OpEnum)(using controller: Controller): GameState = {
     input match {
-      case OpEnum.y =>
-        command.undo()  // Kaufbefehl rückgängig machen
-        AdditionalActionsState()
+      case OpEnum.buy =>
+        AdditionalActionsState(isDouble)
+      case OpEnum.end =>
+        command.undo()
+        AdditionalActionsState(isDouble)
       case _ =>
-        if (isDouble) RollingState()
-        else EndTurnState()
+        this
     }
   }
 }

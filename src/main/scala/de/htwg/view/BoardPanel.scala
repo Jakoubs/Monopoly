@@ -2,6 +2,7 @@
 package de.htwg.view
 
 import de.htwg.controller.IController
+import scalafx.scene.text.Font
 import scalafx.geometry.{HPos, Insets, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, HBox, VBox}

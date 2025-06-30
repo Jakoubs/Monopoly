@@ -153,62 +153,38 @@ object GUI extends JFXApp3 with Observer {
       buyHouseButton.minHeight = 40
       buyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
       buyHouseButton.onAction = _ => {
-        val dialog = new TextInputDialog() {
-          initOwner(stage)
-          title = "Haus kaufen"
-          headerText = "Geben Sie die ID des Grundstücks ein (1-40)."
-          contentText = "Grundstücks-ID:"
-        }
-        dialog.showAndWait().foreach { inputText =>
-          Try(inputText.toInt).toOption match {
-            case Some(intValue) if intValue >= 1 && intValue <= 40 =>
-              gameController.foreach { ctrl =>
-                val player = ctrl.currentPlayer
-                ctrl.board.fields(intValue - 1) match {
-                  case propertyField: PropertyField =>
-                    val maxHouses = 5
-                    val housePrice = propertyField.price / 2
-
-                    val validationResult = for {
-                      _ <- Try(if (!propertyField.owner.exists(_.name == player.name)) throw new Exception(s"Sie besitzen ${propertyField.name} nicht."))
-                      _ <- Try(if (player.balance < housePrice) throw new Exception(s"Sie haben nicht genug Geld. Benötigt: ${housePrice}€"))
-                      _ <- Try(if (propertyField.house.amount >= maxHouses) throw new Exception(s"Auf ${propertyField.name} können keine weiteren Häuser gebaut werden."))
-                      ownsAll <- Try {
-                        val group = ctrl.board.fields.collect { case p: PropertyField if p.color == propertyField.color => p }
-                        group.forall(_.owner.exists(_.name == player.name))
-                      }
-                      _ <- Try(if (!ownsAll) throw new Exception(s"Sie müssen alle Grundstücke der Farbe ${propertyField.color} besitzen."))
-                    } yield ()
-
-                    validationResult match {
-                      case scala.util.Success(_) =>
-                        ctrl.handleInput(OpEnum.fieldSelected(intValue))
-                      case scala.util.Failure(e) =>
-                        new Alert(AlertType.Error) {
-                          initOwner(stage)
-                          title = "Fehler beim Hauskauf"
-                          headerText = "Aktion nicht möglich"
-                          contentText = e.getMessage
-                        }.showAndWait()
-                    }
-                  case _ =>
-                    new Alert(AlertType.Error) {
-                      initOwner(stage)
-                      title = "Ungültiges Feld"
-                      headerText = "Auf diesem Feld können keine Häuser gebaut werden."
-                    }.showAndWait()
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
+        gameController.foreach { ctrl =>
+          ctrl.handleInput(OpEnum.buy)
+          val dialog = new TextInputDialog() {
+            initOwner(stage)
+            title = "Haus kaufen"
+            headerText = "Geben Sie die ID des Grundstücks ein (1-40)."
+            contentText = "Grundstücks-ID:"
+          }
+          dialog.showAndWait().foreach { inputText =>
+            Try(inputText.toInt).toOption match {
+              case Some(intValue) if intValue >= 1 && intValue <= 40 =>
+                val beforeState = ctrl.state
+                ctrl.handleInput(OpEnum.fieldSelected(intValue))
+                if (ctrl.state == beforeState) {
+                  new Alert(AlertType.Error) {
+                    initOwner(stage)
+                    title = "Fehler beim Hauskauf"
+                    headerText = "Aktion nicht möglich"
+                    contentText = "Hauskauf konnte nicht durchgeführt werden. Prüfen Sie Besitz, Geld und Farbgruppe."
+                  }.showAndWait()
                 }
-              }
-            case _ =>
-              new Alert(AlertType.Error) {
-                initOwner(stage)
-                title = "Ungültige Eingabe"
-                headerText = "Bitte geben Sie eine gültige Ganzzahl zwischen 1 und 40 ein."
-              }.showAndWait()
+              case _ =>
+                new Alert(AlertType.Error) {
+                  initOwner(stage)
+                  title = "Ungültige Eingabe"
+                  headerText = "Bitte geben Sie eine gültige Ganzzahl zwischen 1 und 40 ein."
+                }.showAndWait()
+            }
           }
         }
       }
-
       buyPropertyButton.minWidth = 50
       buyPropertyButton.minHeight = 40
       buyPropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #f0ad4e; -fx-text-fill: white;"

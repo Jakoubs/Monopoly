@@ -1,10 +1,11 @@
 package de.htwg.model
 
-import de.htwg.Board
+import de.htwg.{Board}
+import de.htwg.model.modelBaseImple.MonopolyGame
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.{Brown, DarkBlue, Green, LightBlue, Orange, Pink, Red, Yellow}
-import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, FreeParkingField, GoField, GoToJailField, JailField, MonopolyGame, Player, PropertyField, TaxField, TrainStationField, UtilityField}
+import de.htwg.model.modelBaseImple.{ChanceField, CommunityChestField, FreeParkingField, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import de.htwg.view.BoardPrinter
 
 class BoardPrinterSpec extends AnyWordSpec {

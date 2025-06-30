@@ -8,6 +8,6 @@ object FileIOModule:
   def select(format: String): IFileIO =
     format.toLowerCase match
       case "xml" => new XMLFileIO()
-      case _      => new JSONFileIO()     // deine XML-Impl
+      case _      => new JSONFileIO()    
 
 

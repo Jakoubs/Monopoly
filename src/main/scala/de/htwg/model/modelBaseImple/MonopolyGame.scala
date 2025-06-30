@@ -24,12 +24,24 @@ case class MonopolyGame(
   }
 
   override def withUpdatedPlayer(newPlayer: IPlayer): IMonopolyGame = {
-    val ps = players.updated(players.indexOf(currentPlayer), newPlayer)
-    this.copy(players = ps, currentPlayer = newPlayer)
+    // Find player by name (most reliable identifier)
+    val playerIndex = players.indexWhere(_.name == newPlayer.name)
+
+    if (playerIndex >= 0) {
+      val ps = players.updated(playerIndex, newPlayer)
+      this.copy(players = ps, currentPlayer = newPlayer)
+    } else {
+      // This should not happen in normal game flow
+      throw new IllegalStateException(s"Player ${newPlayer.name} not found in game. Current players: ${players.map(_.name).mkString(", ")}")
+    }
   }
 
   override def withUpdatedPlayers(newPlayers: Vector[IPlayer]): IMonopolyGame = {
     this.copy(players = newPlayers)
+  }
+
+  override def withUpdatedBoard(newBoard: Board): MonopolyGame = {
+    MonopolyGame(players, newBoard, currentPlayer, sound)
   }
 
   override def withUpdatedBoardAndPlayer(field: BoardField, player: IPlayer): IMonopolyGame = {
