@@ -1,6 +1,6 @@
 package de.htwg.controller
 
-import de.htwg.controller.controllerBaseImpl.{Controller, TurnInfo}
+import de.htwg.controller.controllerBaseImpl.{Command, Controller, EndTurnState, MovingState, RollingState, StartTurnState, TurnInfo}
 import de.htwg.controller.controllerBaseImpl.OpEnum.end
 import de.htwg.controller.controllerBaseImpl.OpEnum.enter
 import org.scalatest.wordspec.AnyWordSpec
@@ -8,8 +8,12 @@ import org.scalatest.matchers.should.Matchers
 import de.htwg.model.*
 import de.htwg.model.modelBaseImple.PropertyField.Color.*
 import de.htwg.model.modelBaseImple.{Dice, GoField, JailField, MonopolyGame, Player, PropertyField, TrainStationField, UtilityField}
-import de.htwg.{Board}
+import de.htwg.Board
 import de.htwg.model.FileIOComponent.JSONFileIO.FileIO as JSONFileIO
+import de.htwg.model.FileIOComponent.{IFileIO, SaveManager}
+
+import java.io.File
+import scala.util.{Failure, Success, Try}
 
 class ControllerSpec extends AnyWordSpec with Matchers {
 
@@ -31,6 +35,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
   val initialGame = MonopolyGame(Vector(player1, player2), board, player1, sound = false)
   val controller = new Controller(initialGame)(using fileIO)
+
 
   "A Controller" should {
 
@@ -69,6 +74,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
       actualInventoryString should be(expectedInventoryString)
     }
+
+
     "update board and player correctly" in {
       val updatedField = PropertyField("brown1", 2, 100, 10, Some(player1), color = Brown, PropertyField.Mortgage(10, false), PropertyField.House(0))
       val updatedPlayer = player1.copy(balance = 1300)
@@ -167,4 +174,58 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       ownedUtils(player2) shouldBe 1
     }
   }
+  "availableSlots" should {
+    "delegate to SaveManager.listSlots" in {
+      // Erstelle ein Dummy-File im saves-Ordner
+      val fn = "testX.json"
+      val dir = new File("saves")
+      dir.mkdirs()
+      val f = new File(dir, fn);
+      f.createNewFile()
+      controller.availableSlots should contain(fn)
+      f.delete()
+    }
+  }
+
+  "undo and redo" should {
+    "invoke Command.undo and Command.execute again and restore state" in {
+      class DummyCmd extends Command {
+        var executeCount = 0
+        var undoCount = 0
+
+        override def execute(): Unit = executeCount += 1
+
+        override def undo(): Unit = undoCount += 1
+      }
+
+      // 1) set intermediary state
+      controller.setState(RollingState())
+      // 2) execute command
+      val cmd = new DummyCmd
+      controller.executeCommand(cmd)
+      cmd.executeCount shouldBe 1
+
+      // 3) change state to something else
+      controller.setState(MovingState(() => (1, 1)))
+
+      // 4) undo → should call undo() and restore to previous RollingState
+      controller.undo()
+      cmd.undoCount shouldBe 1
+      controller.state shouldBe a[RollingState]
+
+      // 5) redo → should call execute() again and restore to nextGameStates (RollingState)
+      controller.redo()
+      cmd.executeCount shouldBe 2
+      controller.state shouldBe a[RollingState]
+    }
+  }
+
+  "setState" should {
+    "update the Controller.state immediately" in {
+      controller.state shouldBe a[RollingState]
+      controller.setState(EndTurnState())
+      controller.state shouldBe a[EndTurnState]
+    }
+  }
 }
+

@@ -1,0 +1,20 @@
+<monopolygame>
+      <sound>true</sound>
+      <currentPlayer>0</currentPlayer>
+      <players>
+        <player>
+          <name>TestPlayer</name>
+          <balance>1234</balance>
+          <position>1</position>
+          <isInJail>false</isInJail>
+          <consecutiveDoubles>0</consecutiveDoubles>
+        </player>
+      </players>
+      <properties>
+        <property>
+          <index>1</index>
+          <owner>TestPlayer</owner>
+          <houses>0</houses>
+        </property>
+      </properties>
+    </monopolygame>
