@@ -5,7 +5,8 @@ ThisBuild / scalaVersion := "3.3.5"
 lazy val root = (project in file("."))
   .settings(
     name := "Monopoly",
-    coverageExcludedPackages := "<empty>;de.htwg.view.*;de.htwg.model.modelBaseImple.SoundPlayer;de.htwg.model.IPlayer;"
+    coverageExcludedPackages := "<empty>;de.htwg.view.*;" +
+      "de.htwg.model.modelBaseImple.SoundPlayer;de.htwg.model.IPlayer;"
   )
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
@@ -33,3 +34,4 @@ libraryDependencies ++= {
   Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
     .map(m => "org.openjfx" % s"javafx-$m" % "16" classifier osName)
 }
+
