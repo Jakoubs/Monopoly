@@ -14,7 +14,6 @@ case class MonopolyGame(
                        ) extends IMonopolyGame {
 
   def createGame: IMonopolyGame = {
-    println("⚠️ [DEBUG] createGame wurde aufgerufen!") // <--- TEST
     MonopolyGame(
       players = players,
       board = board,
