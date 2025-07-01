@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "3.3.5"
 lazy val root = (project in file("."))
   .settings(
     name := "Monopoly",
-    coverageExcludedPackages := "<empty>;de.htwg.view.*;de.htwg.SoundPlayer;"
+    coverageExcludedPackages := "<empty>;de.htwg.view.*;de.htwg.model.modelBaseImple.SoundPlayer;de.htwg.model.IPlayer;"
   )
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
@@ -15,7 +15,6 @@ Compile/mainClass := Some("de.htwg.Monopoly")
 
 
 libraryDependencies ++= {
-  // Determine OS version of JavaFX binaries
   lazy val osName = System.getProperty("os.name") match {
     case n if n.startsWith("Linux") => "linux"
     case n if n.startsWith("Mac") =>
