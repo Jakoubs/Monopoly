@@ -1,41 +1,17 @@
 <monopolygame>
       <sound>true</sound>
-      <currentPlayer>2</currentPlayer>
+      <currentPlayer>-1</currentPlayer>
       <players>
-        <player>
-          <name>🐺</name>
-          <balance>1300</balance>
-          <position>16</position>
-          <isInJail>false</isInJail>
-          <consecutiveDoubles>0</consecutiveDoubles>
-        </player><player>
-          <name>🐝</name>
-          <balance>1220</balance>
-          <position>15</position>
-          <isInJail>false</isInJail>
-          <consecutiveDoubles>0</consecutiveDoubles>
-        </player><player>
-          <name>🐙</name>
-          <balance>1400</balance>
-          <position>17</position>
-          <isInJail>false</isInJail>
-          <consecutiveDoubles>1</consecutiveDoubles>
-        </player><player>
-          <name>🦋</name>
-          <balance>1500</balance>
-          <position>8</position>
-          <isInJail>false</isInJail>
-          <consecutiveDoubles>0</consecutiveDoubles>
-        </player>
+        
       </players>
       <properties>
         <property>
           <index>2</index>
-          <owner>🐺</owner>
+          <owner></owner>
           <houses>5</houses>
         </property><property>
           <index>4</index>
-          <owner>🐺</owner>
+          <owner></owner>
           <houses>0</houses>
         </property><property>
           <index>6</index>
@@ -47,11 +23,11 @@
           <houses>0</houses>
         </property><property>
           <index>9</index>
-          <owner>🐙</owner>
+          <owner></owner>
           <houses>0</houses>
         </property><property>
           <index>10</index>
-          <owner>🐝</owner>
+          <owner></owner>
           <houses>0</houses>
         </property><property>
           <index>12</index>
@@ -67,11 +43,11 @@
           <houses>0</houses>
         </property><property>
           <index>15</index>
-          <owner>🐝</owner>
+          <owner></owner>
           <houses>0</houses>
         </property><property>
           <index>16</index>
-          <owner>🐺</owner>
+          <owner></owner>
           <houses>0</houses>
         </property><property>
           <index>17</index>

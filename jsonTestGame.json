@@ -1,0 +1,20 @@
+{
+  "sound": true,
+  "currentPlayerIndex": 0,
+  "players": [
+    {
+      "name": "Tester",
+      "balance": 500,
+      "position": 1,
+      "isInJail": false,
+      "consecutiveDoubles": 0
+    }
+  ],
+  "properties": [
+    {
+      "index": 1,
+      "owner": "Tester",
+      "houses": 0
+    }
+  ]
+}
