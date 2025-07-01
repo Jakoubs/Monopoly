@@ -22,6 +22,7 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.util.Duration
 import scalafx.geometry.Insets
 import scalafx.stage.Modality
+import de.htwg.model.modelBaseImple.SoundPlayer
 
 import scala.util.{Random, Try}
 import scalafx.scene.control.Alert
@@ -123,6 +124,7 @@ object GUI extends JFXApp3 with Observer {
       rollDiceButton.minHeight = 40
       rollDiceButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
       rollDiceButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(enter)) // Keep this single call
         val timeline = new Timeline {
           var count = 0
@@ -211,6 +213,7 @@ object GUI extends JFXApp3 with Observer {
       buyPropertyButton.minHeight = 40
       buyPropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #f0ad4e; -fx-text-fill: white;"
       buyPropertyButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(y))
       }
 
@@ -218,6 +221,7 @@ object GUI extends JFXApp3 with Observer {
       refusePropertyButton.minHeight = 40
       refusePropertyButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #d9534f; -fx-text-fill: yellow;"
       refusePropertyButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(n))
       }
 
@@ -225,6 +229,7 @@ object GUI extends JFXApp3 with Observer {
       endTurnButton.minHeight = 40
       endTurnButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #d9534f; -fx-text-fill: white;"
       endTurnButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(end))
       }
 
@@ -232,6 +237,7 @@ object GUI extends JFXApp3 with Observer {
       payJailFineButton.minHeight = 40
       payJailFineButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #7289DA; -fx-text-fill: white;"
       payJailFineButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(pay))
       }
 
@@ -239,6 +245,7 @@ object GUI extends JFXApp3 with Observer {
       confirmBuyHouseButton.minHeight = 40
       confirmBuyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
       confirmBuyHouseButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(buy))
       }
 
@@ -246,6 +253,7 @@ object GUI extends JFXApp3 with Observer {
       declineBuyHouseButton.minHeight = 40
       declineBuyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #d9534f; -fx-text-fill: white;"
       declineBuyHouseButton.onAction = _ => {
+        SoundPlayer().playBackground("src/main/resources/sound/click.wav")
         gameController.foreach(_.handleInput(end))
       }
 
@@ -449,6 +457,7 @@ object GUI extends JFXApp3 with Observer {
         saveButton.minHeight = 40
         saveButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
         saveButton.onAction = _ => {
+          SoundPlayer().playBackground("src/main/resources/sound/click.wav")
           new TextInputDialog() {
             initOwner(stage)
             title = "Spielstand speichern"
@@ -471,6 +480,7 @@ object GUI extends JFXApp3 with Observer {
         loadButton.minHeight = 40
         loadButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #ffffff; -fx-text-fill: black;"
         loadButton.onAction = _ => {
+          SoundPlayer().playBackground("src/main/resources/sound/click.wav")
           val slots = gameController.get.availableSlots
           if (slots.isEmpty) {
             new Alert(AlertType.Information) {
@@ -491,6 +501,7 @@ object GUI extends JFXApp3 with Observer {
                 minWidth = 200
                 style = "-fx-font: normal bold 14pt sans-serif;"
                 onAction = _ => {
+                  SoundPlayer().playBackground("src/main/resources/sound/click.wav")
                   dialog.setResult(slot)
                   dialog.close()
                 }
@@ -524,15 +535,12 @@ object GUI extends JFXApp3 with Observer {
       HBox.setHgrow(leftColumn, Priority.Always)
     }
 
-    // Trade Button Action korrekt implementieren
     tradeButton.onAction = _ => {
+      SoundPlayer().playBackground("src/main/resources/sound/click.wav")
       println(s"Current state: isShowingTradePanel = $isShowingTradePanel") // Debug
-
       if (isShowingTradePanel) {
-        // Wechsel zurück zu Board Panel
         switchToPanel(false)
       } else {
-        // Wechsel zu Trade Panel
         switchToPanel(true)
       }
     }
