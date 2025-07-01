@@ -180,7 +180,9 @@ object GUI extends JFXApp3 with Observer {
 
                     validationResult match {
                       case scala.util.Success(_) =>
+                        ctrl.handleInput(OpEnum.buy)
                         ctrl.handleInput(OpEnum.fieldSelected(intValue))
+                        println(ctrl.state)
                       case scala.util.Failure(e) =>
                         new Alert(AlertType.Error) {
                           initOwner(stage)
@@ -384,7 +386,7 @@ object GUI extends JFXApp3 with Observer {
 
       if (showTradePanel) {
         // Trade Panel hinzufügen und konfigurieren
-        tradePanel.refresh()
+        //tradePanel.refresh()
         contentContainer.children += tradePanel
         VBox.setVgrow(tradePanel, Priority.Always)
         tradePanel.visible = true

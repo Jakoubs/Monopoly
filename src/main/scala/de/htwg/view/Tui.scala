@@ -108,7 +108,8 @@ class Tui(controller: IController) extends Observer {
               controller.handleInput(OpEnum.LoadWithName(name))
             case _ =>
               Try(input.toInt).toOption match {
-                case Some(id) => controller.handleInput(OpEnum.fieldSelected(id))
+                case Some(id) =>
+                  controller.handleInput(OpEnum.fieldSelected(id))
                 case None => println("Ungültige Eingabe.")
               }
           }
