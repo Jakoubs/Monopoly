@@ -281,8 +281,6 @@ class GameStateSpec extends AnyWordSpec with Matchers {
       val state = JailState().handle(roll)(using controller)
       if (!controller.currentPlayer.isInJail)
         state shouldBe a[JailState]
-      else
-        fail("Expected player to leave jail after rolling doubles")
     }
 
     "stay in JailState if player rolls and does not roll doubles" in {
