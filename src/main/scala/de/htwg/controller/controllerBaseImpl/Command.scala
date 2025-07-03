@@ -49,9 +49,11 @@ case class BuyCommand[T <: BuyableField](
 
       PropertyField.House().buyHouse(player, field, controller.game) match {
         case Success((updatedField: PropertyField, updatedPlayer: IPlayer)) =>
+          executedState = Some((updatedField, updatedPlayer))
           controller.updateBoardAndPlayer(updatedField, updatedPlayer)
         case Failure(exception) =>
       }
+
     }
 
     def undo(): Unit = {
@@ -75,6 +77,7 @@ case class RollDiceCommand()(using controller: Controller) extends Command {
     def execute(): Unit = {
       previousPlayerState = Some(controller.currentPlayer)
       rollResult = controller.game.rollDice(controller.sound)
+      executedState = Some(controller.currentPlayer)
     }
 
     def undo(): Unit = {
@@ -97,7 +100,8 @@ case class PayJailFeeCommand()(using controller: Controller, player: IPlayer) ex
         isInJail = false,
         balance = player.balance - 50,
       )
-        controller.updatePlayer(updatedPlayer)
+      executedState = Some(updatedPlayer)
+      controller.updatePlayer(updatedPlayer)
     }
 
     def undo(): Unit = {
