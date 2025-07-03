@@ -77,7 +77,7 @@ case class RollDiceCommand()(using controller: Controller) extends Command {
     def execute(): Unit = {
       previousPlayerState = Some(controller.currentPlayer)
       rollResult = controller.game.rollDice(controller.sound)
-      executedState = Some(controller.currentPlayer)
+      executedPlayerState = Some(controller.currentPlayer)
     }
 
     def undo(): Unit = {
