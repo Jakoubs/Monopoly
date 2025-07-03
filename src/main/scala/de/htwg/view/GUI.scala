@@ -14,7 +14,7 @@ import scalafx.Includes.*
 import scalafx.application.Platform
 import de.htwg.view.BoardPanel
 import de.htwg.controller.controllerBaseImpl.OpEnum.{buy, end, enter, n, pay, y, SaveWithName, LoadWithName}
-import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
+import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, EndTurnState, GameState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, StartTurnState}
 import de.htwg.model.modelBaseImple.{BoardField, Dice, GoField, GoToJailField, JailField, Player, PropertyField, TaxField, TrainStationField, UtilityField}
 import scalafx.animation.{KeyFrame, Timeline}
 import scalafx.collections.ObservableBuffer
@@ -44,7 +44,6 @@ object GUI extends JFXApp3 with Observer {
   private lazy val refusePropertyButton = new Button("Passen")
   private lazy val endTurnButton = new Button("Zug beenden")
   private lazy val payJailFineButton = new Button("Kaution zahlen")
-  private lazy val confirmBuyHouseButton = new Button("Bestätigen")
   private lazy val declineBuyHouseButton = new Button("Abbrechen")
   private lazy val saveButton = new Button("save")
   private lazy val loadButton = new Button("load")
@@ -58,7 +57,7 @@ object GUI extends JFXApp3 with Observer {
   private lazy val houseConfirmationButtons = new HBox {
     spacing = 15
     alignment = Pos.Center
-    children = Seq(confirmBuyHouseButton, declineBuyHouseButton)
+    children = Seq(declineBuyHouseButton)
   }
 
   private lazy val turnInfoLabel = new Label {
@@ -237,12 +236,6 @@ object GUI extends JFXApp3 with Observer {
         gameController.foreach(_.handleInput(pay))
       }
 
-      confirmBuyHouseButton.minWidth = 120
-      confirmBuyHouseButton.minHeight = 40
-      confirmBuyHouseButton.style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
-      confirmBuyHouseButton.onAction = _ => {
-        gameController.foreach(_.handleInput(buy))
-      }
 
       declineBuyHouseButton.minWidth = 120
       declineBuyHouseButton.minHeight = 40
@@ -339,9 +332,6 @@ object GUI extends JFXApp3 with Observer {
           // Modal dialog is open, but we keep the buttons for context
           setVisible(endTurnButton, true)
           setVisible(buyHouseButton, true)
-
-        case ConfirmBuyHouseState(_, _) =>
-          setVisible(houseConfirmationButtons, true)
 
         case EndTurnState() =>
           // Transient state, triggers next turn
