@@ -83,7 +83,7 @@ case class PropertyField(name: String, index: Int, price: Int, rent: Int, owner:
                 // If all checks pass, proceed with the purchase
                 val updatedField = field.copy(house = PropertyField.House(field.house.amount + 1))
                 val updatedPlayer = player.copyPlayer(balance = player.balance - housePrice)
-                if(game.sound){
+                if (game.sound) {
                   SoundPlayer().playBackground("src/main/resources/sound/house.wav")
                 }
                 (updatedField, updatedPlayer)

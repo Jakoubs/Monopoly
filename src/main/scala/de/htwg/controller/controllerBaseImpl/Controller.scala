@@ -47,6 +47,7 @@ case class TurnInfo(
 class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IController with Observable{
   given controller: Controller = this
   var currentTurnInfo: TurnInfo = TurnInfo()
+
   private val undoStack: mutable.Stack[Command] = mutable.Stack()
   private val redoStack: mutable.Stack[Command] = mutable.Stack()
 
@@ -95,14 +96,6 @@ class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IContro
     game = game.withNextPlayer
   }
 
-  def executeCommand(cmd: Command): Unit = {
-    cmd.previousGameStates = Some(state)   // Zustand vor Ausführung
-    cmd.execute()
-    cmd.nextGameStates = Some(state)       // Zustand nach Ausführung
-    undoStack.push(cmd)
-    redoStack.clear()
-  }
-
   def saveSlot(slotName: String): Try[Unit] = {
     val path = SaveManager.slotPath(slotName)
     fileIO.save(game, path)
@@ -117,36 +110,41 @@ class Controller(var game: IMonopolyGame)(using fileIO: IFileIO) extends IContro
         notifyObservers()
         Success(())
       case Failure(err) =>
-        println(s"❌ Fehler beim Laden: ${err.getMessage}")
         Failure(err)
     }
   }
 
   def availableSlots: Vector[String] = SaveManager.listSlots
 
+  def executeCommand(cmd: Command): Unit = {
+    cmd.execute()
+    undoStack.push(cmd)
+    redoStack.clear()
+    notifyObservers()
+  }
+
   def undo(): Unit = {
     if (undoStack.nonEmpty) {
       val cmd = undoStack.pop()
       cmd.undo()
-      cmd.previousGameStates.foreach(state = _) 
       redoStack.push(cmd)
+      notifyObservers()
     }
-  }
-
-  def setState(newState: GameState): Unit = {
-    state = newState
-    notifyObservers()
   }
 
   def redo(): Unit = {
     if (redoStack.nonEmpty) {
       val cmd = redoStack.pop()
-      cmd.execute()
-      cmd.nextGameStates.foreach(state = _) 
+      cmd.redo()
       undoStack.push(cmd)
       notifyObservers()
     }
+  }
 
+
+  def setState(newState: GameState): Unit = {
+    state = newState
+    notifyObservers()
   }
 
   def isGameOver: Boolean = game.players.count(_.balance > 0) <= 1

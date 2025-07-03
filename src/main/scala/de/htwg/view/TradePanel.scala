@@ -6,15 +6,12 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Button, CheckBox, ComboBox, Dialog, Label, TextField}
 import scalafx.scene.layout.{HBox, VBox}
-import de.htwg.model.modelBaseImple.Trade
-import de.htwg.model.modelBaseImple.Player
-import de.htwg.model.modelBaseImple.BoardField
-import de.htwg.model.modelBaseImple.BuyableField
+import de.htwg.model.modelBaseImple.{BoardField, BuyableField, Player, PropertyField, Trade, TrainStationField, UtilityField}
 import de.htwg.util.util.Observable
 import scalafx.scene.control.ButtonType
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.control.ControlIncludes.jfxDialogPane2sfx
-
+import scalafx.scene.Node as SFXNode
 
 class TradePanel(controller: IController) extends VBox with Observable {
   spacing = 20
@@ -33,23 +30,19 @@ class TradePanel(controller: IController) extends VBox with Observable {
   private var moneyFieldDemand: TextField = _
   private var actionButtonsBox: HBox = _
 
-
-  // Method to refresh/rebuild the panel
   def refreshPanel(): Unit = {
-    children.clear() // Clear existing children before rebuilding
+    children.clear()
     buildPanel()
   }
+
   private def buildPanel(): Unit = {
-    // Re-initialize otherPlayerComboBox to ensure items are fresh
     otherPlayerComboBox = new ComboBox[String] {
-      // Update items with current players, excluding the current player
       items = ObservableBuffer(controller.players.filter(_ != controller.currentPlayer).map(_.name): _*)
       promptText = "Wähle einen Spieler"
       prefWidth = 200
       style = "-fx-font: normal 12pt sans-serif;"
     }
 
-    // Player selection section
     playerSelectionBox = new VBox {
       spacing = 10
       alignment = Pos.Center
@@ -65,6 +58,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
     moneyFieldOffer = new TextField {
       promptText = "Betrag eingeben"
       prefWidth = 150
+      text = "0"
     }
 
     offerBox = new VBox {
@@ -85,7 +79,6 @@ class TradePanel(controller: IController) extends VBox with Observable {
       private val propertiesBox = new VBox {
         spacing = 10
         alignment = Pos.TopLeft
-        // Ensure this always shows the *current player's* properties
         children = controller.currentPlayer.getProperties(controller.board.fields).map { property =>
           new CheckBox(property.name) {
             style = "-fx-font: normal 12pt sans-serif; -fx-text-fill: white;"
@@ -99,6 +92,7 @@ class TradePanel(controller: IController) extends VBox with Observable {
     moneyFieldDemand = new TextField {
       promptText = "Betrag eingeben"
       prefWidth = 150
+      text = "0"
     }
 
     demandBox = new VBox {
@@ -119,10 +113,8 @@ class TradePanel(controller: IController) extends VBox with Observable {
       private val propertiesBox = new VBox {
         spacing = 10
         alignment = Pos.TopLeft
-        // Initial empty, will be populated by ComboBox action
       }
 
-      // This is crucial: the ComboBox action updates the properties for the *selected* player
       otherPlayerComboBox.onAction = _ => {
         propertiesBox.children.clear()
         val selectedPlayerName = Option(otherPlayerComboBox.value.value).filter(_.nonEmpty)
@@ -140,95 +132,117 @@ class TradePanel(controller: IController) extends VBox with Observable {
 
       children = Seq(moneyLabel, moneyFieldDemand, propertiesLabel, propertiesBox)
     }
+
     val tradeBoxesContainer = new HBox {
       spacing = 20
       alignment = Pos.Center
       children = Seq(offerBox, demandBox)
     }
+
     actionButtonsBox = new HBox {
       spacing = 30
       alignment = Pos.Center
+
 
       private val confirmButton = new Button("Handel vorschlagen") {
         style = "-fx-font: normal bold 14pt sans-serif; -fx-background-color: #5cb85c; -fx-text-fill: white;"
         prefWidth = 200
         prefHeight = 40
         onAction = _ => {
-          val confirmButtonType = new ButtonType("Bestätigen", ButtonData.OKDone)
-          val cancelButtonType = new ButtonType("Ablehnen", ButtonData.CancelClose)
-          val dialog = new Dialog[Boolean]() {
-            title = "Handelsvorschlag"
-            contentText = s"Handel mit ${controller.currentPlayer.name}: Er bietet ${moneyFieldOffer.text.value.toInt}€, du giebst ${moneyFieldDemand.text.value.toInt}€"
-            dialogPane().buttonTypes = Seq(confirmButtonType, cancelButtonType)
-          }
-          dialog.dialogPane().getStylesheets.add(getClass.getResource("/style/dark_mode.css").toExternalForm)
-          dialog.dialogPane().getStyleClass.add("dark-dialog-pane")
-          dialog.resultConverter = dialogButton => {
-            if (dialogButton == confirmButtonType) true else false
-          }
-
-          val result = dialog.showAndWait()
-
           val selectedPlayerOption = Option(otherPlayerComboBox.value.value).filter(_.nonEmpty)
 
           selectedPlayerOption match {
             case Some(selectedPlayerName) =>
               val selectedPlayer = controller.players.find(_.name == selectedPlayerName).getOrElse(controller.currentPlayer)
 
-              val offerAmount = try { moneyFieldOffer.text.value.toInt } catch { case _: NumberFormatException => 0 }
-              val demandAmount = try { moneyFieldDemand.text.value.toInt } catch { case _: NumberFormatException => 0 }
-              if (!(result.get == false)) {
-                Trade().tradeCall(
-                  controller.currentPlayer.asInstanceOf[Player], // The current player initiating the trade
-                  selectedPlayer.asInstanceOf[Player],
-                  offerAmount,
-                  demandAmount
-                ) match {
-                  case Some((p1, p2)) =>
-                    controller.updatePlayer(p1)
-                    val updatedPlayers = controller.players.map { playerInList =>
-                      if (playerInList.name == p2.name) {
-                        p2
-                      } else {
-                        playerInList
-                      }
+              val offerAmount = try {
+                val text = moneyFieldOffer.text.value.trim
+                if (text.isEmpty) 0 else text.toInt
+              } catch {
+                case _: NumberFormatException => 0
+              }
+
+              val demandAmount = try {
+                val text = moneyFieldDemand.text.value.trim
+                if (text.isEmpty) 0 else text.toInt
+              } catch {
+                case _: NumberFormatException => 0
+              }
+
+              def findSelectedCheckBoxesRecursive(node: scalafx.scene.Node): List[String] = {
+                node match {
+                  case cb: CheckBox if cb.selected.value =>
+                    List(cb.text.value)
+                  case vbox: VBox =>
+                    vbox.children.toList.flatMap {
+                      case n: javafx.scene.control.CheckBox => findSelectedCheckBoxesRecursive(new CheckBox(n))
+                      case n: javafx.scene.layout.VBox => findSelectedCheckBoxesRecursive(new VBox(n))
+                      case n: javafx.scene.layout.HBox => findSelectedCheckBoxesRecursive(new HBox(n))
+                      case _ => Nil
                     }
-                    controller.updatePlayers(updatedPlayers)
-                    refreshPanel()
-                    notifyObservers()
-                  case None =>
-                    // Handel fehlgeschlagen, keine Aktion erforderlich
-                    new Alert(AlertType.Warning) {
-                      title = "Warnung"
-                      headerText = "Handel fehlgeschlagen"
-                      contentText = "Der Handel konnte nicht durchgeführt werden."
-                    }.showAndWait()
+                  case hbox: HBox =>
+                    hbox.children.toList.flatMap {
+                      case n: javafx.scene.control.CheckBox => findSelectedCheckBoxesRecursive(new CheckBox(n))
+                      case n: javafx.scene.layout.VBox => findSelectedCheckBoxesRecursive(new VBox(n))
+                      case n: javafx.scene.layout.HBox => findSelectedCheckBoxesRecursive(new HBox(n))
+                      case _ => Nil
+                    }
+                  case _ =>
+                    List.empty
                 }
               }
 
-              refreshPanel()
+              val selectedOfferPropertyNames = findSelectedCheckBoxesRecursive(offerBox)
+              val listOffer = selectedOfferPropertyNames.flatMap { propName =>
+                controller.currentPlayer.getProperties(controller.board.fields)
+                  .find(_.name == propName)
+              }
 
-            case None =>
-              new Alert(AlertType.Warning) {
-                title = "Warnung"
-                headerText = "Kein Spieler ausgewählt"
-                contentText = "Bitte wähle einen Handelspartner aus der Liste aus."
-              }.showAndWait()
+              val selectedDemandPropertyNames = findSelectedCheckBoxesRecursive(demandBox)
+              val listDemand = selectedDemandPropertyNames.flatMap { propName =>
+                selectedPlayer.getProperties(controller.board.fields)
+                  .find(_.name == propName)
+              }
+
+              val confirmButtonType = new ButtonType("Bestätigen", ButtonData.OKDone)
+              val cancelButtonType = new ButtonType("Ablehnen", ButtonData.CancelClose)
+              val dialog = new Dialog[Boolean]() {
+                title = "Handelsvorschlag"
+                val offerDisplay = if (offerAmount > 0) s"${offerAmount}€" else "0€"
+                val demandDisplay = if (demandAmount > 0) s"${demandAmount}€" else "0€"
+                val offerPropsText = if (listOffer.nonEmpty) s" + ${listOffer.map(_.name).mkString(", ")}" else ""
+                val demandPropsText = if (listDemand.nonEmpty) s" + ${listDemand.map(_.name).mkString(", ")}" else ""
+
+                contentText = s"Handel mit $selectedPlayerName:\nDu bietest: ${offerDisplay}${offerPropsText}\nDu verlangst: ${demandDisplay}${demandPropsText}"
+                dialogPane().buttonTypes = Seq(confirmButtonType, cancelButtonType)
+              }
+
+              dialog.dialogPane().getStylesheets.add(getClass.getResource("/style/dark_mode.css").toExternalForm)
+              dialog.dialogPane().getStyleClass.add("dark-dialog-pane")
+              dialog.resultConverter = dialogButton => {
+                if (dialogButton == confirmButtonType) true else false
+              }
+
+              val result = dialog.showAndWait()
+
+              if (result.contains(true)) {
+                val tradeResult = Trade().tradeCall(
+                  controller.currentPlayer.asInstanceOf[Player],
+                  selectedPlayer.asInstanceOf[Player],
+                  offerAmount,
+                  demandAmount)
+              }
           }
         }
       }
 
-      children = Seq(confirmButton)
+      children = Seq(titleLabel, playerSelectionBox, tradeBoxesContainer, actionButtonsBox)
     }
 
-    children = Seq(titleLabel, playerSelectionBox, tradeBoxesContainer, actionButtonsBox)
-  }
+    buildPanel()
 
-  // Initialize the panel by calling buildPanel()
-  buildPanel()
-
-  // Public method to refresh the panel from outside
-  def refresh(): Unit = {
-    refreshPanel()
+    def refresh(): Unit = {
+      refreshPanel()
+    }
   }
 }

@@ -3,7 +3,7 @@ package de.htwg.view
 import de.htwg.controller.IController
 import de.htwg.controller.controllerBaseImpl.OpEnum.roll
 import de.htwg.util.util.{Observable, Observer}
-import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, ConfirmBuyHouseState, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
+import de.htwg.controller.controllerBaseImpl.{AdditionalActionsState, BuyHouseState, BuyPropertyState, EndTurnState, JailState, MovingState, OpEnum, PropertyDecisionState, RollingState, TurnInfo}
 
 import scala.io.StdIn.readLine
 import scala.util.Try
@@ -108,28 +108,10 @@ class Tui(controller: IController) extends Observer {
               controller.handleInput(OpEnum.LoadWithName(name))
             case _ =>
               Try(input.toInt).toOption match {
-                case Some(id) => controller.handleInput(OpEnum.fieldSelected(id))
+                case Some(id) =>
+                  controller.handleInput(OpEnum.fieldSelected(id))
                 case None => println("Ungültige Eingabe.")
               }
-          }
-        case _: ConfirmBuyHouseState =>
-          println("Kauf bestätigen? (y/n)")
-          val input = readLine()
-          input match {
-            case "y" => controller.handleInput(OpEnum.buy)
-            case "n" => controller.handleInput(OpEnum.end)
-            case "s" =>
-              print("Speichern unter Namen: ")
-              val name = readLine().trim
-              controller.handleInput(OpEnum.SaveWithName(name))
-
-            case "l" =>
-              println("Verfügbare Speicherstände:")
-              controller.availableSlots.zipWithIndex.foreach { case (f, i) => println(s"${i+1}) $f") }
-              print("Name des Slots zum Laden: ")
-              val name = readLine().trim
-              controller.handleInput(OpEnum.LoadWithName(name))
-            case _ => println("Ungültige Eingabe. Aktion wird abgebrochen."); controller.handleInput(OpEnum.end)
           }
         case _: RollingState =>
           println("Press enter to roll a dice")
