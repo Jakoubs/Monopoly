@@ -6,4 +6,5 @@ WORKDIR /monopoly
 
 COPY . .
 
-CMD ["sbt", "run"]
+ENTRYPOINT ["sbt"]
+CMD ["run"]

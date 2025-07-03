@@ -30,12 +30,12 @@ object Monopoly:
     val controller = Controller(game)
     gameController = Some(controller)
 
-    Future {
+    //Future {
       val tui = Tui(controller)
       tui.run()
-    }
+    //}
 
-    GUI.main(args)
+    //GUI.main(args)
   }
 
   def defineGame(): IMonopolyGame = {

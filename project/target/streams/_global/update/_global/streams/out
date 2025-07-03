@@ -1,3 +1,4 @@
-[0m[[0m[0mdebug[0m] [0m[0mnot up to date. inChanged = true, force = false[0m
-[0m[[0m[0mdebug[0m] [0m[0mUpdating ProjectRef(uri("file:/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/project/"), "projekt-build")...[0m
-[0m[[0m[0mdebug[0m] [0m[0mDone updating ProjectRef(uri("file:/home/jakob/Dokumente/03_SoSe25/04_SoEn/Projekt/project/"), "projekt-build")[0m
+[0m[[0m[33mwarn[0m] [0m[0msbt-scoverage_2.12_1.0-2.3.1.jar no longer exists at /home/jakob/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scoverage/sbt-scoverage_2.12_1.0/2.3.1/sbt-scoverage_2.12_1.0-2.3.1.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0mnot up to date. inChanged = false, force = false[0m
+[0m[[0m[0mdebug[0m] [0m[0mUpdating ProjectRef(uri("file:/Users/timbrutscher/Documents/Uni/Semester%203/Software%20Engineering/Monopoly/project/"), "monopoly-build")...[0m
+[0m[[0m[0mdebug[0m] [0m[0mDone updating ProjectRef(uri("file:/Users/timbrutscher/Documents/Uni/Semester%203/Software%20Engineering/Monopoly/project/"), "monopoly-build")[0m
